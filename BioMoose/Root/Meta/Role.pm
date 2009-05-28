@@ -4,9 +4,9 @@ use Moose;
 
 extends 'Moose::Meta::Role';
 
-# overarching BioPerl-relates, role-specific stuff here
-
 no Moose;
+
+# overarching BioPerl-relates, role-specific stuff here
 
 1;
 
