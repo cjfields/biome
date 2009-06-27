@@ -1,4 +1,4 @@
-package Bio::Moose::Root::Role;
+package Bio::Moose::Role;
 
 use Moose::Role ();
 

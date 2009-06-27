@@ -2,7 +2,14 @@ package Bio::Moose::Root::Error;
 
 use Moose;
 
-# there is some oddity with order of loading that is causing problems, may need to use BUILDALL
+# Some oddity with order of loading that is causing problems, likely
+# Moose-related, may need to use BUILDALL
+
+# also, Exception::Class::Base is strict re: passed arguments (throws when
+# fields aren't present). This class makes it work within a Moose framework. We
+# can't guarantee a non-Bio::Moose::Root::Error (beyond those already know to
+# work with Moose) will work at this time.
+
 extends qw(Moose::Object Exception::Class::Base);
 
 sub new {

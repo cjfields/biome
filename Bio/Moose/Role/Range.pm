@@ -1,6 +1,6 @@
 package Bio::Moose::Role::Range;
 
-use Bio::Moose::Root::Role;
+use Bio::Moose::Role;
 
 # not sure about implementing these yet:
 
@@ -36,10 +36,10 @@ has end     => (
 has strand  => (
     isa     => 'Int',
     is      => 'rw',
-    where   => sub {
-        $_ >= -1 && $_ <= 1
-    },
-    default => 0
+    #where   => sub {
+    #    $_ >= -1 && $_ <= 1
+    #},
+    default => 0,
 );
 
 sub length {
@@ -57,7 +57,8 @@ our %VALID_STRAND_TESTS = (
 
 sub _strong {
     my ($s1, $s2) = ($_[0]->strand, $_[1]->strand);
-    ($s1 != 0 && $s1 == $s2) ? 1 : 0 }
+    ($s1 != 0 && $s1 == $s2) ? 1 : 0
+}
 
 sub _weak {
     my ($s1, $s2) = ($_[0]->strand, $_[1]->strand);
@@ -79,21 +80,24 @@ sub _testStrand() {
 sub overlaps {
     my ($self, $other, $so) = @_;
     $self->_eval_ranges($other);
-    ($self->_testStrand($other, $so) && !(($self->start() > $other->end() || $self->end() < $other->start())))
+    ($self->_testStrand($other, $so)
+        && !(($self->start() > $other->end() || $self->end() < $other->start())))
     ? 1 : 0;
 }
 
 sub contains {
     my ($self, $other, $so) = @_;
     $self->_eval_ranges($other);
-    ($self->_testStrand($other, $so) && $other->start() >= $self->start() && $other->end() <= $self->end()) ?
-    1 : 0;
+    ($self->_testStrand($other, $so)
+        && $other->start() >= $self->start() && $other->end() <= $self->end())
+    ? 1 : 0;
 }
 
 sub equals {
     my ($self, $other, $so) = @_;
     $self->_eval_ranges($other);
-    ($self->_testStrand($other, $so)   && $self->start() == $other->start() && $self->end()   == $other->end() )
+    ($self->_testStrand($other, $so)
+        && $self->start() == $other->start() && $self->end() == $other->end())
     ? 1 : 0;
 }
 
@@ -218,7 +222,7 @@ sub overlap_extent{
 	}
 }
 
-sub subtract() {
+sub subtract {
     my ($self, $range, $so) = @_;
 
     return $self unless $self->_testStrand($range, $so);
@@ -258,7 +262,7 @@ sub subtract() {
 }
 
 # should be genericized for nonstranded Ranges.  I'm not sure about
-# modifying the strand in place
+# modifying the object in place...
 
 sub offset_stranded {
     my ($self, $offset_fiveprime, $offset_threeprime) = @_;
@@ -270,6 +274,7 @@ sub offset_stranded {
     return $self;
 }
 
+# may make this abstract...
 sub to_string {
     my $self = shift;
     return sprintf("(%s, %s) strand=%d", $self->start, $self->end, $self->strand);
@@ -291,104 +296,11 @@ sub _eval_ranges {
     }
 }
 
-no Bio::Moose::Root::Role;
+no Bio::Moose::Role;
 
 1;
 
 __END__
-
-# $Id: RangeI.pm 15549 2009-02-21 00:48:48Z maj $
-#
-# BioPerl module for Bio::RangeI
-#
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
-#
-# Cared for by Lehvaslaiho <heikki-at-bioperl-dot-org>
-#
-# Copyright Matthew Pocock
-#
-# You may distribute this module under the same terms as perl itself
-#
-# POD documentation - main docs before the code
-
-=head1 NAME
-
-Bio::RangeI - Range interface
-
-=head1 SYNOPSIS
-
-  #Do not run this module directly
-
-=head1 DESCRIPTION
-
-This provides a standard BioPerl range interface that should be
-implemented by any object that wants to be treated as a range. This
-serves purely as an abstract base class for implementers and can not
-be instantiated.
-
-Ranges are modeled as having (start, end, length, strand). They use
-Bio-coordinates - all points E<gt>= start and E<lt>= end are within the
-range. End is always greater-than or equal-to start, and length is
-greater than or equal to 1. The behaviour of a range is undefined if
-ranges with negative numbers or zero are used.
-
-So, in summary:
-
-  length = end - start + 1
-  end >= start
-  strand = (-1 | 0 | +1)
-
-=head1 FEEDBACK
-
-=head2 Mailing Lists
-
-User feedback is an integral part of the evolution of this and other
-Bioperl modules. Send your comments and suggestions preferably to one
-of the Bioperl mailing lists.  Your participation is much appreciated.
-
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
-
-=head2 Support 
- 
-Please direct usage questions or support issues to the mailing list:
-  
-L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
-with code and data examples if at all possible.
-
-=head2 Reporting Bugs
-
-Report bugs to the Bioperl bug tracking system to help us keep track
-the bugs and their resolution.  Bug reports can be submitted via the
-web:
-
-  http://bugzilla.bioperl.org/
-
-=head1 AUTHOR - Heikki Lehvaslaiho
-
-Email:  heikki-at-bioperl-dot-org
-
-=head1 CONTRIBUTORS
-
-Juha Muilu (muilu@ebi.ac.uk)
-Sendu Bala (bix@sendu.me.uk)
-Malcolm Cook (mec@stowers-institute.org)
-Stephen Montgomery (sm8 at sanger.ac.uk)
-
-=head1 APPENDIX
-
-The rest of the documentation details each of the object
-methods. Internal methods are usually preceded with a _
-
-=cut
-
-=head1 Abstract methods
-
-These methods must be implemented in all subclasses.
 
 =head2 start
 
