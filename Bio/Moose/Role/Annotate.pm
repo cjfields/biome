@@ -1,9 +1,6 @@
+package Bio::Moose::Role::Annotate;
 
-package Bio::Moose::Role::Annotation;
-
-use Moose::Role;
-
-
+use Bio::Moose::Role;
 
 =head2 as_text
 
@@ -15,12 +12,11 @@ use Moose::Role;
  Example :
  Returns : a string
  Args    : none
-
+ Status  : Stable
 
 =cut
 
 requires 'as_text';
-
 
 =head2 display_text
 
@@ -40,9 +36,9 @@ requires 'as_text';
  Example :
  Returns : a string
  Args    : [optional] callback
+ Status  : Stable
 
 =cut
-
 
 requires 'display_text';
 
@@ -54,10 +50,9 @@ requires 'display_text';
  Example :
  Returns : a hash reference
  Args    : none
-
+ Status  : Uncertain
 
 =cut
-
 
 require 'hash_tree';
 
@@ -77,14 +72,15 @@ require 'hash_tree';
  Example :
  Returns : value of tagname (a scalar)
  Args    : new value (a scalar, optional)
-
+ Status  : Stable
 
 =cut
 
+has tag_name => (
+   is    => 'rw',
+   does  => 'Str'
+);
 
-require 'tagname';
-
-
-no Moose::Role;
+no Bio::Moose::Role;
 
 1;
