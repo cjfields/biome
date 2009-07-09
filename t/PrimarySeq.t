@@ -18,12 +18,6 @@ BEGIN {
     with qw(Bio::Moose::Role::PrimarySeq
 			Bio::Moose::Role::Describe
 			Bio::Moose::Role::Identify);
-    
-	# by default, object_id*( is an alias for accession_number
-	
-	#has object_id => {
-	#	#trigger => sub { shift->accession_number(@_) }
-	#};
 	
     no Bio::Moose;
     __PACKAGE__->meta->make_immutable;
