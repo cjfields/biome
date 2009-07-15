@@ -44,7 +44,7 @@ isa_ok($table, 'HASH');
 #
 #my $stream  = Bio::Tools::IUPAC->new('-seq' => $ambiseq);
 #is $stream->count(), 4;
-#
+
 #my $b = 1; 
 #while (my $uniqueseq = $stream->next_seq()) {
 #    if( ! $uniqueseq->isa('Bio::Seq') ) {

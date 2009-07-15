@@ -5,7 +5,7 @@ use strict;
 
 BEGIN { 
 	use lib '.';
-    use Test::More tests => 28;
+    use Test::More tests => 40;
     use Test::Moose;
     use Test::Exception;
 	use_ok('Bio::Moose::Tools::CodonTable');
