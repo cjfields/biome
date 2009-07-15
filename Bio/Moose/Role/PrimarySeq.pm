@@ -2,7 +2,7 @@ package Bio::Moose::Role::PrimarySeq;
 
 use Bio::Moose::Role;
 
-#requires qw(translate);
+use Bio::Moose::Tools::CodonTable;
 
 # greedy method, guaranteed to return a raw sequence
 # may need make this into a separate method as opposed to an attribute
@@ -27,6 +27,9 @@ has is_circular => (
 # should allow a narrow set of symbols for now, maybe enum, i.e. GAP, RESIDUE,
 # FRAMESHIFT)
 
+# Should we role Range into this as well?  Every sequence has a start/end/strand,
+# in this case start = 1, end = length -1, strand maybe based on alphabet or 0
+
 has symbols => (
     is   => 'rw',
     isa  => 'HashRef[Str]',
@@ -39,7 +42,7 @@ has symbols => (
 # alias for rawseq, to disambiguate use of this from returning an object
 sub seq {
     my $self = shift;
-    $self->rawseq();
+    $self->rawseq(@_);
 }
 
 # returns raw subsequence; trunc() returns similar, but object
@@ -159,120 +162,110 @@ sub trunc {
     return $self->clone(-rawseq => $self->subseq(@_));
 }
 
-# needs minor cleaning up, CodonTable (or similar) implementation
-# Speaking of, we need a common base class that contains simple
-# data, such as IUPAC, codon table info, etc. 
-
 sub translate {
     my ($self,@args) = @_;
-    $self->throw_not_implemented();
-    #my ($terminator, $unknown, $frame, $codonTableId, $complete, $throw,
-    #     $codonTable, $orf, $start_codon, $offset) =
-    #        $self->rearrange([qw(TERMINATOR
-    #                           UNKNOWN
-    #                           FRAME
-    #                           CODONTABLE_ID
-    #                           COMPLETE
-    #                           THROW
-    #                           CODONTABLE
-    #                           ORF
-    #                           START
-    #                           OFFSET)], @args);
-    ### Initialize termination codon, unknown codon, codon table id, frame
-    #$terminator //= '*';
-    #$unknown //= "X";
-    #$frame //= 0;
-    #$codonTableId //= 1;
-    #
-    ### Get a CodonTable, error if custom CodonTable is invalid
-    ##if ($codonTable) {
-    ##     $self->throw("Need a Bio::Tools::CodonTable object, not ". $codonTable)
-    ##        unless $codonTable->isa('Bio::Tools::CodonTable');
-    ##} else {
-    ##     $codonTable = Bio::Tools::CodonTable->new( -id => $codonTableId);
-    ##}
-    #
-    ### Error if alphabet is "protein"
-    #$self->throw("Can't translate an amino acid sequence.") if
-    #    ($self->alphabet =~ /protein/i);
-    #
-    ### Error if -start parameter isn't a valid codon
-    #if ($start_codon) {
-    #    $self->throw("Invalid start codon: $start_codon.") if
-    #       ( $start_codon !~ /^[A-Z]{3}$/i );
-    #}
-    # 
-    #my $seq;
-    # 
-    #if ($offset) {
-    #   $self->throw("Offset must be 1, 2, or 3.") if
-    #       ( $offset !~ /^[123]$/ );
-    #   my ($start, $end) = ($offset, $self->length);
-    #   ($seq) = $self->subseq($start, $end);
-    #} else {
-    #   ($seq) = $self->seq();
-    #}
-    #
-    ### ignore frame if an ORF is supposed to be found
-    #if ($orf) {
-    #    $seq = $self->_find_orf($seq,$codonTable,$start_codon);
-    #} else {
-    ### use frame, error if frame is not 0, 1 or 2
-    #    $self->throw("Valid values for frame are 0, 1, or 2, not $frame.")
-    #       unless ($frame == 0 or $frame == 1 or $frame == 2);
-    #    $seq = substr($seq,$frame);
-    #}
-    #
-    ### Translate it
-    #my $output = $codonTable->translate($seq);
-    ## Use user-input terminator/unknown
-    #$output =~ s/\*/$terminator/g;
-    #$output =~ s/X/$unknown/g;
-    #
-    ### Only if we are expecting to translate a complete coding region
-    #if ($complete) {
-    #    my $id = $self->display_id;
-    #    # remove the terminator character
-    #    if( substr($output,-1,1) eq $terminator ) {
-    #        chop $output;
-    #    } else {
-    #        $throw && $self->throw("Seq [$id]: Not using a valid terminator codon!");
-    #        $self->warn("Seq [$id]: Not using a valid terminator codon!");
-    #    }
-    #    # test if there are terminator characters inside the protein sequence!
-    #    if ($output =~ /\*/) {
-    #        $throw && $self->throw("Seq [$id]: Terminator codon inside CDS!");
-    #        $self->warn("Seq [$id]: Terminator codon inside CDS!");
-    #    }
-    #    # if the initiator codon is not ATG, the amino acid needs to be changed to M
-    #    if ( substr($output,0,1) ne 'M' ) {
-    #        if ($codonTable->is_start_codon(substr($seq, 0, 3)) ) {
-    #            $output = 'M'. substr($output,1);
-    #        }  elsif ($throw) {
-    #            $self->throw("Seq [$id]: Not using a valid initiator codon!");
-    #        } else {
-    #            $self->warn("Seq [$id]: Not using a valid initiator codon!");
-    #        }
-    #    }
-    #}
-    #
-    #my $seqclass;
-    #if ($self->can_call_new()) {
-    #    $seqclass = ref($self);
-    #} else {
-    #    $seqclass = 'Bio::PrimarySeq';
-    #    $self->_attempt_to_load_Seq();
-    #}
-    #my $out = $seqclass->new( '-seq' => $output,
-    #            '-display_id'  => $self->display_id,
-    #            '-accession_number' => $self->accession_number,
-    #            # is there anything wrong with retaining the
-    #            # description?
-    #            '-desc' => $self->desc(),
-    #            '-alphabet' => 'protein',
-    #  '-verbose' => $self->verbose
-    #              );
-    #return $out;
+    my ($terminator, $unknown, $frame, $codonTableId, $complete, $throw,
+         $codonTable, $orf, $start_codon, $offset) =
+            $self->rearrange([qw(TERMINATOR
+                               UNKNOWN
+                               FRAME
+                               CODONTABLE_ID
+                               COMPLETE
+                               THROW
+                               CODONTABLE
+                               ORF
+                               START
+                               OFFSET)], @args);
+    # Initialize termination codon, unknown codon, codon table id, frame
+    $terminator //= '*';
+    $unknown //= "X";
+    $frame //= 0;
+    $codonTableId //= 1;
+        
+    # Get a CodonTable, error if custom CodonTable is invalid
+    if ($codonTable) {
+         $self->throw("Need a Bio::Moose::Tools::CodonTable object, not ". $codonTable)
+            unless $codonTable->isa('Bio::Moose::Tools::CodonTable');
+    } else {
+         $codonTable = Bio::Moose::Tools::CodonTable->new( -id => $codonTableId);
+    }
+    
+    # Error if alphabet is "protein"
+    $self->throw("Can't translate an amino acid sequence.") if
+        ($self->alphabet eq 'protein');
+
+    ## Error if -start parameter isn't a valid codon
+    if ($start_codon) {
+        $self->throw("Invalid start codon: $start_codon.") if
+           ( $start_codon !~ /^[A-Z]{3}$/i );
+    }
+     
+    my $seq;
+     
+    if ($offset) {
+        $self->throw("Offset must be 1, 2, or 3.") if
+            ( $offset !~ /^[123]$/ );
+        my ($start, $end) = ($offset, $self->length);
+        ($seq) = $self->subseq($start, $end);
+    } else {
+        ($seq) = $self->rawseq();
+    }
+    
+    # ignore frame if an ORF is supposed to be found
+    if ($orf) {
+        $seq = $self->_find_orf($seq,$codonTable,$start_codon);
+    } else {
+        # use frame, error if frame is not 0, 1 or 2
+        $self->throw("Valid values for frame are 0, 1, or 2, not $frame.")
+           unless ($frame == 0 or $frame == 1 or $frame == 2);
+        $seq = substr($seq,$frame);
+    }
+    
+    # TODO:
+    # Preferentially, CodonTable::translate should handle gaps but currently
+    # doesn't; discussion on what to do here
+    
+    # TODO:
+    # this should be normalized to whatever symbols are used for gaps...
+    $seq =~ tr/-//d;
+    
+    # Translate it
+    my $output = $codonTable->translate($seq);
+    # Use user-input terminator/unknown
+    $output =~ s/\*/$terminator/g;
+    $output =~ s/X/$unknown/g;
+
+    # Only if we are expecting to translate a complete coding region
+    if ($complete) {
+        my $id = $self->display_id;
+        # remove the terminator character
+        if( substr($output,-1,1) eq $terminator ) {
+            chop $output;
+        } else {
+            $throw && $self->throw("Seq [$id]: Not using a valid terminator codon!");
+            $self->warn("Seq [$id]: Not using a valid terminator codon!");
+        }
+        # test if there are terminator characters inside the protein sequence!
+        if ($output =~ /\*/) {
+            $throw && $self->throw("Seq [$id]: Terminator codon inside CDS!");
+            $self->warn("Seq [$id]: Terminator codon inside CDS!");
+        }
+        # if the initiator codon is not ATG, the amino acid needs to be changed to M
+        if ( substr($output,0,1) ne 'M' ) {
+            if ($codonTable->is_start_codon(substr($seq, 0, 3)) ) {
+                $output = 'M'. substr($output,1);
+            }  elsif ($throw) {
+                $self->throw("Seq [$id]: Not using a valid initiator codon!");
+            } else {
+                $self->warn("Seq [$id]: Not using a valid initiator codon!");
+            }
+        }
+    }
+
+    return $self->clone(
+                -rawseq     => $output,
+                -alphabet   => 'protein',
+                  );
 }
 
 # account for sequences with gaps
@@ -284,6 +277,49 @@ sub length {
         $len =~ s{$gs}{}g;
     }
     CORE::length($len);
+}
+
+=head2 _find_orf
+
+ Title   : _find_orf
+ Usage   :
+ Function: Finds ORF starting at 1st initiation codon in nucleotide sequence.
+           The ORF is not required to have a termination codon.
+ Example :
+ Returns : A nucleotide sequence or nothing, if no initiation codon is found.
+ Args    : Nucleotide sequence, CodonTable object, alternative initiation
+           codon (optional).
+
+=cut
+
+sub _find_orf {
+	my ($self, $sequence, $codonTable, $start_codon) = @_;
+
+	# find initiation codon and remove leading sequence
+	while ($sequence) {
+		my $codon = substr($sequence,0,3);
+		if ($start_codon) {
+			last if ( $codon =~ /$start_codon/i );
+		} else {
+			last if ($codonTable->is_start_codon($codon));
+		}
+		$sequence = substr($sequence,1);
+	}
+	return unless $sequence;
+
+	# find termination codon and remove trailing sequence
+	my $len = CORE::length($sequence);
+	my $offset = 3;
+	while ($offset < $len) {
+		my $codon = substr($sequence,$offset,3);
+		if ( $codonTable->is_ter_codon($codon) ){
+			$sequence = substr($sequence, 0, $offset + 3);
+			return $sequence;
+		}
+		$offset += 3;
+	}
+	$self->warn("No termination codon found, will translate - sequence:\n$sequence");
+	$sequence;
 }
 
 no Bio::Moose::Role;
