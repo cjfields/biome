@@ -4,7 +4,7 @@ use Moose ();
 
 use Moose::Exporter;
 
-use Bio::Moose::Root::Root;
+#use Bio::Moose::Root;
 use Bio::Moose::Meta::Class;
 
 our $EXCEPTION_CLASS = '';
@@ -26,7 +26,7 @@ sub init_meta {
 	shift;
 	my $moose = Moose->init_meta(
 		@_,
-		base_class 	=> 'Bio::Moose::Root::Root',
+		base_class 	=> 'Bio::Moose::Root',
 		metaclass 	=> 'Bio::Moose::Meta::Class',
 		);
 	

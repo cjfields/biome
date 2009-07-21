@@ -32,25 +32,31 @@ sub raise_error {
 }
 
 sub create_error {
-    my ( $self, $text, @args ) = @_;
-
-    require Carp::Heavy;
-
-    local $error_level = ($error_level || 0 ) + 1;
-
-    my $class = ref $self ? $self->error_class : "Moose::Error::Default";
+    my ( $self, @args ) = @_;
     
+    my $text;
+    local $error_level = ($error_level || 0 ) + 1;    
+    if ( @args % 2 == 1 ) {
+        $text = shift @args;
+    }
+    
+    my %args = (metaclass => $self, last_error => $@, @args );    
+    $text = $args{message} || 'Something wrong!';
+    
+    my $class = ref $self ? $self->error_class : "Moose::Error::Default";
+
     my $std = $self->stack_trace_dump();
     my $title = "------------- EXCEPTION $class -------------";
     my $footer = ('-' x CORE::length($title))."\n";
-    $text ||= '';
     my $msg = "\n$title\n". "MSG: $text\n". $std. $footer."\n";
 
-    my %args = ( message => $msg, metaclass => $self, last_error => $@, @args );
-
+    $args{message} = $msg;
+    
     $args{depth} += $error_level;
 
     Class::MOP::load_class($class);
+
+    require Carp::Heavy;
     
     $class->new(
         Carp::caller_info($args{depth}),
@@ -101,7 +107,7 @@ sub stack_trace{
 
 no Moose;
 
-__PACKAGE__->meta->make_immutable();
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;
 

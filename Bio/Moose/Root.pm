@@ -1,4 +1,4 @@
-package Bio::Moose::Root::Root;
+package Bio::Moose::Root;
 use Moose 0.79;
 
 extends 'Moose::Object';
@@ -12,166 +12,15 @@ extends 'Moose::Object';
 has 'verbose' => (
     is   => 'rw',
     isa  => 'Bool',
-    default => $ENV{BIOPERL_DEBUG} || 0
+    default => $ENV{BIOMOOSE_DEBUG} || 0
     );
 
 # strictness level; setting to True converts warnings to exceptions
 has 'strict' => (
     is      => 'rw',
     isa     => 'Int',
-    where   => sub {$_ >= -1 && $_ <= 1},
-    default => $ENV{BIOPERL_STRICT} || 0
+    default => $ENV{BIOMOOSE_STRICT} || 0
     );
-
-sub debug {
-    my ($self, @msgs) = @_;
-    if (defined $self->verbose) {
-        CORE::warn @msgs;
-    }
-}
-
-sub warn {
-    #my ($self,$string) = @_;
-    #
-    #my $verbose = $self->verbose;
-    #
-    #my $header = "\n--------------------- WARNING ---------------------\nMSG: ";
-    #my $footer =   "---------------------------------------------------\n";
-    #
-    #if ($verbose >= 2) {
-    #    $self->throw($string);
-    #}
-    #elsif ($verbose <= -1) {
-    #    return;
-    #}
-    #elsif ($verbose == 1) {
-    #    CORE::warn $header, $string, "\n", $self->stack_trace_dump, $footer;
-    #    return;
-    #}    
-    #
-    #CORE::warn $header, $string, "\n", $footer;
-}
-
-sub throw {
-    my ($self, @args) = @_;
-    
-    # Note: value isn't passed on (not sure why, we should address that)
-    
-    # This delegates to the Bio::Moose::Meta::Class throw_error(), which calls
-    # proper error class. Therefore we should probably do most of the
-    # grunt work there so it also BP-izes the other errors that'll pop up, such
-    # as type check errors, etc.
-    
-    my ($text, $class, $value) = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
-    $text ||= $args[0] if @args == 1;
-    
-    if (defined $class) {
-        $self->meta->error_class($class)
-    } else {
-        $class = $self->meta->error_class() || '';
-    }
-    
-    # the following should work for any error class set in the meta class,
-    # including the text-only Moose fallback using Carp
-    $self->meta->throw_error($text, value => $value);
-}
-
-sub deprecated{
-    #my ($self) = shift;
-    #my ($msg, $version) = $self->_rearrange([qw(MESSAGE VERSION)], @_);
-    #if (!defined $msg) {
-    #    my $prev = (caller(0))[3];
-    #    $msg = "Use of ".$prev."() is deprecated";
-    #}
-    ## delegate to either warn or throw based on whether a version is given
-    #if ($version) {
-    #    $self->throw('Version must be numerical, such as 1.006000 for v1.6.0, not '.
-    #                 $version) unless $version =~ /^\d+\.\d+$/;
-    #    $msg .= "\nDeprecated in $version";
-    #    if ($Bio::Root::Version::VERSION >= $version) {
-    #        $self->throw($msg)
-    #    } 
-    #}
-    ## passing this on to warn() should deal properly with verbosity issues
-    #$self->warn($msg);
-}
-
-sub throw_not_implemented {
-    my $self = shift;
-
-    # Bio::Root::Root::throw() knows how to check for Error.pm and will
-    # throw an Error-derived object of the specified class (Bio::Root::NotImplemented),
-    # which is defined in Bio::Root::Exception.
-    # If Error.pm is not available, the name of the class is just included in the
-    # error message.
-
-    my $message = $self->_not_implemented_msg;
-
-    $self->throw(-text=>$message,
-                 -class=>'Bio::Root::NotImplemented');
-}
-
-
-=head2 warn_not_implemented
-
- Purpose : Generates a warning that a method has not been implemented.
-           Intended for use in the method definitions of 
-           abstract interface modules where methods are defined
-           but are intended to be overridden by subclasses.
-           Generally, throw_not_implemented() should be used,
-           but warn_not_implemented() may be used if the method isn't
-           considered essential and convenient no-op behavior can be 
-           provided within the interface.
- Usage   : $object->warn_not_implemented( method-name-string );
- Example : $self->warn_not_implemented( "get_foobar" );
- Returns : Calls $self->warn on this object, if available.
-           If the object doesn't have a warn() method,
-           Carp::carp() will be used.
- Args    : n/a
-
-
-=cut
-
-#'
-
-sub warn_not_implemented {
-#    my $self = shift;
-#    my $message = $self->_not_implemented_msg;
-#    if( $self->can('warn') ) {
-#        $self->warn( $message );
-#    }else {
-#	    carp $message ;
-#    }
-}
-
-#sub _not_implemented_msg {
-#    my $self = shift;
-#    my $package = ref $self;
-#    my $meth = (caller(2))[3]; # may not work as intended here; 
-#    my $msg =<<EOD_NOT_IMP;
-#Abstract method \"$meth\" is not implemented by package $package.
-#This is not your fault - author of $package should be blamed!
-#EOD_NOT_IMP
-#    return $msg;
-#}
-
-# Maybe move into a role or trait for optional root utilities (though it's
-# fairly ubiquitous in bp).  Switch to MooseX::Method::Signatures?
-
-sub rearrange {
-    my $dummy = shift;
-    my $order = shift;
-    return @_ unless (substr($_[0]||'',0,1) eq '-');
-    push @_,undef unless $#_ %2;
-    my %param;
-    while( @_ ) {
-	(my $key = shift) =~ tr/a-z\055/A-Z/d; #deletes all dashes!
-	$param{$key} = shift;
-    }
-    map { $_ = uc($_) } @$order; # for bug #1343, but is there perf hit here?
-    return @param{@$order};
-}
-
 
 sub BUILDARGS {
     my ($class, @args) = @_;
@@ -199,13 +48,126 @@ sub BUILDARGS {
     return $params;
 }
 
-#sub _load_module {
-#    shift->meta->load_module(shift);
-#}
+sub warn {
+    my ($self,$string) = @_;
+
+    my $strict = $self->strict;
+
+    my $header = "\n--------------------- WARNING ---------------------\nMSG: ";
+    my $footer =   "---------------------------------------------------\n";
+    if ($strict >= 2) {
+        $self->throw($string);
+    }
+    elsif ($strict <= -1) {
+        return;
+    }
+    elsif ($strict == 1) {
+        CORE::warn $header. $string. "\n". $self->meta->stack_trace_dump. $footer;
+        return;
+    }    
+
+    CORE::warn $header. $string. "\n". $footer;
+}
+
+sub throw {
+    my ($self, @args) = @_;
+    
+    # Note: value isn't passed on (not sure why, we should address that)
+    
+    # This delegates to the Bio::Moose::Meta::Class throw_error(), which calls
+    # proper error class. Therefore we should probably do most of the
+    # grunt work there so it also BP-izes the other errors that'll pop up, such
+    # as type check errors, etc.
+    
+    my ($text, $class, $value) = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
+    $text ||= $args[0] if @args == 1;
+    
+    # set the error class if passed
+    if (defined $class) {
+        $self->meta->error_class($class)
+    } 
+    
+    # the following should work for any error class set in the meta class,
+    # including the text-only Moose fallback using Carp
+    $self->meta->throw_error(message => $text, value => $value);
+}
+
+sub deprecated{
+    my ($self) = shift;
+    #my ($msg, $version) = $self->_rearrange([qw(TEXT VERSION)], @_);
+    #if (!defined $msg) {
+    my $prev = (caller(0))[3];
+    my $msg = "Use of ".$prev."() is deprecated";
+    #}
+    # delegate to either warn or throw based on whether a version is given
+    #if ($version) {
+    #    $self->throw('Version must be numerical, such as 1.006000 for v1.6.0, not '.
+    #                 $version) unless $version =~ /^\d+\.\d+$/;
+    #    $msg .= "\nDeprecated in $version";
+    #    if ($Bio::Moose::Root::VERSION >= $version) {
+    #        $self->throw($msg)
+    #    } 
+    #}
+    ## passing this on to warn() should deal properly with verbosity issues
+    $self->warn($msg);
+}
+
+sub throw_not_implemented {
+    my $self = shift;
+    
+    # this method may be supplanted by Moose's autmated system for required
+    # abstract role methods
+
+    my $message = $self->_not_implemented_msg;
+
+    $self->throw(-text=>$message); # no class yet for unimplemented methods
+}
+
+sub warn_not_implemented {
+    my $self = shift;
+    my $message = $self->_not_implemented_msg;
+    $self->warn( $message );
+}
+
+sub _not_implemented_msg {
+    my $self = shift;
+    my $package = ref $self;
+    my $meth = (caller(2))[3]; # may not work as intended here; 
+    my $msg =<<EOD_NOT_IMP;
+Abstract method \"$meth\" is not implemented by package $package.
+This is not your fault - author of $package should be blamed!
+EOD_NOT_IMP
+    return $msg;
+}
+
+# Maybe move into a role or trait for optional root utilities (though it's
+# fairly ubiquitous in bp).  Switch to MooseX::Method::Signatures?
+
+sub rearrange {
+    my $dummy = shift;
+    my $order = shift;
+    return @_ unless (index($_[0]||'', '-') == 0);
+    push @_,undef unless $#_ %2;
+    my %param;
+    while( @_ ) {
+	(my $key = shift) =~ tr/a-z\055/A-Z/d; #deletes all dashes!
+	$param{$key} = shift;
+    }
+    map { $_ = uc($_) } @$order; # for bug #1343, but is there perf hit here?
+    return @param{@$order};
+}
+
+sub debug {
+    my ($self, @msgs) = @_;
+    if ($self->verbose) {
+        CORE::warn @msgs;
+    }
+}
 
 # cleanup methods needed?  These should probably go into the meta class
 
 no Moose;
+
 __PACKAGE__->meta->make_immutable();
 
 1;

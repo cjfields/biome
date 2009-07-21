@@ -1,5 +1,4 @@
-# -*-Perl-*- Test Harness script for Bioperl
-# $Id: Range.t 15112 2008-12-08 18:12:38Z sendu $
+# -*-Perl-*- Test Harness script for Bio::Moose
 
 use strict;
 
@@ -97,43 +96,36 @@ is($ranges[11]->length, 50);
 
 # see above for logic table 
 my %map = (
-r0  => '111111111110110110100100100111111000110110000100100000111000000110000000100000000000000000000000000000000000',
-r1  => 'xxxxxxxxx110110110110110110110110000110110000110110000110000000110000000110000000000000000000000000000000000',
-r2  => 'xxxxxxxxxxxxxxxxxx111111111100100000110110000111111000100000000110000000111000000000000000000000000000000000',
-r3  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxx111111111110110110100100100111000000110000000100000000000000000000000000000000000',
-r4  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx110110110110110110110000000110000000110000000000000000000000000000000000',
-r5  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111100000000110000000111000000000000000000000000000000000',
-r6  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111110110110100100100111000000110000000100000000',
-r7  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx110110110110110110110000000110000000110000000',
-r8  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111100000000110000000111000000',
-r9  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111110110110100100100',
-r10 => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx110110110110110110',
+r0  => '111111111111111000111000000110110110110110000110000000100100100100100000100000000000000000000000000000000000',
+r1  => 'xxxxxxxxx111111000111111000110110000110110000110110000100100000100100000100100000000000000000000000000000000',
+r2  => 'xxxxxxxxxxxxxxxxxx111111111110000000110110000110110110100000000100100000100100100000000000000000000000000000',
+r3  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxx111111111111111000111000000100100100100100000100000000000000000000000000000000000',
+r4  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111000111111000100100000100100000100100000000000000000000000000000000',
+r5  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111100000000100100000100100100000000000000000000000000000',
+r6  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111111111000111000000100100100100100000100000000',
+r7  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111000111111000100100000100100000100100000',
+r8  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111100000000100100000100100100',
+r9  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111111111000111000000',
+r10 => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111000111111000',
 r11 => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111',  
 );
 
 # cover all variations
 
 # logic table; uncomment code below for output
-#printf("%-2s  %s\n",' ', join('',map {sprintf("r%-8d", $_)} (0..11)));
-#printf("%-2s  %s\n",' ', ('o  c  e  'x12));
-#printf("%-2s  %s\n",' ', ('iws'x36));
 
 for my $i (0..$#ranges) {
     my $string = '';
     my $istring = '';
     for my $j ($i..$#ranges) {
-        for my $method (qw(overlaps contains equals)) {
-            for my $test (qw(ignore weak strong)) {
-                my $com = $ranges[$i]->$method($ranges[$j], $test);
-                my $inv = $ranges[$j]->$method($ranges[$i], $test);
-                #$istring .= ($inv == $com) ? 1 : 0; # for inverse logic table
-                $string .= $com;
+        for my $test (qw(ignore weak strong)) {
+            for my $method (qw(overlaps contains equals)) {
+                $string .= $ranges[$i]->$method($ranges[$j], $test);
             }
         }
     }
     ok(exists $map{'r'.$i});
     is(sprintf("%s%s",'x' x ($i*9), $string), $map{'r'.$i}, "logic tests for ranges $i..$#ranges");
-    #printf("r%-2d %s%s\n",$i, 'x' x ($i*9), $string);
 }
 
 =head1 Geometric tests
@@ -254,7 +246,7 @@ my %subtract_tests = ( # rx->subtract(ry)               ry->subtract(rx)
     'ignore' =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
             },
  '0,4' =>   {   
-    'strong' =>  ['(1, 100) strand=1',                  '(0, 0) strand=0'],
+    'strong' =>  ['(1, 100) strand=1',                  '(25, 75) strand=0'],
     'weak'   =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
     'ignore' =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
             },
@@ -282,13 +274,11 @@ for my $set (sort keys %subtract_tests) {
         my @sub1 = $r1->subtract($r2, $st);
         my $string = join(',',map {$_->to_string} @sub1);
         is($string, $subtract_tests{$set}->{$st}->[0], "Subtract ".join(' from ',@ind).", strand test = $st");
-        my @sub2 = $r2->subtract($r1);
+        my @sub2 = $r2->subtract($r1, $st);
         $string = join(',',map {$_->to_string} @sub2);
         is($string, $subtract_tests{$set}->{$st}->[1], "Subtract ".join(' from ',reverse @ind).", strand test = $st");        
     }
 }
-
-
 
 # test implemention of offsetStranded:
 #$r = Bio::Range->new(-start => 30, -end => 40, -strand => -1);
