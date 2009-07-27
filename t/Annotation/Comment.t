@@ -8,7 +8,7 @@ BEGIN {
     use_ok('Bio::Moose::Annotation::Comment');
 }
 
-my $comment = Bio::Annotation::Comment->new(-tag_name => 'mycomment',
+my $comment = Bio::Moose::Annotation::Comment->new(-tag_name => 'mycomment',
                                             -text => 'sometext');
 is $comment->text, 'sometext';
 is $comment->value, 'sometext';

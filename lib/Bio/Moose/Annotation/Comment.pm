@@ -1,5 +1,5 @@
 # Let the code begin...
-package Bio::Annotation::Comment;
+package Bio::Moose::Annotation::Comment;
 
 use Bio::Moose;
 

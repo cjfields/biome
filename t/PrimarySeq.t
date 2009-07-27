@@ -5,29 +5,14 @@ use strict;
 
 BEGIN { 
     use lib '.';
-    use Test::More tests => 48;
+    use Test::More tests => 50;
     use Test::Moose;
     use Test::Exception;
+	use_ok('Bio::Moose::PrimarySeq');
 }
 
-{
-    package MyPrimarySeq;
-    
-    use Bio::Moose;
-    
-    with qw(Bio::Moose::Role::PrimarySeq
-            Bio::Moose::Role::Describe
-            Bio::Moose::Role::Identify);
-    
-    has '+display_id' => (
-        default     => sub {shift->id(@_)}
-        );
-    
-    no Bio::Moose;
-    __PACKAGE__->meta->make_immutable;
-}
-
-my $seq = MyPrimarySeq->new(
+# simple get/set
+my $seq = Bio::Moose::PrimarySeq->new(
                     -rawseq           => '----TTGGTGG---CGTCA--ACT---',
                     -display_id       => 'new-id',
                     -alphabet         => 'dna',
@@ -52,7 +37,7 @@ is $seq->authority("bioperl.org"), "bioperl.org";
 is $seq->namespace("t"), "t";
 is $seq->version(0), 0;
 
-# NYI
+# NYI, do we want this?  How often is it used?
 #is $seq->lsid_string(), "bioperl.org:t:X677667";
 
 is $seq->namespace_string(), "t:X677667.0";
@@ -67,7 +52,7 @@ is($seq->subseq(-start => 2, -end => 9, -strand => 1, -gaps => 0), 'TGGTGGCG');
 # across two gaps
 is($seq->subseq(-start => 7, -end => 15, -strand => 1), 'G---CGTCA--ACT');
 
-# NYI
+# TODO: Locations NYI
 #my $location = Bio::Location::Simple->new('-start' => 2, 
 #                                                     '-end' => 5,
 #                                                     '-strand' => -1);
@@ -96,7 +81,7 @@ my $trunc = $seq->trunc(-start => 1, -end => 4);
 does_ok $trunc, 'Bio::Moose::Role::PrimarySeq';
 is $trunc->rawseq(), 'TTGG' || diag("Expecting TTGG. Got ".$trunc->seq());
 
-# NYI
+# TODO: Locations NYI
 #$trunc = $seq->trunc($splitlocation);
 #isa_ok($trunc, 'Bio::PrimarySeqI');
 #is( $trunc->seq(), 'TTGGTGACGC');
@@ -199,15 +184,17 @@ is $aa->rawseq, 'M' or diag("Translation: ". $aa->seq);
 is $seq->rawseq('TTGGTGGCG?CAACT'), 'TTGGTGGCG?CAACT';
 
 # test for some aliases
-# implementation-specific, see above for MyPrimarySeq
+# implementation-specific, see above for Bio::Moose::PrimarySeq
 
-$seq = MyPrimarySeq->new(-id => 'aliasid',
-        -description => 'Alias desc');
+$seq = Bio::Moose::PrimarySeq->new(
+		-display_id 	=> 'myID',
+		-id				=> 'foo',
+        -description 	=> 'Alias desc');
 is($seq->description, 'Alias desc');
-is($seq->display_id, 'aliasid'); 
+is($seq->display_id, 'myID'); 
 $seq->display_id('foo'); 
 is($seq->display_id, 'foo'); 
-is($seq->id, 'aliasid'); 
+ok(!$seq->can('id'), 'we do not use the generic id()');
 
 # test that x's are ignored and n's are assumed to be 'dna' no longer true!
 # See Bug 2438. There are protein sequences floating about which are all 'X'
@@ -219,3 +206,10 @@ is($seq->id, 'aliasid');
 #is($seq->alphabet,'protein');
 #$seq->rawseq('atgnnnnnn');
 #is($seq->alphabet,'dna');
+
+# alphabet has a type constraint
+dies_ok {Bio::Moose::PrimarySeq->new(
+	-rawseq           => '----TTGGTGG---CGTCA--ACT---',
+	-display_id       => 'new-id',
+	-alphabet         => 'foo')} 'alphabet is a contrained type';
+
