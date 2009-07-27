@@ -21,16 +21,18 @@ my $build = Module::Build->new(
                             # tentative list of MooseX modules
 
                             # I don't think we should include MooseX::Declares,
-                            # MooseX::Method. As nice as they are, as both have
-                            # a ton of additional dependencies beyond Moose and
-                            # are still alpha software
+                            # MooseX::Method::Signatures. As nice as they are,
+                            # as both have a ton of additional dependencies
+                            # beyond Moose and are still alpha software
 
                             'MooseX::AttributeHelpers'  => 0,  # extended attributes
                             'MooseX::Singleton'         => 0,  
-                            'MooseX::Params::Validate'  => 0,  # replace rearrange?
                             'MooseX::ClassAttribute'    => 0,
-                            'MooseX::Types::Structured' => 0,  # extended types
-                            'MooseX::Clone'             => 0   # we have a root clone method, this could replace it
+                            'MooseX::Types'             => 0,  # may be removed based on benchmarks
+                            #'MooseX::Params::Validate'  => 0,  # replace rearrange?
+                            #'MooseX::Types::Structured' => 0,  # extended types
+                            #'MooseX::Clone'             => 0   # we have a root clone method, this could replace it
+                            'List::MoreUtils'           => 0
                            },
     build_requires      => {
                             'Module::Build'             => 0.2805,
