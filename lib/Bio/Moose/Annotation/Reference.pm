@@ -1,25 +1,19 @@
 # Let the code begin...
 
-package Bio::Annotation::Reference;
+package Bio::Moose::Annotation::Reference;
 
 use Bio::Moose;
 
-with qw(Bio::Moose::Role::Annotate
-        Bio::Moose::Role::DBLink
-        Bio::Moose::Role::Identify);
+extends 'Bio::Moose::Annotation::DBLink';
+
+with 'Bio::Moose::Role::Range';
 
 has '+DEFAULT_CB' => (
     default     => sub { sub { $_[0]->title || ''} },
     lazy        => 1
     );
 
-# should this be a simple Range, like Annotation::Target?
-has [qw(start end)]  => (
-    is          => 'rw',
-    isa         => 'Int'
-);
-
-has [qw(rp rg authors location title medline pubmed primary_id
+has [qw(rp rg authors location title medline pubmed
      publisher editor encoded_ref doi consortium gb_reference)]  => (
     is          => 'rw',
     isa         => 'Str'

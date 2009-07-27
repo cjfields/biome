@@ -5,7 +5,7 @@ package Bio::Moose::Annotation::DBLink;
 use Bio::Moose;
 
 with qw(Bio::Moose::Role::Annotate
-        Bio::Moose::Role::DBLink
+        Bio::Moose::Role::DatabaseLink
         Bio::Moose::Role::Identify);
 
 has '+DEFAULT_CB' => (
@@ -14,16 +14,6 @@ has '+DEFAULT_CB' => (
                           ($_[0]->version ? '.' . $_[0]->version : '')) || '' },
     lazy        => 1
     );
-
-has [qw(tagname database primary_id optional_id comment version url authority )] => (
-    is          => 'rw',
-    isa         => 'Str'
-);
-
-has '+object_id' => (
-    default     => sub {shift->primary_id(@_)},
-    lazy        => 1
-);
 
 has '+namespace' => (
     default     => sub {shift->database(@_)},
@@ -39,22 +29,15 @@ sub as_text{
         ." in database ".$self->database;
 }
 
-sub hash_tree{
-    my ($self) = @_;
-    
-    my $h = {};
-    $h->{'database'}   = $self->database;
-    $h->{'primary_id'} = $self->primary_id;
-    if( defined $self->optional_id ) {
-        $h->{'optional_id'} = $self->optional_id;
-    }
-    if( defined $self->comment ) {
-        # we know that comments have hash_tree methods
-        $h->{'comment'} = $self->comment;
-    }
- 
-    return $h;
-}
+#########################################################################
+#
+# Builders for Bio::Moose::Role::Identity
+#
+#########################################################################
+
+sub _build_display_id {$_[1]}
+sub _build_object_id {shift->primary_id(@_)}
+sub _build_id {shift->display_id(@_)}
 
 no Bio::Moose;
 
@@ -292,7 +275,6 @@ methods. Internal methods are usually preceded with a _
            This is aliased to primary_id().
  Returns : A scalar
 
-
 =cut
 
 =head2 version
@@ -303,7 +285,6 @@ methods. Internal methods are usually preceded with a _
            the same object. Higher numbers are considered to be
            later and more relevant, but a single object described
            the same identifier should represent the same concept
-
  Returns : A number
 
 =cut
@@ -315,7 +296,6 @@ methods. Internal methods are usually preceded with a _
  Function: a string which represents the organisation which
            granted the namespace, written as the DNS name for  
            organisation (eg, wormbase.org)
-
  Returns : A scalar
 
 =cut
@@ -327,9 +307,7 @@ methods. Internal methods are usually preceded with a _
  Function: A string representing the name space this identifier
            is valid in, often the database name or the name
            describing the collection 
-
            For DBLink this is the same as database().
  Returns : A scalar
-
 
 =cut
