@@ -1,6 +1,6 @@
 package Bio::Moose::Root;
 use Moose 0.79;
-
+use Modern::Perl;
 extends 'Moose::Object';
 
 # run BEGIN block to check for exception class, default to light output?
@@ -164,6 +164,19 @@ sub debug {
     }
 }
 
+# simple clone; calls meta class clone_object. This may be replaced by
+# MooseX::Clone functionality (so we have more introspection and control over
+# what is and what isn't cloned, and so we can do recursive cloning)
+
+# until then if needed we can override this in inheriting classes for recursive
+# cloning
+
+sub clone {
+    my ($self, @p) = @_;
+    my $params = $self->BUILDARGS(@p);
+    $self->meta->clone_object($self, %$params);
+}
+
 # cleanup methods needed?  These should probably go into the meta class
 
 no Moose;
@@ -270,14 +283,3 @@ __END__
 
 =cut
 
-=head2 _load_module
-
- Title   : _load_module
- Usage   : $self->_load_module("Bio::SeqIO::genbank");
- Function: Loads up (like use) the specified module at run time on demand.
- Example : 
- Returns : TRUE on success. Throws an exception upon failure.
- Args    : The module to load (_without_ the trailing .pm).
- Status  : Unstable
-
-=cut

@@ -37,6 +37,7 @@ subtype SequenceAlphabet,
 	message { "Strand must be 'dna', 'rna', or 'protein'"};
 	
 no MooseX::Types;
+no MooseX::Types::Moose;
 
 1;
 

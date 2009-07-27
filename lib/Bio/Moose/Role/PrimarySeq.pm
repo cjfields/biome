@@ -1,6 +1,7 @@
 package Bio::Moose::Role::PrimarySeq;
 
 use Bio::Moose::Role;
+use Bio::Moose::Types qw(SequenceAlphabet);
 
 use Bio::Moose::Tools::CodonTable;
 
@@ -14,7 +15,7 @@ has rawseq => (
 # make a subtype or coerce input into a subtype?
 has alphabet => (
    is    => 'rw',
-   isa   => 'Str',
+   isa   => SequenceAlphabet,
 );
 
 has is_circular => (
@@ -27,8 +28,10 @@ has is_circular => (
 # should allow a narrow set of symbols for now, maybe enum, i.e. GAP, RESIDUE,
 # FRAMESHIFT)
 
-# Should we role Range into this as well?  Every sequence has a start/end/strand,
-# in this case start = 1, end = length -1, strand maybe based on alphabet or 0
+
+# Should we role Range/Location into this as well? Every sequence has a
+# start/end/strand, in this case start = 1, end = length -1, strand maybe based
+# on alphabet or 0 This gets tricky with mRNA (split locations).
 
 has symbols => (
     is   => 'rw',
@@ -321,6 +324,13 @@ sub _find_orf {
 	$self->warn("No termination codon found, will translate - sequence:\n$sequence");
 	$sequence;
 }
+
+sub _build_display_id {$_[1]}
+
+# alias of primary_id
+sub _build_id { shift->primary_id(@_) }
+
+sub _build_object_id { shift->accession_number(@_) }
 
 no Bio::Moose::Role;
 
