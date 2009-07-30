@@ -1,6 +1,6 @@
-package Bio::Moose::Role::Range;
+package Biome::Role::Range;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 # not sure about implementing these yet:
 
@@ -8,7 +8,7 @@ use Bio::Moose::Role;
 #disconnected_ranges
 #offset_stranded
 
-use Bio::Moose::Types qw(SequenceStrand);
+use Biome::Types qw(SequenceStrand);
 
 # should start/end be required? 
 has start   => (
@@ -288,14 +288,14 @@ sub _eval_ranges {
     $self->throw("end is undefined in calling instance") if !defined $self->end;    
     for my $obj (@ranges) {
         $self->throw("Not an object") unless ref($obj);
-        $self->throw("Passed object does not implement Bio::Moose::Role::Range role")
-            unless $obj->does('Bio::Moose::Role::Range');
+        $self->throw("Passed object does not implement Biome::Role::Range role")
+            unless $obj->does('Biome::Role::Range');
         $self->throw("start is undefined in passed instance") if !defined $obj->start;
         $self->throw("end is undefined in passed instance") if !defined $obj->end;
     }
 }
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 

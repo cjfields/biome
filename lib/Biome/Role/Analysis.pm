@@ -1,6 +1,6 @@
-package Bio::Moose::Role::Analysis;
+package Biome::Role::Analysis;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 =head2 analysis_name
 
@@ -300,12 +300,12 @@ Usually, after this call, you ask for results of the finished job:
 
 requires 'wait_for';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 
-package Bio::Analysis::Job;
+package BioMe::Role::Analysis::Job;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 
 =head2 id
@@ -659,7 +659,7 @@ mirror object on the server side).
 
 requires 'remove';
 
-no Bio::Moose::Role;
+no Biome::Role;
 1;
 
 1;

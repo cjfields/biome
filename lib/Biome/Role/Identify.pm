@@ -1,6 +1,6 @@
-package Bio::Moose::Role::Identify;
+package Biome::Role::Identify;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 requires qw(_build_display_id _build_id _build_object_id);
 
@@ -56,7 +56,7 @@ sub namespace_string {
          (defined($self->version()) ? ".".$self->version : '');   
 }
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 
@@ -176,7 +176,7 @@ __END__
 
 =head2 id
 
- Note    : The generic attribute id() is not implemented in Bio::Moose
+ Note    : The generic attribute id() is not implemented in Biome
  
 =cut
 

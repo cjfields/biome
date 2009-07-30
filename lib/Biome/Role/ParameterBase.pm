@@ -1,6 +1,6 @@
-package Bio::Moose::Root::ParameterBase;
+package Biome::Root::ParameterBase;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 
 =head2 set_parameters
@@ -65,5 +65,5 @@ requires 'available_parameters';
 
 requires 'get_parameters';
 
-no Bio::Moose::Role;
+no Biome::Role;
 1;

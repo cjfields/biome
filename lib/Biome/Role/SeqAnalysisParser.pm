@@ -1,6 +1,6 @@
-package Bio::Moose::Role::SeqAnalysisParser;
+package Biome::Role::SeqAnalysisParser;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 =head2 next_feature
 
@@ -17,6 +17,6 @@ use Bio::Moose::Role;
 
 requires 'next_feature';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;

@@ -1,6 +1,6 @@
-package Bio::Moose::Role::AnnotateCollection;
+package Biome::Role::AnnotateCollection;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 requires qw(
     get_all_Annotation_keys
@@ -13,7 +13,7 @@ requires qw(
     flatten_Annotations
 );
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 
@@ -31,7 +31,7 @@ __END__
 =head2 get_Annotations()
 
  Usage   : my @annotations = $collection->get_Annotations('key')
- Function: Retrieves all the Bio::Moose::Role::Annotate objects for a specific key
+ Function: Retrieves all the Biome::Role::Annotate objects for a specific key
  Returns : list of instances that Annotate - empty if no objects stored for a key
  Args    : string which is key for annotations
 
@@ -41,7 +41,7 @@ __END__
  Usage   : my @annotations = $collection->get_nested_Annotations(
                                 '-key' => \@keys,
                                 '-recursive => 1);
- Function: Retrieves all the Bio::Moose::Role::Annotate objects for one or more
+ Function: Retrieves all the Biome::Role::Annotate objects for one or more
            specific key(s). If -recursive is set to true, traverses the nested 
            annotation collections recursively and returns all annotations 
            matching the key(s).
@@ -52,7 +52,7 @@ __END__
            the key under which they were attached, unless the tagname was
            already set.
 
- Returns : list of Bio::Moose::Role::Annotate - empty if no objects stored for a key
+ Returns : list of Biome::Role::Annotate - empty if no objects stored for a key
  Args    : -keys      => arrayref of keys to search for (optional)
            -recursive => boolean, whether or not to recursively traverse the 
             nested annotations and return annotations with matching keys.
@@ -72,7 +72,7 @@ __END__
            Hence, for un-nested annotation collections this will be identical
            to get_Annotations.
  Example :
- Returns : an array of L<Bio::Moose::Role::Annotate> compliant objects
+ Returns : an array of L<Biome::Role::Annotate> compliant objects
  Args    : keys (list of strings) for annotations (optional)
 
 =head2 get_num_of_Annotations
@@ -91,7 +91,7 @@ __END__
  Usage   : my @annotations = $collection->next_Annotation(-keys => ['foo', 'ba
             -recursive => 1);
  Function: Iterates through the contained Annotations
- Returns : list of Bio::Moose::Role::Annotate - empty if no objects stored for a key
+ Returns : list of Biome::Role::Annotate - empty if no objects stored for a key
  Args    : -keys      => arrayref of keys to search for (optional)
            -recursive => boolean, whether or not to recursively traverse the 
             nested annotations and return annotations with matching keys.
@@ -117,7 +117,7 @@ __END__
 
  Returns : none
  Args    : annotation key ('disease', 'dblink', ...)
-           object to store (must implement Bio::Moose::Role::Annotate Role)
+           object to store (must implement Biome::Role::Annotate Role)
            [optional] object archetype to map future storage of object
            of these types to
 
@@ -125,7 +125,7 @@ __END__
 
  Usage   :
  Function: Remove the annotations for the specified key from this collection.
- Returns : an list of Bio::Moose::Role::Annotate compliant objects which were stored
+ Returns : an list of Biome::Role::Annotate compliant objects which were stored
            under the given key(s)
  Args    : the key(s) (tag name(s), one or more strings) for which to
            remove annotations (optional; if none given, flushes all
@@ -143,7 +143,7 @@ __END__
 
            This should not change anything for un-nested collections.
  Example :
- Returns : an array Bio::Moose::Role::Annotate compliant objects which were stored
+ Returns : an array Biome::Role::Annotate compliant objects which were stored
            under the given key(s)
  Args    : list of keys (strings) the annotation for which to flatten,
            defaults to all keys if not given

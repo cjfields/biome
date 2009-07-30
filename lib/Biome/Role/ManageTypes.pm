@@ -1,6 +1,6 @@
-package Bio::Moose::Role::ManageTypes;
+package Biome::Role::ManageTypes;
 
-use Bio::Moose::Role;
+use Biome::Role;
 use MooseX::AttributeHelpers;
 use List::MoreUtils 'any';
 
@@ -49,7 +49,7 @@ __END__
 
 # $Id: ManageTypes.pm 15549 2009-02-21 00:48:48Z maj $
 #
-# BioPerl module for Bio::Moose::Role::ManageTypes
+# BioPerl module for Biome::Role::ManageTypes
 #
 # Please direct questions and support issues to <bioperl-l@bioperl.org> 
 #
@@ -59,7 +59,7 @@ __END__
 
 =head1 NAME
 
-Bio::Moose::Role::ManageTypes - Type manager role
+Biome::Role::ManageTypes - Type manager role
 
 =head1 SYNOPSIS
 
@@ -67,14 +67,14 @@ Bio::Moose::Role::ManageTypes - Type manager role
 
     $tm = MyTypeManager->new(-typemap =>
         {
-            'reference'     => "Bio::Moose::Annotation::Reference",
-            'comment'       => "Bio::Moose::Annotation::Comment",
-            'dblink'        => "Bio::Moose::Annotation::DBLink",
-            'simplevalue'   => "Bio::Moose::Annotation::SimpleValue",
+            'reference'     => "Biome::Annotation::Reference",
+            'comment'       => "Biome::Annotation::Comment",
+            'dblink'        => "Biome::Annotation::DBLink",
+            'simplevalue'   => "Biome::Annotation::SimpleValue",
         }
     );
 
-    # $key is a string or a Bio::Moose::Role::OntologyTerm compliant object
+    # $key is a string or a Biome::Role::OntologyTerm compliant object
     print "The type for $key is ",$tm->type_for_key($key),"\n";
 
     if( !$tm->is_valid($key,$object) ) {

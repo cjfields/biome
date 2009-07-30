@@ -1,6 +1,6 @@
-package Bio::Moose::Role::SimpleAnalysis;
+package Biome::Role::SimpleAnalysis;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 =head2 analysis_name
 
@@ -173,5 +173,5 @@ requires 'result';
 
 
 
-no Bio::Moose::Role;
+no Biome::Role;
 1;

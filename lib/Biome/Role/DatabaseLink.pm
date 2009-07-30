@@ -1,8 +1,8 @@
 # Let the code begin...
 
-package Bio::Moose::Role::DatabaseLink;
+package Biome::Role::DatabaseLink;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 # We could create a constaint for the URL if needed...
 has [qw(database optional_id comment url)] => (
@@ -10,7 +10,7 @@ has [qw(database optional_id comment url)] => (
     isa         => 'Str'
 );
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 

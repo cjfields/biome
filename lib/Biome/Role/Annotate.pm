@@ -1,6 +1,6 @@
-package Bio::Moose::Role::Annotate;
+package Biome::Role::Annotate;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 requires qw(as_text);
 
@@ -33,7 +33,7 @@ sub display_text {
     return $cb->($self);
 }
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 

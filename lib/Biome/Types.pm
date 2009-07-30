@@ -6,16 +6,17 @@
 # Moose::Util::TypeParameters, so may revert to the latter if speed becomes an
 # issue
 
-package Bio::Moose::Types;
+package Biome::Types;
 
 use MooseX::Types -declare => [qw(
 							   SequenceStrand
 							   SequenceStrandInt
 							   SequenceStrandChar
 							   SequenceAlphabet
+							   CoordinatePolicy
 							   )];
 
-use MooseX::Types::Moose qw(Int Str);
+use MooseX::Types::Moose qw(Int Str Obj);
 
 subtype SequenceStrandInt,
 	as Int,
@@ -35,6 +36,12 @@ subtype SequenceAlphabet,
 	as Str,
 	where { /^(?:dna|rna|protein)$/xism }, # do we want more?
 	message { "Strand must be 'dna', 'rna', or 'protein'"};
+
+#an object which consumes the 'Biome::Role::Location::CoordinatePolicy' role
+subtype CoordinatePolicy
+	as Obj, 
+	where { $_->meta->does_role('Biome::Role::Location::CoordinatePolicy')}, 
+	message { "The object should consume Biome::Role::Location::CoordinatePolicy role"};
 	
 no MooseX::Types;
 no MooseX::Types::Moose;

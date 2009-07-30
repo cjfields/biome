@@ -1,6 +1,6 @@
-package Bio::Moose::Role::Annotatable;
+package Biome::Role::Annotatable;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 
 =head2 annotation
@@ -20,6 +20,6 @@ See L<Bio::AnnotationCollectionI>
 
 requires 'annotation';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;

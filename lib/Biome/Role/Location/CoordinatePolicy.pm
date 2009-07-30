@@ -1,10 +1,10 @@
 # Let the code begin...
 
 
-package Bio::Moose::Role::Location::CoordinatePolicy;
+package Biome::Role::Location::CoordinatePolicy;
 use strict;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 =head2 start
 
@@ -32,6 +32,6 @@ requires  'start';
 
 requires 'end'; 
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;

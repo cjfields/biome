@@ -1,6 +1,6 @@
-package Bio::Moose::Role::IdCollection;
+package Biome::Role::IdCollection;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 =head2 id_authorities
 
@@ -30,6 +30,6 @@ requires 'id_authorities';
 
 requires 'ids';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;

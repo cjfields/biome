@@ -1,6 +1,6 @@
-package Bio::Moose::Role::Describe;
+package Biome::Role::Describe;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 =head2 display_name
 
@@ -22,7 +22,7 @@ has display_name => (
     isa   => 'Str',
     default => sub {
         my $self = shift;
-        if ($self->does('Bio::Moose::Role::Identify')) {
+        if ($self->does('Biome::Role::Identify')) {
             $self->display_id(@_);
         } else {
             $_[0] || ''
@@ -51,7 +51,7 @@ has description => (
     isa   => 'Str'
    );
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 

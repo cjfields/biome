@@ -2,12 +2,12 @@
 # Let the code begin...
 
 
-package BioMe::Location::Atomic;
-use BioMe;
-use BioMe::Location::WidestCoordPolicy;
-use BioMe::Types qw/SequenceStrand Int Str CoordinatePolicy/;
+package Biome::Location::Atomic;
+use Biome;
+use Biome::Location::WidestCoordPolicy;
+use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy/;
 
-with 'BioMe::Role::LocationI';
+with 'Biome::Role::LocationI';
 
 
 sub new { 
@@ -358,7 +358,7 @@ See L<Bio::Location::CoordinatePolicyI> for more information
 has 'coordinate_policy' => (
 	is => 'rw', 
 	isa => 'CoordinatePolicy', 
-	default => sub { BioMe::Location::WidestCoordinatePolicy->new() }, 
+	default => sub { Biome::Location::WidestCoordinatePolicy->new() }, 
 );
 
 =head2 trunc
@@ -387,14 +387,14 @@ sub trunc {
 
   my $out;
   if( $newstart < 1 || $newend > ($end-$start+1) ) {
-    $out = BioMe::Location::Atomic->new();
+    $out = Biome::Location::Atomic->new();
     $out->start($self->start);
     $out->end($self->end);
     $out->strand($self->strand);
     $out->seq_id($self->seqid);
     $out->is_remote(1);
   } else {
-    $out = BioMe::Location::Atomic->new();
+    $out = Biome::Location::Atomic->new();
     $out->start($newstart);
     $out->end($newend);
     $out->strand($newstrand);

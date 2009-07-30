@@ -1,6 +1,6 @@
-package Bio::Moose::Role::Cluster;
+package Biome::Role::Cluster;
 
-use Bio::Moose::Role; 
+use Biome::Role; 
 
 
 
@@ -72,5 +72,5 @@ requires 'cluster_score';
 
 requires 'get_members';
 
-no Bio::Moose::Role;
+no Biome::Role;
 1;

@@ -1,11 +1,11 @@
 # Let the code begin...
 
 
-package Bio::Moose::Role::Location::SplitLocation;
+package Biome::Role::Location::SplitLocation;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
-with 'Bio::Moose::Role::Location';
+with 'Biome::Role::Location';
 
 
 =head2 sub_Location
@@ -50,7 +50,7 @@ requires 'splittype';
 
 requires 'is_single_sequence';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 

@@ -1,8 +1,8 @@
-package Bio::Moose::Root::Location;
+package Biome::Role::Location;
 
-use Bio::Moose::Root;
+use Biome::Role;
 
-with 'Bio::Moose::Root::Range';
+with 'Biome::Root::Range';
 
 
 =head2 location_type
@@ -329,6 +329,6 @@ requires 'valid_Location';
 
 
 
-no Bio::Moose::Root;
+no Biome::Role;
 
 1;

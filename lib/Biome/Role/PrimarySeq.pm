@@ -1,9 +1,9 @@
-package Bio::Moose::Role::PrimarySeq;
+package Biome::Role::PrimarySeq;
 
-use Bio::Moose::Role;
-use Bio::Moose::Types qw(SequenceAlphabet);
+use Biome::Role;
+use Biome::Types qw(SequenceAlphabet);
 
-use Bio::Moose::Tools::CodonTable;
+use Biome::Tools::CodonTable;
 
 # greedy method, guaranteed to return a raw sequence
 # may need make this into a separate method as opposed to an attribute
@@ -66,7 +66,7 @@ sub subseq {
     # account for all variations and additional constraints, such as laziness,
     # fly/lightweight, etc.)
     
-    if( ref($start) && $start->does('Bio::Moose::Role::Range') ) {
+    if( ref($start) && $start->does('Biome::Role::Range') ) {
         # does not handle complex locations; not sure whether we should
         # implement or not (segments are much easier, and relevant code such as
         # sliced_seq can DTRT by calling this as needed)
@@ -187,10 +187,10 @@ sub translate {
         
     # Get a CodonTable, error if custom CodonTable is invalid
     if ($codonTable) {
-         $self->throw("Need a Bio::Moose::Tools::CodonTable object, not ". $codonTable)
-            unless $codonTable->isa('Bio::Moose::Tools::CodonTable');
+         $self->throw("Need a Biome::Tools::CodonTable object, not ". $codonTable)
+            unless $codonTable->isa('Biome::Tools::CodonTable');
     } else {
-         $codonTable = Bio::Moose::Tools::CodonTable->new( -id => $codonTableId);
+         $codonTable = Biome::Tools::CodonTable->new( -id => $codonTableId);
     }
     
     # Error if alphabet is "protein"
@@ -332,7 +332,7 @@ sub _build_id { shift->primary_id(@_) }
 
 sub _build_object_id { shift->accession_number(@_) }
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
 

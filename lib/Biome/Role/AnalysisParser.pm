@@ -1,6 +1,6 @@
-package Bio::Moose::Role::AnalysisParser;
+package Biome::Role::AnalysisParser;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 
 =head2 next_result
@@ -18,6 +18,6 @@ use Bio::Moose::Role;
 
 requires 'next_result';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;

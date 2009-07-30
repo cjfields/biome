@@ -1,6 +1,6 @@
-package Bio::Moose::Role::AnalysisResult;
+package Biome::Role::AnalysisResult;
 
-use Bio::Moose::Role; 
+use Biome::Role; 
 
 
 
@@ -121,5 +121,5 @@ sub next_feature {
     $self->throw_not_implemented;
 }
 
-no Bio::Moose::Role;
+no Biome::Role;
 1;

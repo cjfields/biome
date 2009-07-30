@@ -61,12 +61,12 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 
-package Bio::Moose::Role::Location::FuzzyLocation;
+package Biome::Role::Location::FuzzyLocation;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
-with 'Bio::Moose::Role::LocationI';
+with 'Biome::Role::LocationI';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 1;
