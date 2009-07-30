@@ -29,7 +29,7 @@ sub hash_tree{
 
 *value = \&text;
 
-no Bio::Moose;
+no BioMe;
 
 __PACKAGE__->meta->make_immutable;
 

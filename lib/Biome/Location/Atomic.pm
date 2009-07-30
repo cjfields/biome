@@ -10,49 +10,9 @@ use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy/;
 with 'Biome::Role::LocationI';
 
 
-sub new { 
-    my ($class, @args) = @_;
-    my $self = {};
-    # This is for the case when we've done something like this
-    # get a 2 features from somewhere (like Bio::Tools::GFF)
-    # Do
-    # my $location = $f1->location->union($f2->location);
-    # We get an error without the following code which 
-    # explictly loads the Bio::Location::Simple class
-    eval {
-	($class) = ref($class) if ref($class);
-	Bio::Root::Root->_load_module($class);
-      };
-    if ( $@ ) {
-	Bio::Root::Root->throw("$class cannot be found\nException $@");
-      }
-    bless $self,$class;
 
-    my ($v,$start,$end,$strand,$seqid) = $self->_rearrange([qw(VERBOSE
-							       START
-							       END
-							       STRAND
-							       SEQ_ID)],@args);
-    defined $v && $self->verbose($v);
-    defined $strand && $self->strand($strand);
-
-    defined $start  && $self->start($start);
-    defined $end    && $self->end($end);
-    if( defined $self->start && defined $self->end &&
-	$self->start > $self->end && $self->strand != -1 ) {
-	$self->warn("When building a location, start ($start) is expected to be less than end ($end), ".
-		    "however it was not. Switching start and end and setting strand to -1");
-
-	$self->strand(-1);
-	my $e = $self->end;
-	my $s = $self->start;
-	$self->start($e);
-	$self->end($s);
-    }
-    $seqid          && $self->seq_id($seqid);
-
-    return $self;
-}
+#still not sure whether we need to switch strand value during object construction when
+#both start and end are passed 
 
 =head2 start
 
@@ -403,6 +363,10 @@ sub trunc {
 
   return $out;
 }
+
+no BioMe;
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
