@@ -1,7 +1,6 @@
-package Bio::Moose::Root::Describable;
+package Bio::Moose::Role::Describe;
 
-use Bio::Moose::Root;
-
+use Bio::Moose::Role;
 
 =head2 display_name
 
@@ -13,12 +12,24 @@ use Bio::Moose::Root;
            less than thirty characters (though again, double checking 
            this is a good idea)
  Returns : A scalar
- Status  : Virtual
+ Status  : Stable, may be reimplemented
 
 =cut
 
-requires 'display_name';
-
+#maybe move the default to builder method
+has display_name => (
+    is    => 'rw',
+    isa   => 'Str',
+    default => sub {
+        my $self = shift;
+        if ($self->does('Bio::Moose::Role::Identify')) {
+            $self->display_id(@_);
+        } else {
+            $_[0] || ''
+        }
+    },
+    lazy   => 1
+   );
 
 =head2 description
 
@@ -31,12 +42,18 @@ requires 'display_name';
            and clients can feel justified at truncating strings at 255
            characters for the purposes of display
  Returns : A scalar
- Status  : Virtual
+ Status  : Stable
 
 =cut
 
-requires 'description';
+has description => (
+    is    => 'rw',
+    isa   => 'Str'
+   );
 
-no Bio::Moose::Root;
+no Bio::Moose::Role;
 
 1;
+
+__END__
+

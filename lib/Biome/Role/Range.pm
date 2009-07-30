@@ -8,6 +8,8 @@ use Bio::Moose::Role;
 #disconnected_ranges
 #offset_stranded
 
+use Bio::Moose::Types qw(SequenceStrand);
+
 # should start/end be required? 
 has start   => (
     isa     => 'Int',
@@ -34,11 +36,8 @@ has end     => (
 );
 
 has strand  => (
-    isa     => 'Int',
+    isa     => SequenceStrand,
     is      => 'rw',
-    #where   => sub {
-    #    $_ >= -1 && $_ <= 1
-    #},
     default => 0,
 );
 

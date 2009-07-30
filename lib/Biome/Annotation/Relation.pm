@@ -1,3 +1,34 @@
+package Bio::Annotation::Relation;
+
+use Bio::Moose;
+
+with 'Bio::Moose::Role::Annotate';
+
+sub as_text{
+   my ($self) = @_;
+   return $self->type." to  ".$self->to->id;
+}
+
+has '+DEFAULT_CB' => (
+    default => sub {sub { return $_[0]->type." to  ".$_[0]->to->id }},
+    lazy    => 1
+    );
+
+has [qw(type to)] => (
+    is          => 'rw',
+    isa         => 'Str'
+);
+
+# TODO: NYI. Thinking this should be a role...
+#has 'tag_term' => (
+#    is          => 'rw',
+#    does        => 'Bio::Moose::Role::OntologyTerm'
+#);
+
+1;
+
+__END__
+
 # $Id: Relation.pm 14708 2008-06-10 00:08:17Z heikki $
 #
 # BioPerl module for Bio::Annotation::Relation
@@ -69,17 +100,6 @@ The rest of the documentation details each of the object methods. Internal metho
 
 =cut
 
-
-# Let the code begin...
-
-
-package Bio::Annotation::Relation;
-use strict;
-
-# Object preamble - inherits from Bio::Root::Root
-
-use base qw(Bio::Root::Root Bio::AnnotationI);
-
 =head2 new
 
  Title   : new
@@ -92,24 +112,6 @@ use base qw(Bio::Root::Root Bio::AnnotationI);
            -tag_term => ontology term representation of the tag [optional]
 
 =cut
-
-sub new{
-   my ($class,@args) = @_;
-
-   my $self = $class->SUPER::new(@args);
-
-   my ($type, $to, $tag, $term) =
-       $self->_rearrange([qw(TYPE TO TAGNAME TAG_TERM)], @args);
-
-   # set the term first
-   defined $term   && $self->tag_term($term);
-   defined $type && $self->type($type);
-   defined $to  && $self->to($to);
-   defined $tag    && $self->tagname($tag);
-
-   return $self;
-}
-
 
 =head1 AnnotationI implementing functions
 
@@ -125,12 +127,6 @@ sub new{
 
 
 =cut
-
-sub as_text{
-   my ($self) = @_;
-
-   return $self->type." to  ".$self->to->id;
-}
 
 =head2 display_text
 
@@ -148,19 +144,6 @@ sub as_text{
 
 =cut
 
-{
-  my $DEFAULT_CB = sub { return $_[0]->type." to  ".$_[0]->to->id };
-  #my $DEFAULT_CB = sub { $_[0]->value};
-
-  sub display_text {
-    my ($self, $cb) = @_;
-    $cb ||= $DEFAULT_CB;
-    $self->throw("Callback must be a code reference") if ref $cb ne 'CODE';
-    return $cb->($self);
-  }
-
-}
-
 =head2 hash_tree
 
  Title   : hash_tree
@@ -170,23 +153,13 @@ sub as_text{
  Returns : hashrf
  Args    : none
 
-
 =cut
 
-sub hash_tree{
-    my $self = shift;
+=head2 tag_name
 
-    my $h = {};
-    $h->{'type'} = $self->type;
-    $h->{'to'} = $self->to;
-    return $h;
-}
-
-=head2 tagname
-
- Title   : tagname
- Usage   : $obj->tagname($newval)
- Function: Get/set the tagname for this annotation value.
+ Title   : tag_name
+ Usage   : $obj->tag_name($newval)
+ Function: Get/set the tag name for this annotation value.
 
            Setting this is optional. If set, it obviates the need to
            provide a tag to AnnotationCollection when adding this
@@ -196,23 +169,7 @@ sub hash_tree{
  Returns : value of tagname (a scalar)
  Args    : new value (a scalar, optional)
 
-
 =cut
-
-sub tagname{
-    my $self = shift;
-
-    # check for presence of an ontology term
-    if($self->{'_tag_term'}) {
-	# keep a copy in case the term is removed later
-	$self->{'tagname'} = $_[0] if @_;
-	# delegate to the ontology term object
-	return $self->tag_term->name(@_);
-    }
-    return $self->{'tagname'} = shift if @_;
-    return $self->{'tagname'};
-}
-
 
 =head1 Specific accessors for Relation
 
@@ -226,17 +183,7 @@ sub tagname{
  Returns : type of relation
  Args    : newtype (optional)
 
-
 =cut
-
-sub type{
-   my ($self,$type) = @_;
-
-   if( defined $type) {
-      $self->{'type'} = $type;
-    }
-    return $self->{'type'};
-}
 
 =head2 to
 
@@ -246,17 +193,7 @@ sub type{
  Returns : the object which the relation applies to
  Args    : new target object (optional)
 
-
 =cut
-
-sub to{
-   my ($self,$to) = @_;
-
-   if( defined $to) {
-      $self->{'to'} = $to;
-    }
-    return $self->{'to'};
-}
 
 =head2 tag_term
 
@@ -284,12 +221,3 @@ sub to{
 
 
 =cut
-
-sub tag_term{
-    my $self = shift;
-
-    return $self->{'_tag_term'} = shift if @_;
-    return $self->{'_tag_term'};
-}
-
-1;

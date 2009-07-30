@@ -881,4 +881,6 @@ no Bio::Moose;
 no MooseX::ClassAttribute;
 no MooseX::AttributeHelpers;
 
+__PACKAGE__->meta->make_immutable;
+
 1;

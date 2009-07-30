@@ -2,6 +2,43 @@ package Bio::Moose::Role::Annotate;
 
 use Bio::Moose::Role;
 
+requires qw(as_text);
+
+has tag_name => (
+    is          => 'rw',
+    does        => 'Str'
+);
+
+has DEFAULT_CB => (
+    is          => 'ro',
+    isa         => 'CodeRef',
+    required    => 1,
+    );
+
+sub hash_tree {
+    my ($self) = @_;
+    my $h = {};
+    # do a little introspection using the meta class 
+    for my $att ($self->meta->get_all_attributes) {
+        next unless $att->has_value($self);
+        $h->{$att->name} = $att->get_value($self);
+    }
+    $h;
+}
+
+sub display_text {
+    my ($self, $cb) = @_;
+    $cb ||= $self->DEFAULT_CB;
+    $self->throw("Callback must be a code reference") if ref $cb ne 'CODE';
+    return $cb->($self);
+}
+
+no Bio::Moose::Role;
+
+1;
+
+__END__
+
 =head2 as_text
 
  Title   : as_text
@@ -15,8 +52,6 @@ use Bio::Moose::Role;
  Status  : Stable
 
 =cut
-
-requires 'as_text';
 
 =head2 display_text
 
@@ -40,8 +75,6 @@ requires 'as_text';
 
 =cut
 
-requires 'display_text';
-
 =head2 hash_tree
 
  Title   : hash_tree
@@ -53,8 +86,6 @@ requires 'display_text';
  Status  : Uncertain
 
 =cut
-
-require 'hash_tree';
 
 =head2 tagname
 
@@ -75,12 +106,3 @@ require 'hash_tree';
  Status  : Stable
 
 =cut
-
-has tag_name => (
-   is    => 'rw',
-   does  => 'Str'
-);
-
-no Bio::Moose::Role;
-
-1;

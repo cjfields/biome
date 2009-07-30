@@ -1,10 +1,11 @@
 package Bio::Moose;
 
-use Moose ();
+our $VERSION = '0.001';
 
+use Modern::Perl;
+use Moose ();
 use Moose::Exporter;
 
-#use Bio::Moose::Root;
 use Bio::Moose::Meta::Class;
 
 our $EXCEPTION_CLASS = '';

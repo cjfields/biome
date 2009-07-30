@@ -1,16 +1,12 @@
 # Let the code begin...
 
-package Bio::Annotation::Target;
+package Bio::Moose::Annotation::Target;
 
 use Bio::Moose;
 
-# possibly make this another role, seeing as it's used three times
-#extends 'Bio::Annotation::DBLink';
+extends 'Bio::Moose::Annotation::DBLink';
 
-with qw(Bio::Moose::Role::Annotate
-        Bio::Moose::Role::DBLink
-        Bio::Moose::Role::Identify
-        Bio::Moose::Role::Range);
+with 'Bio::Moose::Role::Range';
 
 has '+DEFAULT_CB' => (
     default => sub {sub { $_[0]->as_text || ''}},
@@ -20,36 +16,19 @@ has '+DEFAULT_CB' => (
 has target_id => (
     is          => 'rw',
     isa         => 'Str',
-    default     => sub {$_->primary_id},
+    default     => sub {shift->primary_id || ''},
     lazy        => 1
 );
 
 sub as_text {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  my $target = $self->target_id || '';
-  my $start  = $self->start     || '';
-  my $end    = $self->end       || '';
-  my $strand = $self->strand    || '';
+    my $target = $self->target_id || '';
+    my $start  = $self->start     || '';
+    my $end    = $self->end       || '';
+    my $strand = $self->strand    || '';
 
    return "Target=".$target." ".$start." ".$end." ".$strand;
-}
-
-sub hash_tree {
-    my ($self) = @_;
-    
-    my $h = {};
-    $h->{'database'}   = $self->database;
-    $h->{'primary_id'} = $self->primary_id;
-    if( defined $self->optional_id ) {
-        $h->{'optional_id'} = $self->optional_id;
-    }
-    if( defined $self->comment ) {
-        # we know that comments have hash_tree methods
-        $h->{'comment'} = $self->comment;
-    }
- 
-    return $h;
 }
 
 no Bio::Moose;

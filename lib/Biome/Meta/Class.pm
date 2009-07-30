@@ -8,7 +8,7 @@ extends 'Moose::Meta::Class';
 
 # possibly other meta sugar as well (set_from_args, others?)
 
-## -------------------------------------------------
+# -------------------------------------------------
 
 our $error_level;
 
@@ -40,8 +40,8 @@ sub create_error {
         $text = shift @args;
     }
     
-    my %args = (metaclass => $self, last_error => $@, @args );    
-    $text = $args{message} || 'Something wrong!';
+    my %args = (metaclass => $self, last_error => $@, @args );
+    $text ||= $args{message} || 'Something wrong!';
     
     my $class = ref $self ? $self->error_class : "Moose::Error::Default";
 
@@ -103,7 +103,7 @@ sub stack_trace{
     return @out;
 }
 
-## -------------------------------------------------
+# -------------------------------------------------
 
 no Moose;
 

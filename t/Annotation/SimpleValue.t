@@ -2,22 +2,17 @@ use strict;
 use warnings;
 
 BEGIN {
-    use lib '.';
-    use Test::More tests => 29;
+    use Test::More tests => 8;
     use Test::Moose;
     use Test::Exception;
-    use_ok('Bio::Moose::Annotation::SimpleValue');
-    use_ok('Bio::Moose::Annotation::Comment');
-    use_ok('Bio::Moose::Annotation::Reference');
-    use_ok('Bio::Moose::Annotation::DBLink');
-    use_ok('Bio::Moose::Annotation::Target');
+	use_ok('Bio::Moose::Annotation::SimpleValue');
 }
 
 #simple value
 
-my $simple = Bio::Moose::Annotation::SimpleValue->new(-tag_name => 'colour',
-					       -value   => '1',
-					      );
+my $simple = Bio::Moose::Annotation::SimpleValue->new(
+                    -tag_name => 'colour',
+					-value   => '1');
 
 does_ok($simple, 'Bio::Moose::Role::Annotate');
 is $simple->display_text, 1;
@@ -28,23 +23,15 @@ is $simple->value(0), 0;
 is $simple->value, 0;
 is $simple->display_text, 0;
 
-my $t = $simple->hash_tree;
-
-is $t->{value}, '0';
-
-# link
-
-my $link1 = Bio::Moose::Annotation::DBLink->new(-database => 'TSC',
-					 -primary_id => 'TSC0000030',
-					);
-does_ok($link1,'Bio::Moose::Role::Annotate');
-does_ok($link1,'Bio::Moose::Role::Identify');
-is $link1->database(), 'TSC';
-is $link1->primary_id(), 'TSC0000030';
-is $link1->as_text, 'Direct database link to TSC0000030 in database TSC';
-
-
-
+## link
+#
+#my $link1 = Bio::Annotation::DBLink->new(-database => 'TSC',
+#					 -primary_id => 'TSC0000030',
+#					);
+#isa_ok($link1,'Bio::AnnotationI');
+#is $link1->database(), 'TSC';
+#is $link1->primary_id(), 'TSC0000030';
+#is $link1->as_text, 'Direct database link to TSC0000030 in database TSC';
 #my $ac = Bio::Annotation::Collection->new();
 #isa_ok($ac,'Bio::AnnotationCollectionI');
 #
@@ -52,18 +39,14 @@ is $link1->as_text, 'Direct database link to TSC0000030 in database TSC';
 #$ac->add_Annotation('dblink',
 #		    Bio::Annotation::DBLink->new(-database => 'TSC',
 #						 -primary_id => 'HUM_FABV'));
-
-my $comment = Bio::Annotation::Comment->new(-tag_name => 'mycomment',
-                                            -text => 'sometext');
-does_ok($simple, 'Bio::Moose::Role::Annotate');
-is $comment->text, 'sometext';
-is $comment->value, 'sometext';
-is $comment->display_text, 'sometext';
-is $comment->tag_name, 'mycomment';
-is $comment->as_text, 'Comment: sometext';
-
+#
+#my $comment = Bio::Annotation::Comment->new( '-text' => 'sometext');
+#is $comment->text, 'sometext';
+#is $comment->as_text, 'Comment: sometext';
 #$ac->add_Annotation('comment', $comment);
-
+#
+#
+#
 #my $target = Bio::Annotation::Target->new(-target_id  => 'F321966.1',
 #					  -start      => 1,
 #					  -end        => 200,
@@ -71,21 +54,22 @@ is $comment->as_text, 'Comment: sometext';
 #					 );
 #isa_ok($target,'Bio::AnnotationI');
 #ok $ac->add_Annotation('target', $target);
-
-my $ref = Bio::Annotation::Reference->new( -authors  => 'author line',
-					   -title    => 'title line',
-					   -location => 'location line',
-					   -start    => 12);
-does_ok($ref,'Bio::Moose::Role::Annotate');
-is $ref->authors, 'author line';
-is $ref->title,  'title line';
-is $ref->location, 'location line';
-is $ref->start, 12;
-is $ref->database, 'MEDLINE';
-is $ref->as_text, 'Reference: title line';
-
+#
+#
+#my $ref = Bio::Annotation::Reference->new( -authors  => 'author line',
+#					   -title    => 'title line',
+#					   -location => 'location line',
+#					   -start    => 12);
+#isa_ok($ref,'Bio::AnnotationI');
+#is $ref->authors, 'author line';
+#is $ref->title,  'title line';
+#is $ref->location, 'location line';
+#is $ref->start, 12;
+#is $ref->database, 'MEDLINE';
+#is $ref->as_text, 'Reference: title line';
 #$ac->add_Annotation('reference', $ref);
-
+#
+#
 #my $n = 0;
 #foreach my $link ( $ac->get_Annotations('dblink') ) {
 #    is $link->database, 'TSC';

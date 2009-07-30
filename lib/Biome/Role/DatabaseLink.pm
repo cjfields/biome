@@ -1,64 +1,16 @@
 # Let the code begin...
 
-package Bio::Moose::Annotation::DBLink;
+package Bio::Moose::Role::DatabaseLink;
 
-use Bio::Moose;
+use Bio::Moose::Role;
 
-with qw(Bio::Moose::Role::Annotate
-        Bio::Moose::Role::DBLink
-        Bio::Moose::Role::Identify);
-
-has '+DEFAULT_CB' => (
-    default     => sub { (($_[0]->database ? $_[0]->database . ':' : '' ) .
-                          ($_[0]->primary_id ? $_[0]->primary_id : '') .
-                          ($_[0]->version ? '.' . $_[0]->version : '')) || '' },
-    lazy        => 1
-    );
-
-has [qw(tagname database primary_id optional_id comment version url authority )] => (
+# We could create a constaint for the URL if needed...
+has [qw(database optional_id comment url)] => (
     is          => 'rw',
     isa         => 'Str'
 );
 
-has '+object_id' => (
-    default     => sub {shift->primary_id(@_)},
-    lazy        => 1
-);
-
-has '+namespace' => (
-    default     => sub {shift->database(@_)},
-    lazy        => 1,
-);
-
-sub as_text{
-    my ($self) = @_;
-
-    return "Direct database link to ".$self->primary_id
-        .($self->version ? ".".$self->version : "")
-        .($self->optional_id ? " (".$self->optional_id.")" : "")
-        ." in database ".$self->database;
-}
-
-sub hash_tree{
-    my ($self) = @_;
-    
-    my $h = {};
-    $h->{'database'}   = $self->database;
-    $h->{'primary_id'} = $self->primary_id;
-    if( defined $self->optional_id ) {
-        $h->{'optional_id'} = $self->optional_id;
-    }
-    if( defined $self->comment ) {
-        # we know that comments have hash_tree methods
-        $h->{'comment'} = $self->comment;
-    }
- 
-    return $h;
-}
-
-no Bio::Moose;
-
-__PACKAGE__->meta->make_immutable;
+no Bio::Moose::Role;
 
 1;
 
