@@ -11,8 +11,8 @@ with 'Biome::Role::LocationI';
 
 
 
-#still not sure whether we need to switch strand value during object construction when
-#both start and end are passed 
+#still not sure how and whether we need to set strand value when both start and end values are passed 
+#during object construction. Maybe running the tests will reveal that
 
 =head2 start
 
