@@ -2,11 +2,9 @@
 # Let the code begin...
 
 
-package Bio::Location::AvWithinCoordPolicy;
-use strict;
-
-
-use base qw(Bio::Location::WidestCoordPolicy);
+package BioMe::Location::AvWithinCoordPolicy;
+use BioMe;
+extends 'BioMe::Location::WidestCoordPolicy';
 
 
 =head2 start
