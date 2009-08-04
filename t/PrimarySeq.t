@@ -5,22 +5,23 @@ use strict;
 
 BEGIN { 
     use lib '.';
-    use Test::More tests => 50;
+    use Test::More tests => 53;
     use Test::Moose;
     use Test::Exception;
-	use_ok('Bio::Moose::PrimarySeq');
+	use_ok('Biome::PrimarySeq');
 }
 
 # simple get/set
-my $seq = Bio::Moose::PrimarySeq->new(
+my $seq = Biome::PrimarySeq->new(
                     -rawseq           => '----TTGGTGG---CGTCA--ACT---',
                     -display_id       => 'new-id',
                     -alphabet         => 'dna',
                     -accession_number => 'X677667',
                     -description      => 'Sample PrimarySeq object');
 ok defined $seq;
-does_ok($seq,'Bio::Moose::Role::PrimarySeq');
+does_ok($seq,'Biome::Role::PrimarySeq');
 is $seq->seq(), '----TTGGTGG---CGTCA--ACT---';
+is $seq->length(), 15;
 is $seq->alphabet(), 'dna';
 is $seq->is_circular(), undef;
 ok $seq->is_circular(1);
@@ -29,8 +30,8 @@ is $seq->accession_number(), 'X677667';
 is $seq->display_id(), 'new-id';
 
 # check Identify, Describe roles
-does_ok($seq,'Bio::Moose::Role::Describe');
-does_ok($seq,'Bio::Moose::Role::Identify');
+does_ok($seq,'Biome::Role::Describe');
+does_ok($seq,'Biome::Role::Identify');
 
 # make sure all methods are implemented
 is $seq->authority("bioperl.org"), "bioperl.org";
@@ -78,8 +79,9 @@ is($seq->subseq(-start => 7, -end => 15, -strand => 1), 'G---CGTCA--ACT');
 #is( $seq->subseq($fuzzy), 'GGTGGC');
 
 my $trunc = $seq->trunc(-start => 1, -end => 4);
-does_ok $trunc, 'Bio::Moose::Role::PrimarySeq';
+does_ok $trunc, 'Biome::Role::PrimarySeq';
 is $trunc->rawseq(), 'TTGG' || diag("Expecting TTGG. Got ".$trunc->seq());
+is $trunc->length(), 4;
 
 # TODO: Locations NYI
 #$trunc = $seq->trunc($splitlocation);
@@ -91,11 +93,12 @@ is $trunc->rawseq(), 'TTGG' || diag("Expecting TTGG. Got ".$trunc->seq());
 #is( $trunc->seq(), 'GGTGGC');
 
 my $rev = $seq->revcom();
-does_ok($rev, 'Bio::Moose::Role::PrimarySeq');
+does_ok($rev, 'Biome::Role::PrimarySeq');
 
-is $rev->seq(), '---AGT--TGACG---CCACCAA----';
+is $rev->seq, '---AGT--TGACG---CCACCAA----';
 is $rev->accession_number, 'X677667';
 is $rev->is_circular, 0;
+is $rev->length, 15;
 
 #
 # Translate
@@ -184,9 +187,9 @@ is $aa->rawseq, 'M' or diag("Translation: ". $aa->seq);
 is $seq->rawseq('TTGGTGGCG?CAACT'), 'TTGGTGGCG?CAACT';
 
 # test for some aliases
-# implementation-specific, see above for Bio::Moose::PrimarySeq
+# implementation-specific, see above for Biome::PrimarySeq
 
-$seq = Bio::Moose::PrimarySeq->new(
+$seq = Biome::PrimarySeq->new(
 		-display_id 	=> 'myID',
 		-id				=> 'foo',
         -description 	=> 'Alias desc');
@@ -208,7 +211,7 @@ ok(!$seq->can('id'), 'we do not use the generic id()');
 #is($seq->alphabet,'dna');
 
 # alphabet has a type constraint
-dies_ok {Bio::Moose::PrimarySeq->new(
+dies_ok {Biome::PrimarySeq->new(
 	-rawseq           => '----TTGGTGG---CGTCA--ACT---',
 	-display_id       => 'new-id',
 	-alphabet         => 'foo')} 'alphabet is a contrained type';

@@ -37,8 +37,8 @@ has symbols => (
     is   => 'rw',
     isa  => 'HashRef[Str]',
     default => sub { {
-        'RESIDUE' => 'A-Za-z*?=',
-        'GAP'     => '-.~'
+        'RESIDUE' => 'A-Za-z\*\?=',
+        'GAP'     => '\-\.~'
     } }
     );
 
@@ -276,8 +276,8 @@ sub length {
     my $self = shift;
     my $len = $self->rawseq();
     if ($self->has_gaps) {
-        my $gs = quotemeta(${$self->symbols}{GAP});
-        $len =~ s{$gs}{}g;
+        my $gs = ${$self->symbols}{GAP};
+        $len =~ s{[$gs]}{}g;
     }
     CORE::length($len);
 }
@@ -324,6 +324,19 @@ sub _find_orf {
 	$self->warn("No termination codon found, will translate - sequence:\n$sequence");
 	$sequence;
 }
+
+sub validate_seq {
+	my ($self,$seqstr) = @_;
+	return 0 unless( defined $seqstr );
+    my $MATCHPATTERN = join('',values %{$self->symbols});
+	if((CORE::length($seqstr) > 0) && ($seqstr !~ /^([$MATCHPATTERN]+)$/)) {
+	    $self->warn("seq doesn't validate, mismatch is ".
+			join(",",($seqstr =~ /([^$MATCHPATTERN]+)/g)));
+		return 0;
+	}
+	return 1;
+}
+
 
 sub _build_display_id {$_[1]}
 
