@@ -15,11 +15,11 @@ our $VERBOSE = $ENV{BIOMOOSE_DEBUG} || 0;
 # import Moose magic through meta class (no need to import separately)
 package MyClass1;
 
-use Bio::Moose; # implied base class is Bio::Root::Root
+use Biome; # implied base class is Bio::Root::Root
 
 has 'test1' => ( is => 'rw');
 
-no Bio::Moose;
+no Biome;
 
 package main;
 
@@ -35,10 +35,10 @@ for my $att (qw(test1 -test1)) {
 	
 	is($i->test1, 'Foo', "Named parameter [$att]");
 	
-	meta_ok('Bio::Moose::Root', 'Bio::Moose::Root has a meta');
-	meta_ok($i, 'Instances of Bio::Moose::Root have a meta class');
+	meta_ok('Biome::Root', 'Biome::Root has a meta');
+	meta_ok($i, 'Instances of Biome::Root have a meta class');
 	
-	isa_ok($i->meta, 'Bio::Moose::Meta::Class');
+	isa_ok($i->meta, 'Biome::Meta::Class');
 	# We should hook in Bio::Root::Exceptions here
 	throws_ok {$i->strict('Foo')} qr/Validation failed for 'Int' failed/,
 		'verbose() requires an Int value';
@@ -50,6 +50,6 @@ for my $att (qw(test1 -test1)) {
 	
 	# explicit warn/throw
 	
-	throws_ok {$i->throw('Foo!')} 'Bio::Moose::Root::Error', 'throw()';
+	throws_ok {$i->throw('Foo!')} 'Biome::Root::Error', 'throw()';
 }
 

@@ -1,4 +1,4 @@
-# -*-Perl-*- Test Harness script for Bio::Moose
+# -*-Perl-*- Test Harness script for Biome
 
 use strict;
 
@@ -12,11 +12,11 @@ BEGIN {
 {
     package MyRange;
     
-    use Bio::Moose;
+    use Biome;
     
-    with 'Bio::Moose::Role::Range';
+    with 'Biome::Role::Range';
     
-    no Bio::Moose;
+    no Biome;
     __PACKAGE__->meta->make_immutable;
 }
 
@@ -80,9 +80,9 @@ for my $s (@spans) {
     }
 }
 
-does_ok($ranges[0],'Bio::Moose::Role::Range', 'Range role');
+does_ok($ranges[0],'Biome::Role::Range', 'Range role');
 isa_ok($ranges[0],'MyRange', 'MyRange class');
-ok(!$ranges[0]->isa('Bio::Moose::Role::Range'), 'Role consumed by class');
+ok(!$ranges[0]->isa('Biome::Role::Range'), 'Role consumed by class');
 is($ranges[0]->start, 1);
 is($ranges[0]->end, 100);
 is($ranges[0]->strand, 1);

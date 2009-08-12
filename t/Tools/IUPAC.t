@@ -8,33 +8,33 @@ BEGIN {
     use Test::More tests => 12;
     use Test::Moose;
     use Test::Exception;
-	use_ok('Bio::Moose::Tools::IUPAC');
+	use_ok('Biome::Tools::IUPAC');
 }
 
 # test class methods
 
 # ambiguous codes - DNA
-my $table = Bio::Moose::Tools::IUPAC->iupac_dna;
+my $table = Biome::Tools::IUPAC->iupac_dna;
 isa_ok($table, 'HASH');
-is(Bio::Moose::Tools::IUPAC->count_iupac_dna, 17);
-is(Bio::Moose::Tools::IUPAC->get_iupac_dna('N'), 'ACGT');
+is(Biome::Tools::IUPAC->count_iupac_dna, 17);
+is(Biome::Tools::IUPAC->get_iupac_dna('N'), 'ACGT');
 
 # ambiguous codes - DNA
-$table = Bio::Moose::Tools::IUPAC->iupac_rev_dna;
+$table = Biome::Tools::IUPAC->iupac_rev_dna;
 isa_ok($table, 'HASH');
-is(Bio::Moose::Tools::IUPAC->count_iupac_rev_dna, 16);
-is(Bio::Moose::Tools::IUPAC->get_iupac_rev_dna('ACGT') , 'N');
+is(Biome::Tools::IUPAC->count_iupac_rev_dna, 16);
+is(Biome::Tools::IUPAC->get_iupac_rev_dna('ACGT') , 'N');
 
 # ambiguous codes - protein
-$table = Bio::Moose::Tools::IUPAC->iupac_aa;
+$table = Biome::Tools::IUPAC->iupac_aa;
 isa_ok($table, 'HASH');
-is(Bio::Moose::Tools::IUPAC->count_iupac_aa, 27);
-is(Bio::Moose::Tools::IUPAC->get_iupac_aa('N') , 'N');
+is(Biome::Tools::IUPAC->count_iupac_aa, 27);
+is(Biome::Tools::IUPAC->get_iupac_aa('N') , 'N');
 
-$table = Bio::Moose::Tools::IUPAC->map_aa_1_3;
+$table = Biome::Tools::IUPAC->map_aa_1_3;
 isa_ok($table, 'HASH');
 
-$table = Bio::Moose::Tools::IUPAC->map_aa_3_1;
+$table = Biome::Tools::IUPAC->map_aa_3_1;
 isa_ok($table, 'HASH');
 
 # NYI
