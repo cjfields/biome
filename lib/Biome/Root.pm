@@ -1,10 +1,10 @@
-package Bio::Moose::Root;
+package Biome::Root;
 use Moose 0.79;
 use Modern::Perl;
 extends 'Moose::Object';
 
 # run BEGIN block to check for exception class, default to light output?
-# or should that go in Bio::Moose?
+# or should that go in Biome?
 
 # Now separating verbosity and strictness/exceptions. Global settings override local
 # ones, but this can be overridden in child classes
@@ -12,14 +12,14 @@ extends 'Moose::Object';
 has 'verbose' => (
     is   => 'rw',
     isa  => 'Bool',
-    default => $ENV{BIOMOOSE_DEBUG} || 0
+    default => $ENV{BIOME_DEBUG} || 0
     );
 
 # strictness level; setting to True converts warnings to exceptions
 has 'strict' => (
     is      => 'rw',
     isa     => 'Int',
-    default => $ENV{BIOMOOSE_STRICT} || 0
+    default => $ENV{BIOME_STRICT} || 0
     );
 
 sub BUILDARGS {
@@ -74,7 +74,7 @@ sub throw {
     
     # Note: value isn't passed on (not sure why, we should address that)
     
-    # This delegates to the Bio::Moose::Meta::Class throw_error(), which calls
+    # This delegates to the Biome::Meta::Class throw_error(), which calls
     # proper error class. Therefore we should probably do most of the
     # grunt work there so it also BP-izes the other errors that'll pop up, such
     # as type check errors, etc.
@@ -104,7 +104,7 @@ sub deprecated{
     #    $self->throw('Version must be numerical, such as 1.006000 for v1.6.0, not '.
     #                 $version) unless $version =~ /^\d+\.\d+$/;
     #    $msg .= "\nDeprecated in $version";
-    #    if ($Bio::Moose::Root::VERSION >= $version) {
+    #    if ($Biome::Root::VERSION >= $version) {
     #        $self->throw($msg)
     #    } 
     #}

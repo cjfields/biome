@@ -1,10 +1,10 @@
-package Bio::Moose::Root::IO;
+package Biome::Root::IO;
 
-use Bio::Moose::Root::Role;
+use Biome::Role;
 
-# IO is a role, nothing to see just yet...
+# IO will be a role, nothing to see here just yet...
 
-no Bio::Moose::Root::Role;
+no Biome::Role;
 
 1;
 

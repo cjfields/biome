@@ -1,4 +1,4 @@
-package Bio::Moose::Root::Error;
+package Biome::Root::Error;
 
 use Moose;
 
@@ -7,7 +7,7 @@ use Moose;
 
 # also, Exception::Class::Base is strict re: passed arguments (throws when
 # fields aren't present). This class makes it work within a Moose framework. We
-# can't guarantee a non-Bio::Moose::Root::Error (beyond those already know to
+# can't guarantee a non-Biome::Root::Error (beyond those already know to
 # work with Moose) will work at this time.
 
 extends qw(Moose::Object Exception::Class::Base);
@@ -26,7 +26,7 @@ sub new {
 has message    => ( isa => "Str",                           is => "ro" );
 has attr       => ( isa => "Moose::Meta::Attribute",        is => "ro" );
 has method     => ( isa => "Moose::Meta::Method",           is => "ro" );
-has metaclass  => ( isa => "Bio::Moose::Meta::Class",       is => "ro" );
+has metaclass  => ( isa => "Biome::Meta::Class",       is => "ro" );
 has data       => ( is  => "ro" );
 has line       => ( isa => "Int",                           is => "ro" );
 has file       => ( isa => "Str",                           is => "ro" );
