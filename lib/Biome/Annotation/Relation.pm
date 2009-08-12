@@ -1,8 +1,8 @@
 package Bio::Annotation::Relation;
 
-use Bio::Moose;
+use Biome;
 
-with 'Bio::Moose::Role::Annotate';
+with 'Biome::Role::Annotate';
 
 sub as_text{
    my ($self) = @_;
@@ -22,7 +22,7 @@ has [qw(type to)] => (
 # TODO: NYI. Thinking this should be a role...
 #has 'tag_term' => (
 #    is          => 'rw',
-#    does        => 'Bio::Moose::Role::OntologyTerm'
+#    does        => 'Biome::Role::OntologyTerm'
 #);
 
 1;
@@ -155,10 +155,10 @@ The rest of the documentation details each of the object methods. Internal metho
 
 =cut
 
-=head2 tag_name
+=head2 tagname
 
- Title   : tag_name
- Usage   : $obj->tag_name($newval)
+ Title   : tagname
+ Usage   : $obj->tagname($newval)
  Function: Get/set the tag name for this annotation value.
 
            Setting this is optional. If set, it obviates the need to

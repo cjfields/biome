@@ -1,121 +1,85 @@
-# Let the code begin...
+package Biome::Annotation::TagTree;
 
-package Bio::Annotation::TagTree;
+use Biome;
+use Moose::Util::TypeConstraints;
 
-use Bio::Moose;
+with 'Biome::Role::Annotate';
 
-with 'Bio::Moose::Role::Annotate';
+use Data::Stag ();
 
-# Object preamble - inherits from Bio::Root::Root
+subtype 'VALID_TAGTREE_FORMAT'
+    => as 'Str'
+    => where {$_ =~ /(?:xml|indent|sxpr|itext)/ixmso};
 
-#use base qw(Bio::Annotation::SimpleValue);
-#use Data::Stag;
+# data stag instance
+#class_type 'My::Data::Stag';
+#
+#coerce 'Data::Stag::StagI'
+#    => from 'Str'
+#        => via { Data::Stag->from( 'istr', $_ ) }
+#    => from 'ArrayRef'
+#        => via { Data::Stag->nodify($_) }
+#    ;
 
-=head2 new
-
- Title   : new
- Usage   : my $sv = Bio::Annotation::TagTree->new();
- Function: Instantiate a new TagTree object
- Returns : Bio::Annotation::TagTree object
- Args    : -value => $value to initialize the object data field [optional]
-           -tagname => $tag to initialize the tagname [optional]
-           -tagformat => format for output [optional]
-                      (types 'xml', 'itext', 'sxpr', 'indent', default = 'itext')
-           -node => Data::Stag node or Bio::Annotation::TagTree instance
-
-=cut
-
-#sub new {
-#    my ( $class, @args ) = @_;
-#    my $self = $class->SUPER::new();
-#    my ( $node, $value, $tag, $format, $verbose ) = $self->_rearrange(
-#        [
-#            qw(
-#              NODE
-#              VALUE
-#              TAGNAME
-#              TAGFORMAT
-#              VERBOSE)
-#        ],
-#        @args
-#    );
-#    $self->throw("Cant use both node and value; mutually exclusive")
-#      if defined $node && defined $value;
-#    defined $tag && $self->tagname($tag);
-#    $format ||= 'itext';
-#    $self->tagformat($format);
-#    defined $value   && $self->value($value);
-#    defined $node    && $self->node($node);
-#    defined $verbose && $self->verbose($verbose);
-#    return $self;
-#}
-
-sub as_text {
-    my ($self) = @_;
-    return "TagTree: " . $self->value;
-}
+#subtype 'StagStr'
+#    => as 'Str';
+#
+#coerce 'Str'
+#    => from 'ArrayRef'
+#        => via { my $node = Data::Stag->nodify($_) };
 
 has '+DEFAULT_CB' => (
     default => sub {sub { $_[0]->value || '' }},
     lazy    => 1
     );
 
-=head2 tag_name
+sub as_text {
+    my ($self) = @_;
+    return "TagTree: " . $self->value;
+}
 
- Title   : tag_name
- Usage   : $obj->tag_name($newval)
- Function: Get/set the tag name for this annotation value.
+has 'node' => (
+    is          => 'rw',
+    isa         => 'Data::Stag::StagI',
+    default     => sub { Data::Stag->new() },
+    predicate   => 'has_node',
+    lazy        => 1,
+    handles     => [qw(element data children subnodes get find findnode findval
+                    addchild add set unset free hash pairs qmatch tnodes
+                    ntnodes get_all_values duplicate)],
+    coerce      => 1
+);
 
-           Setting this is optional. If set, it obviates the need to provide
-           a tag to AnnotationCollection when adding this object.
- Example :
- Returns : value of tag name (a scalar)
- Args    : new value (a scalar, optional)
+has 'value' => (
+    is          => 'rw',
+    isa         => 'Str',
+    #trigger     => \&_build_value,
+    #lazy        => 1,
+);
 
-=cut
-
-=head1 Specific accessors for TagTree
-
-=cut
-
-=head2 value
-
- Title   : value
- Usage   : $obj->value($newval)
- Function: Get/set the value for this annotation.
- Returns : value of value
- Args    : newvalue (optional)
-
-=cut
-
-sub value {
+# using get/set value also gets/sets node()
+sub _build_value {
     my ( $self, $value ) = @_;
-
     # set mode? This resets the entire tagged database
     my $format = $self->tagformat;
-    if ($value) {
-        if ( ref $value ) {
-            if ( ref $value eq 'ARRAY' ) {
 
-                # note the tagname() is not used here; it is only used for
-                # storing this AnnotationI in the annotation collection
-                eval { $self->{db} = Data::Stag->nodify($value) };
-            }
-            else {
-
-                # assuming this is blessed; passing on to node() and copy
-                $self->node( $value, 'copy' );
-            }
+    if ( ref $value ) {
+        if ( ref $value eq 'ARRAY' ) {
+            # note the tagname() is not used here; it is only used for
+            # storing this AnnotationI in the annotation collection
+            eval { $self->node(Data::Stag->nodify($value)) };
         }
         else {
-
-            # not trying to guess here for now; we go by the tagformat() setting
-            my $h = Data::Stag->getformathandler($format);
-            eval { $self->{db} = Data::Stag->from( $format . 'str', $value ) };
+            # assuming this is blessed; passing on to node() and copy
+            $self->node( $value, 'copy' );
         }
-        $self->throw("Data::Stag error:\n$@") if $@;
     }
-
+    else {
+        # not trying to guess here for now; we go by the tagformat() setting
+        my $h = Data::Stag->getformathandler($format);
+        eval { $self->node(Data::Stag->from( $format . 'str', $value )) };
+    }
+    $self->throw("Data::Stag error:\n$@") if $@;
     # get mode?
     # How do we return a data structure?
     # for now, we use the output (if there is a Data::Stag node present)
@@ -123,436 +87,144 @@ sub value {
     $self->node->$format;
 }
 
-=head2 tagformat
-
- Title   : tagformat
- Usage   : $obj->tagformat($newval)
- Function: Get/set the output tag format for this annotation.
- Returns : value of tagformat
- Args    : newvalue (optional) - format for the data passed into value
-           must be of values 'xml', 'indent', 'sxpr', 'itext', 'perl'
-
-=cut
-
-my %IS_VALID_FORMAT = map { $_ => 1 } qw(xml indent sxpr itext);
-
-sub tagformat {
-    my ( $self, $value ) = @_;
-    if ( defined $value ) {
-        $self->throw( "$value is not a valid format; valid format types:\n"
-              . join( ',', map { "'$_'" } keys %IS_VALID_FORMAT ) )
-          if !exists $IS_VALID_FORMAT{$value};
-        $self->{'tagformat'} = $value;
-    }
-    return $self->{'tagformat'};
-}
-
-=head2 node
-
- Title   : node
- Usage   : $obj->node()
- Function: Get/set the topmost Data::Stag node used for this annotation.  
- Returns : Data::Stag node implementation
-           (default is Data::Stag::StagImpl)
- Args    : (optional) Data::Stag node implementation
-           (optional)'copy' => flag to create a copy of the node
-
-=cut
-
-sub node {
-    my ( $self, $value, $copy ) = @_;
-    if ( defined $value && ref $value ) {
-        $self->{'db'} =
-          $value->isa('Data::Stag::StagI')
-          ? ( $copy && $copy eq 'copy' ? $value->duplicate : $value )
-          : $value->isa('Bio::Annotation::TagTree') ? ( $copy
-              && $copy eq 'copy' ? $value->node->duplicate : $value->node )
-          : $self->throw(
-            'Object must be Data::Stag::StagI or Bio::Annotation::TagTree');
-    }
-    
-    # lazily create Data::Stag instance if not present
-    if (!$self->{'db'}) {
-        $self->{'db'} = Data::Stag->new();
-    }
-    return $self->{'db'};
-}
-
-=head2 Data::Stag convenience methods
-
-Because Data::Stag uses blessed arrays and the core Bioperl class uses blessed
-hashes, TagTree uses an internal instance of a Data::Stag node for data storage.
-Therefore the following methods actually delegate to the Data:::Stag internal
-instance.
-
-For consistency (since one could recursively check child nodes), methods retain
-the same names as Data::Stag. Also, no 'magic' (AUTOLOAD'ed) methods are
-employed, simply b/c full-fledged Data::Stag functionality can be attained by
-grabbing the Data::Stag instance using node().
-
-=head2 element
-
- Title   : element
- Usage   :
- Function: Returns the element name (key name) for this node
- Example :
- Returns : scalar
- Args    : none
-
-=cut
-
-sub element {
-    my $self = shift;
-    return $self->node->element;
-}
-
-=head2 data
-
- Title   : data
- Usage   :
- Function: Returns the data structure (array ref) for this node
- Example :
- Returns : array ref
- Args    : none
-
-=cut
-
-sub data {
-    my $self = shift;
-    return $self->node->data;
-}
-
-=head2 children
-
- Title   : children
- Usage   :
- Function: Get the top-level array of Data::Stag nodes or (if the top level is
-           a terminal node) a scalar value.
-
-           This is similar to StructuredValue's get_values() method, with the
-           key difference being instead of array refs and scalars you get either
-           Data::Stag nodes or the value for this particular node.
-
-           For consistency (since one could recursively check nodes),
-           we use the same method name as Data::Stag children().
- Example :
- Returns : an array
- Args    : none
-
-=cut
-
-sub children {
-    my $self = shift;
-    return $self->node->children;
-}
-
-=head2 subnodes
-
- Title   : subnodes
- Usage   :
- Function: Get the top-level array of Data::Stag nodes.  Unlike children(),
-           this only returns an array of nodes (if this is a terminal node,
-           no value is returned)
- Example :
- Returns : an array of nodes
- Args    : none
-
-=cut
-
-sub subnodes {
-    my $self = shift;
-    return $self->node->subnodes;
-}
-
-=head2 get
-
- Title   : get
- Usage   : 
- Function: Returns the nodes or value for the named element or path
- Example : 
- Returns : returns array of nodes or a scalar (if node is terminal)
-           dependent on wantarray
- Args    : none
-
-=cut
-
-sub get {
-    my ( $self, @vals ) = @_;
-    return $self->node->get(@vals);
-}
-
-=head2 find
-
- Title   : find
- Usage   : 
- Function: Recursively searches for and returns the nodes or values for the
-           named element or path
- Example : 
- Returns : returns array of nodes or scalars (for terminal nodes)
- Args    : none
-
-=cut
-
-sub find {
-    my ( $self, @vals ) = @_;
-    return $self->node->find(@vals);
-}
-
-=head2 findnode
-
- Title   : findnode
- Usage   : 
- Function: Recursively searches for and returns a list of nodes
-           of the given element path
- Example : 
- Returns : returns array of nodes
- Args    : none
-
-=cut
-
-sub findnode {
-    my ( $self, @vals ) = @_;
-    return $self->node->findnode(@vals);
-}
-
-=head2 findval
-
- Title   : findval
- Usage   : 
- Function: 
- Example : 
- Returns : returns array of nodes or values
- Args    : none
-
-=cut
-
-sub findval {
-    my ( $self, @vals ) = @_;
-    return $self->node->findval(@vals);
-}
-
-=head2 addchild
-
- Title   : addchild
- Usage   : $struct->addchild(['name' => [['foo'=> 'bar1']]]);
- Function: add new child node to the current node.  One can pass in a node, TagTree,
-           or data structure; for instance, in the above, this would translate
-           to (in XML):
-
-           <name>
-             <foo>bar1</foo>
-           </name>
-
- Returns : node
- Args    : first arg = element name
-           all other args are added as tag-value pairs
-
-=cut
-
-sub addchild {
-    my ( $self, @vals ) = @_;
-
-    # check for element tag first (if no element, must be empty Data::Stag node)
-    if ( !$self->element ) {
-
-        # try to do the right thing; if more than one element, wrap in array ref
-        @vals > 1 ? $self->value( \@vals ) : $self->value( $vals[0] );
-        return $self->{db};
-    }
-    elsif ( !$self->node->ntnodes ) {
-
-        # if this is a terminal node, can't add to it (use set?)
-        $self->throw("Can't add child to node; only terminal node is present!");
-    }
-    else {
-        return $self->node->addchild(@vals);
-    }
-}
-
-=head2 add
-
- Title   : add
- Usage   : $struct->add('foo', 'bar1', 'bar2', 'bar3');
- Function: add tag-value nodes to the current node.  In the above, this would
-           translate to (in XML):
-           <foo>bar1</foo>
-           <foo>bar2</foo>
-           <foo>bar3</foo>
- Returns : 
- Args    : first arg = element name
-           all other args are added as tag-value pairs
-
-=cut
-
-sub add {
-    my ( $self, @vals ) = @_;
-
-    # check for empty object and die for now
-    if ( !$self->node->element ) {
-        $self->throw("Can't add to terminal element!");
-    }
-    return $self->node->add(@vals);
-}
-
-=head2 set
-
- Title   : set
- Usage   : $struct->set('foo','bar');
- Function: sets a single tag-value pair in the current node.  Note this
-           differs from add() in that this replaces any data already present
- Returns : node
- Args    : first arg = element name
-           all other args are added as tag-value pairs
-
-=cut
-
-sub set {
-    my ( $self, @vals ) = @_;
-
-    # check for empty object
-    if ( !$self->node->element ) {
-        $self->throw("Can't add to tree; empty tree!");
-    }
-    return $self->node->set(@vals);
-}
-
-=head2 unset
-
- Title   : unset
- Usage   : $struct->unset('foo');
- Function: unsets all key-value pairs of the passed element from the
-           current node
- Returns : node
- Args    : element name
-
-=cut
-
-sub unset {
-    my ( $self, @vals ) = @_;
-    return $self->node->unset(@vals);
-}
-
-=head2 free
-
- Title   : free
- Usage   : $struct->free
- Function: removes all data from the current node
- Returns : 
- Args    : 
-
-=cut
-
-sub free {
-    my ($self) = @_;
-    return $self->node->free;
-}
-
-=head2 hash
-
- Title   : hash
- Usage   : $struct->hash;
- Function: turns the tag-value tree into a hash, all data values are array refs
- Returns : hash
- Args    : first arg = element name
-           all other args are added as tag-value pairs
-
-=cut
-
-sub hash {
-    my ($self) = @_;
-    return $self->node->hash;
-}
-
-=head2 pairs
-
- Title   : pairs
- Usage   : $struct->pairs;
- Function: turns the tag-value tree into a hash, all data values are scalar
- Returns : hash
- Args    : first arg = element name
-           all other args are added as tag-value pairs, note that duplicates
-           will be lost
-
-=cut
-
-sub pairs {
-    my ($self) = @_;
-    return $self->node->pairs;
-}
-
-=head2 qmatch
-
- Title    : qmatch
- Usage    : @persons = $s->qmatch('person', ('name'=>'fred'));
- Function : returns all elements in the node tree which match the
-            element name and the key-value pair
- Returns  : Array of nodes
- Args     : return-element str, match-element str, match-value str
-
-=cut
-
-sub qmatch {
-    my ( $self, @vals ) = @_;
-    return $self->node->qmatch(@vals);
-}
-
-=head2 tnodes
-
- Title    : tnodes
- Usage    : @termini = $s->tnodes;
- Function : returns all terminal nodes below this node
- Returns  : Array of nodes
- Args     : return-element str, match-element str, match-value str
-
-=cut
-
-sub tnodes {
-    my ($self) = @_;
-    return $self->node->tnodes;
-}
-
-=head2 ntnodes
-
- Title    : ntnodes
- Usage    : @termini = $s->ntnodes;
- Function : returns all nonterminal nodes below this node
- Returns  : Array of nodes
- Args     : return-element str, match-element str, match-value str
-
-=cut
-
-sub ntnodes {
-    my ($self) = @_;
-    return $self->node->ntnodes;
-}
-
-=head2 StructureValue-like methods
-
-=cut
-
-=head2 get_all_values
-
- Title    : get_all_values
- Usage    : @termini = $s->get_all_values;
- Function : returns all terminal node values
- Returns  : Array of values
- Args     : return-element str, match-element str, match-value str
-
-This is meant to emulate the values one would get from StructureValue's
-get_all_values() method. Note, however, using this method dissociates the
-tag-value relationship (i.e. you only get the value list, no elements)
-
-=cut
-
-sub get_all_values {
-    my $self = shift;
-    my @kids = $self->children;
-    my @vals;
-    while ( my $val = shift @kids ) {
-        ( ref $val ) ? push @kids, $val->children : push @vals, $val;
-    }
-    return @vals;
-}
+has 'tagformat' => (
+    is          => 'rw',
+    isa         => 'VALID_TAGTREE_FORMAT',
+    default     => 'itext'
+);
+
+# wondering if we should use MooseX::NonMoose to wrap up the Data::Stag
+# instance.  Removes the delegation hassle...
+
+#sub element {
+#    my $self = shift;
+#    return $self->node->element;
+#}
+#
+#sub data {
+#    my $self = shift;
+#    return $self->node->data;
+#}
+#
+#sub children {
+#    my $self = shift;
+#    return $self->node->children;
+#}
+#
+#sub subnodes {
+#    my $self = shift;
+#    return $self->node->subnodes;
+#}
+#
+#sub get {
+#    my ( $self, @vals ) = @_;
+#    return $self->node->get(@vals);
+#}
+#
+#sub find {
+#    my ( $self, @vals ) = @_;
+#    return $self->node->find(@vals);
+#}
+#
+#sub findnode {
+#    my ( $self, @vals ) = @_;
+#    return $self->node->findnode(@vals);
+#}
+#
+#sub findval {
+#    my ( $self, @vals ) = @_;
+#    return $self->node->findval(@vals);
+#}
+#
+#sub addchild {
+#    my ( $self, @vals ) = @_;
+#
+#    # check for element tag first (if no element, must be empty Data::Stag node)
+#    if ( !$self->element ) {
+#
+#        # try to do the right thing; if more than one element, wrap in array ref
+#        @vals > 1 ? $self->value( \@vals ) : $self->value( $vals[0] );
+#        return $self->{db};
+#    }
+#    elsif ( !$self->node->ntnodes ) {
+#
+#        # if this is a terminal node, can't add to it (use set?)
+#        $self->throw("Can't add child to node; only terminal node is present!");
+#    }
+#    else {
+#        return $self->node->addchild(@vals);
+#    }
+#}
+#
+#sub add {
+#    my ( $self, @vals ) = @_;
+#
+#    # check for empty object and die for now
+#    if ( !$self->node->element ) {
+#        $self->throw("Can't add to terminal element!");
+#    }
+#    return $self->node->add(@vals);
+#}
+#
+#sub set {
+#    my ( $self, @vals ) = @_;
+#
+#    # check for empty object
+#    if ( !$self->node->element ) {
+#        $self->throw("Can't add to tree; empty tree!");
+#    }
+#    return $self->node->set(@vals);
+#}
+#
+#sub unset {
+#    my ( $self, @vals ) = @_;
+#    return $self->node->unset(@vals);
+#}
+#
+#sub free {
+#    my ($self) = @_;
+#    return $self->node->free;
+#}
+#
+#sub hash {
+#    my ($self) = @_;
+#    return $self->node->hash;
+#}
+#
+#sub pairs {
+#    my ($self) = @_;
+#    return $self->node->pairs;
+#}
+#
+#sub qmatch {
+#    my ( $self, @vals ) = @_;
+#    return $self->node->qmatch(@vals);
+#}
+#
+#sub tnodes {
+#    my ($self) = @_;
+#    return $self->node->tnodes;
+#}
+#
+#sub ntnodes {
+#    my ($self) = @_;
+#    return $self->node->ntnodes;
+#}
+#
+#sub get_all_values {
+#    my $self = shift;
+#    my @kids = $self->children;
+#    my @vals;
+#    while ( my $val = shift @kids ) {
+#        ( ref $val ) ? push @kids, $val->children : push @vals, $val;
+#    }
+#    return @vals;
+#}
+
+no Biome;
+no Moose::Util::TypeConstraints;
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -713,3 +385,330 @@ methods are usually preceded with a _
  Args    : none
 
 =cut
+
+=head2 tagname
+
+ Title   : tagname
+ Usage   : $obj->tagname($newval)
+ Function: Get/set the tag name for this annotation value.
+
+           Setting this is optional. If set, it obviates the need to provide
+           a tag to AnnotationCollection when adding this object.
+ Example :
+ Returns : value of tag name (a scalar)
+ Args    : new value (a scalar, optional)
+
+=cut
+
+=head1 Specific accessors for TagTree
+
+=cut
+
+=head2 value
+
+ Title   : value
+ Usage   : $obj->value($newval)
+ Function: Get/set the value for this annotation.
+ Returns : value of value
+ Args    : newvalue (optional)
+
+=cut
+
+=head2 new
+
+ Title   : new
+ Usage   : my $sv = Bio::Annotation::TagTree->new();
+ Function: Instantiate a new TagTree object
+ Returns : Bio::Annotation::TagTree object
+ Args    : -value => $value to initialize the object data field [optional]
+           -tagname => $tag to initialize the tagname [optional]
+           -tagformat => format for output [optional]
+                      (types 'xml', 'itext', 'sxpr', 'indent', default = 'itext')
+           -node => Data::Stag node or Bio::Annotation::TagTree instance
+
+=cut
+
+=head2 tagformat
+
+ Title   : tagformat
+ Usage   : $obj->tagformat($newval)
+ Function: Get/set the output tag format for this annotation.
+ Returns : value of tagformat
+ Args    : newvalue (optional) - format for the data passed into value
+           must be of values 'xml', 'indent', 'sxpr', 'itext', 'perl'
+
+=cut
+
+=head2 node
+
+ Title   : node
+ Usage   : $obj->node()
+ Function: Get/set the topmost Data::Stag node used for this annotation.  
+ Returns : Data::Stag node implementation
+           (default is Data::Stag::StagImpl)
+ Args    : (optional) Data::Stag node implementation
+           (optional)'copy' => flag to create a copy of the node
+
+=cut
+
+=head2 clone_node
+
+ Title   : clone_node
+ Usage   : my $copy = $obj->clone_node()
+ Function: Get/set the topmost Data::Stag node used for this annotation.  
+ Returns : copy of whatever is in node()
+ Args    : none
+
+=cut
+
+=head2 Data::Stag convenience methods
+
+Because Data::Stag uses blessed arrays and the core Bioperl class uses blessed
+hashes, TagTree uses an internal instance of a Data::Stag node for data storage.
+Therefore the following methods actually delegate to the Data:::Stag internal
+instance.
+
+For consistency (since one could recursively check child nodes), methods retain
+the same names as Data::Stag. Also, no 'magic' (AUTOLOAD'ed) methods are
+employed, simply b/c full-fledged Data::Stag functionality can be attained by
+grabbing the Data::Stag instance using node().
+
+=head2 element
+
+ Title   : element
+ Usage   :
+ Function: Returns the element name (key name) for this node
+ Example :
+ Returns : scalar
+ Args    : none
+
+=cut
+
+=head2 data
+
+ Title   : data
+ Usage   :
+ Function: Returns the data structure (array ref) for this node
+ Example :
+ Returns : array ref
+ Args    : none
+
+=cut
+
+=head2 children
+
+ Title   : children
+ Usage   :
+ Function: Get the top-level array of Data::Stag nodes or (if the top level is
+           a terminal node) a scalar value.
+
+           This is similar to StructuredValue's get_values() method, with the
+           key difference being instead of array refs and scalars you get either
+           Data::Stag nodes or the value for this particular node.
+
+           For consistency (since one could recursively check nodes),
+           we use the same method name as Data::Stag children().
+ Example :
+ Returns : an array
+ Args    : none
+
+=cut
+
+=head2 subnodes
+
+ Title   : subnodes
+ Usage   :
+ Function: Get the top-level array of Data::Stag nodes.  Unlike children(),
+           this only returns an array of nodes (if this is a terminal node,
+           no value is returned)
+ Example :
+ Returns : an array of nodes
+ Args    : none
+
+=cut
+
+=head2 get
+
+ Title   : get
+ Usage   : 
+ Function: Returns the nodes or value for the named element or path
+ Example : 
+ Returns : returns array of nodes or a scalar (if node is terminal)
+           dependent on wantarray
+ Args    : none
+
+=cut
+
+=head2 find
+
+ Title   : find
+ Usage   : 
+ Function: Recursively searches for and returns the nodes or values for the
+           named element or path
+ Example : 
+ Returns : returns array of nodes or scalars (for terminal nodes)
+ Args    : none
+
+=cut
+
+=head2 findnode
+
+ Title   : findnode
+ Usage   : 
+ Function: Recursively searches for and returns a list of nodes
+           of the given element path
+ Example : 
+ Returns : returns array of nodes
+ Args    : none
+
+=cut
+
+=head2 findval
+
+ Title   : findval
+ Usage   : 
+ Function: 
+ Example : 
+ Returns : returns array of nodes or values
+ Args    : none
+
+=cut
+
+=head2 addchild
+
+ Title   : addchild
+ Usage   : $struct->addchild(['name' => [['foo'=> 'bar1']]]);
+ Function: add new child node to the current node.  One can pass in a node, TagTree,
+           or data structure; for instance, in the above, this would translate
+           to (in XML):
+
+           <name>
+             <foo>bar1</foo>
+           </name>
+
+ Returns : node
+ Args    : first arg = element name
+           all other args are added as tag-value pairs
+
+=cut
+
+=head2 add
+
+ Title   : add
+ Usage   : $struct->add('foo', 'bar1', 'bar2', 'bar3');
+ Function: add tag-value nodes to the current node.  In the above, this would
+           translate to (in XML):
+           <foo>bar1</foo>
+           <foo>bar2</foo>
+           <foo>bar3</foo>
+ Returns : 
+ Args    : first arg = element name
+           all other args are added as tag-value pairs
+
+=cut
+
+=head2 set
+
+ Title   : set
+ Usage   : $struct->set('foo','bar');
+ Function: sets a single tag-value pair in the current node.  Note this
+           differs from add() in that this replaces any data already present
+ Returns : node
+ Args    : first arg = element name
+           all other args are added as tag-value pairs
+
+=cut
+
+=head2 unset
+
+ Title   : unset
+ Usage   : $struct->unset('foo');
+ Function: unsets all key-value pairs of the passed element from the
+           current node
+ Returns : node
+ Args    : element name
+
+=cut
+
+=head2 free
+
+ Title   : free
+ Usage   : $struct->free
+ Function: removes all data from the current node
+ Returns : 
+ Args    : 
+
+=cut
+
+=head2 hash
+
+ Title   : hash
+ Usage   : $struct->hash;
+ Function: turns the tag-value tree into a hash, all data values are array refs
+ Returns : hash
+ Args    : first arg = element name
+           all other args are added as tag-value pairs
+
+=cut
+
+=head2 pairs
+
+ Title   : pairs
+ Usage   : $struct->pairs;
+ Function: turns the tag-value tree into a hash, all data values are scalar
+ Returns : hash
+ Args    : first arg = element name
+           all other args are added as tag-value pairs, note that duplicates
+           will be lost
+
+=cut
+
+=head2 qmatch
+
+ Title    : qmatch
+ Usage    : @persons = $s->qmatch('person', ('name'=>'fred'));
+ Function : returns all elements in the node tree which match the
+            element name and the key-value pair
+ Returns  : Array of nodes
+ Args     : return-element str, match-element str, match-value str
+
+=cut
+
+=head2 tnodes
+
+ Title    : tnodes
+ Usage    : @termini = $s->tnodes;
+ Function : returns all terminal nodes below this node
+ Returns  : Array of nodes
+ Args     : return-element str, match-element str, match-value str
+
+=cut
+
+=head2 ntnodes
+
+ Title    : ntnodes
+ Usage    : @termini = $s->ntnodes;
+ Function : returns all nonterminal nodes below this node
+ Returns  : Array of nodes
+ Args     : return-element str, match-element str, match-value str
+
+=cut
+
+=head2 StructureValue-like methods
+
+=cut
+
+=head2 get_all_values
+
+ Title    : get_all_values
+ Usage    : @termini = $s->get_all_values;
+ Function : returns all terminal node values
+ Returns  : Array of values
+ Args     : return-element str, match-element str, match-value str
+
+This is meant to emulate the values one would get from StructureValue's
+get_all_values() method. Note, however, using this method dissociates the
+tag-value relationship (i.e. you only get the value list, no elements)
+
+=cut
+

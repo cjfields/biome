@@ -183,13 +183,13 @@ methods. Internal methods are usually preceded with a _
 
 # Let the code begin...
 
-package Bio::Moose::Tools::CodonTable;
+package Biome::Tools::CodonTable;
 
-use Bio::Moose;
+use Biome;
 use MooseX::ClassAttribute;
 use MooseX::AttributeHelpers;
 
-use Bio::Moose::Tools::IUPAC;
+use Biome::Tools::IUPAC;
 
 # first set internal values for all translation tables
 
@@ -298,7 +298,7 @@ class_has iupac_dna => (
 	is      	=> 'ro',
 	init_arg	=> undef,
 	lazy		=> 1,
-    default     => sub {Bio::Moose::Tools::IUPAC->iupac_dna},
+    default     => sub {Biome::Tools::IUPAC->iupac_dna},
 );
 
 has gap => (
@@ -877,7 +877,7 @@ sub _build_codons {
     return $codons;
 }
 
-no Bio::Moose;
+no Biome;
 no MooseX::ClassAttribute;
 no MooseX::AttributeHelpers;
 

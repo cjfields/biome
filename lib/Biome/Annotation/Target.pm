@@ -1,23 +1,17 @@
 # Let the code begin...
 
-package Bio::Moose::Annotation::Target;
+package Biome::Annotation::Target;
 
-use Bio::Moose;
+use Biome;
 
-extends 'Bio::Moose::Annotation::DBLink';
+extends 'Biome::Annotation::DBLink';
 
-with 'Bio::Moose::Role::Range';
+with 'Biome::Role::Range',
+     'Biome::Role::Annotate' => {'data_slots' => [qw(target_id)]};
 
 has '+DEFAULT_CB' => (
     default => sub {sub { $_[0]->as_text || ''}},
     lazy    => 1
-    );
-
-has target_id => (
-    is          => 'rw',
-    isa         => 'Str',
-    default     => sub {shift->primary_id || ''},
-    lazy        => 1
 );
 
 sub as_text {
@@ -31,7 +25,7 @@ sub as_text {
    return "Target=".$target." ".$start." ".$end." ".$strand;
 }
 
-no Bio::Moose;
+no Biome;
 
 __PACKAGE__->meta->make_immutable();
 

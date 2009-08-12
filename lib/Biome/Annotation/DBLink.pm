@@ -1,12 +1,12 @@
 # Let the code begin...
 
-package Bio::Moose::Annotation::DBLink;
+package Biome::Annotation::DBLink;
 
-use Bio::Moose;
+use Biome;
 
-with qw(Bio::Moose::Role::Annotate
-        Bio::Moose::Role::DatabaseLink
-        Bio::Moose::Role::Identify);
+with qw(Biome::Role::Annotate
+        Biome::Role::DatabaseLink
+        Biome::Role::Identify);
 
 has '+DEFAULT_CB' => (
     default     => sub { (($_[0]->database ? $_[0]->database . ':' : '' ) .
@@ -31,7 +31,7 @@ sub as_text{
 
 #########################################################################
 #
-# Builders for Bio::Moose::Role::Identity
+# Builders for Biome::Role::Identity
 #
 #########################################################################
 
@@ -39,7 +39,7 @@ sub _build_display_id {$_[1]}
 sub _build_object_id {shift->primary_id(@_)}
 sub _build_id {shift->display_id(@_)}
 
-no Bio::Moose;
+no Biome;
 
 __PACKAGE__->meta->make_immutable;
 
@@ -171,11 +171,11 @@ methods. Internal methods are usually preceded with a _
 
 =cut
 
-=head2 tag_name
+=head2 tagname
 
- Title   : tag_name
- Usage   : $obj->tag_name($newval)
- Function: Get/set the tag_name for this annotation value.
+ Title   : tagname
+ Usage   : $obj->tagname($newval)
+ Function: Get/set the tagname for this annotation value.
 
            Setting this is optional. If set, it obviates the need to
            provide a tag to Bio::AnnotationCollectionI when adding

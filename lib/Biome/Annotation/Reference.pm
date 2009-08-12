@@ -1,23 +1,21 @@
 # Let the code begin...
 
-package Bio::Moose::Annotation::Reference;
+package Biome::Annotation::Reference;
 
-use Bio::Moose;
+use Biome;
 
-extends 'Bio::Moose::Annotation::DBLink';
+extends 'Biome::Annotation::DBLink';
 
-with 'Bio::Moose::Role::Range';
+with 'Biome::Role::Range',
+    'Biome::Role::Annotate' => {
+    data_slots      => [qw(rp rg authors location title medline pubmed
+     publisher editor encoded_ref doi consortium gb_reference)]
+};
 
 has '+DEFAULT_CB' => (
     default     => sub { sub { $_[0]->title || ''} },
     lazy        => 1
     );
-
-has [qw(rp rg authors location title medline pubmed
-     publisher editor encoded_ref doi consortium gb_reference)]  => (
-    is          => 'rw',
-    isa         => 'Str'
-);
 
 # from DBLink Role
 has '+database' => (
@@ -32,7 +30,7 @@ sub as_text{
    return "Reference: ".$self->title;
 }
 
-no Bio::Moose;
+no Biome;
 
 __PACKAGE__->meta->make_immutable;
 
@@ -42,7 +40,7 @@ __END__
 
 # $Id: Reference.pm 15549 2009-02-21 00:48:48Z maj $
 #
-# BioPerl module for Bio::Moose::Annotation::Reference
+# BioPerl module for Biome::Annotation::Reference
 #
 # Please direct questions and support issues to <bioperl-l@bioperl.org> 
 #
@@ -149,10 +147,10 @@ methods. Internal methods are usually preceded with a _
 
 =cut
 
-=head2 tag_name
+=head2 tagname
 
- Title   : tag_name
- Usage   : $obj->tag_name($newval)
+ Title   : tagname
+ Usage   : $obj->tagname($newval)
  Function: Get/set the tag name for this annotation value.
 
            Setting this is optional. If set, it obviates the need to provide

@@ -1,35 +1,25 @@
 # Let the code begin...
-package Bio::Moose::Annotation::Comment;
+package Biome::Annotation::Comment;
 
-use Bio::Moose;
+use Biome;
 
-with 'Bio::Moose::Role::Annotate';
+with 'Biome::Role::Annotate' => {
+    'data_slots' => [qw(text type)]
+};
 
 has '+DEFAULT_CB' => (
     default => sub { sub { $_[0]->text || ''} },
     lazy    => 1
     );
 
-has [qw(text type)] => (
-    is      => 'rw',
-    isa     => 'Str'
-);
-
 sub as_text{
     my ($self) = @_;
     return "Comment: ".$self->text;
 }
 
-sub hash_tree{
-    my $self = shift;
-    my $h = {};
-    $h->{'text'} = $self->text;
-    return $h;
-}
-
 *value = \&text;
 
-no BioMe;
+no Biome;
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,18 +1,15 @@
 # Let the code begin...
-package Bio::Moose::Annotation::SimpleValue;
+package Biome::Annotation::SimpleValue;
 
-use Bio::Moose;
+use Biome;
 
-with 'Bio::Moose::Role::Annotate';
+with 'Biome::Role::Annotate' => {
+    'data_slots'        => [qw(value term)]
+};
 
 has '+DEFAULT_CB' => (
     default => sub {sub { $_[0]->value}},
     lazy    => 1
-    );
-
-has [qw(value term)] => (
-    is      => 'rw',
-    isa     => 'Str',
     );
 
 sub as_text{
@@ -20,14 +17,7 @@ sub as_text{
     return "Value: ".$self->value;
 }
 
-#sub hash_tree{
-#    my $self = shift;
-#    my $h = {};
-#    $h->{'value'} = $self->value;
-#    return $h;
-#}
-
-no Bio::Moose;
+no Biome;
 
 __PACKAGE__->meta->make_immutable;
 

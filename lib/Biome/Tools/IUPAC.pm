@@ -142,9 +142,9 @@ methods. Internal methods are usually preceded with a _
 
 # Let the code begin...
 
-package Bio::Moose::Tools::IUPAC;
+package Biome::Tools::IUPAC;
 
-use Bio::Moose;
+use Biome;
 use MooseX::ClassAttribute;
 use MooseX::AttributeHelpers;
 

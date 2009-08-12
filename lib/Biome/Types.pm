@@ -13,10 +13,10 @@ use MooseX::Types -declare => [qw(
 							   SequenceStrandInt
 							   SequenceStrandChar
 							   SequenceAlphabet
-							   CoordinatePolicy
+                               CoordinatePolicy
 							   )];
 
-use MooseX::Types::Moose qw(Int Str Obj);
+use MooseX::Types::Moose qw(Int Str Object);
 
 subtype SequenceStrandInt,
 	as Int,
@@ -38,8 +38,8 @@ subtype SequenceAlphabet,
 	message { "Strand must be 'dna', 'rna', or 'protein'"};
 
 #an object which consumes the 'Biome::Role::Location::CoordinatePolicy' role
-subtype CoordinatePolicy
-	as Obj, 
+subtype CoordinatePolicy,
+	as Object,
 	where { $_->meta->does_role('Biome::Role::Location::CoordinatePolicy')}, 
 	message { "The object should consume Biome::Role::Location::CoordinatePolicy role"};
 	

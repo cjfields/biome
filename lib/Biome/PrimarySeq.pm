@@ -1,12 +1,25 @@
-package Bio::Moose::PrimarySeq;
+package Biome::PrimarySeq;
 
-use Bio::Moose;
+use Biome;
 
-with qw(Bio::Moose::Role::PrimarySeq
-        Bio::Moose::Role::Describe
-        Bio::Moose::Role::Identify);
+with 'Biome::Role::PrimarySeq',
+     'Biome::Role::Describe', 
+     'Biome::Role::Identify'; 
 
-sub _build_display_id { $_[0] }
+# validate sequences by default (we might make this optional to speed things up)
+after 'rawseq'  => sub {
+    $_[0]->validate_seq($_[1])
+};
 
-no Bio::Moose;
+has '+object_id'    => (
+    default     => sub {shift->accession_number(@_)},
+    lazy        => 1
+    );
+
+has '+display_name'    => (
+    default     => sub {shift->display_id(@_)},
+    lazy        => 1
+    );
+
+no Biome;
 __PACKAGE__->meta->make_immutable;
