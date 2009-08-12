@@ -43,12 +43,13 @@ has symbols => (
     );
 
 # alias for rawseq, to disambiguate use of this from returning an object
+# Note this isn't a first-class attribute (just an alias for one)
 sub seq {
     my $self = shift;
     $self->rawseq(@_);
 }
 
-# returns raw subsequence; trunc() returns similar, but object
+# returns raw subsequence; trunc() calls this for objects
 sub subseq {
     my $self = shift;
     my ($start,$end,$strand,$gaps,$replace) = $self->rearrange([qw(START 
@@ -336,14 +337,6 @@ sub validate_seq {
 	}
 	return 1;
 }
-
-
-sub _build_display_id {$_[1]}
-
-# alias of primary_id
-sub _build_id { shift->primary_id(@_) }
-
-sub _build_object_id { shift->accession_number(@_) }
 
 no Biome::Role;
 

@@ -2,6 +2,18 @@ package Biome::Role::Describe;
 
 use Biome::Role;
 
+#maybe move the default to builder method
+has [qw(display_name description)] => (
+    is          => 'rw',
+    isa         => 'Str'
+   );
+
+no Biome::Role;
+
+1;
+
+__END__
+
 =head2 display_name
 
  Title   : display_name
@@ -13,23 +25,6 @@ use Biome::Role;
            this is a good idea)
  Returns : A scalar
  Status  : Stable, may be reimplemented
-
-=cut
-
-#maybe move the default to builder method
-has display_name => (
-    is    => 'rw',
-    isa   => 'Str',
-    default => sub {
-        my $self = shift;
-        if ($self->does('Biome::Role::Identify')) {
-            $self->display_id(@_);
-        } else {
-            $_[0] || ''
-        }
-    },
-    lazy   => 1
-   );
 
 =head2 description
 
@@ -45,15 +40,3 @@ has display_name => (
  Status  : Stable
 
 =cut
-
-has description => (
-    is    => 'rw',
-    isa   => 'Str'
-   );
-
-no Biome::Role;
-
-1;
-
-__END__
-

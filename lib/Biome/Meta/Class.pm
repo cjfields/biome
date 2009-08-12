@@ -1,4 +1,4 @@
-package Bio::Moose::Meta::Class;
+package Biome::Meta::Class;
 
 use Moose;
 
@@ -21,7 +21,7 @@ sub throw_error {
 sub raise_error {
     my ( $self, @args ) = @_;
     if (ref $args[0] &&
-        ($args[0]->isa('Exception::Class::Base') || # includes Bio::Moose::Root::Error
+        ($args[0]->isa('Exception::Class::Base') || # includes Biome::Root::Error
         $args[0]->isa('Error::Base'))) {
         my $class = shift @args;
         $class->throw(@args);

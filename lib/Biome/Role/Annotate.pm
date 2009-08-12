@@ -1,39 +1,79 @@
 package Biome::Role::Annotate;
 
-use Biome::Role;
+use MooseX::Role::Parameterized;
 
-requires qw(as_text);
-
-has tag_name => (
-    is          => 'rw',
-    does        => 'Str'
+parameter data_slots => (
+    isa         => 'ArrayRef[Str]',
 );
 
-has DEFAULT_CB => (
-    is          => 'ro',
-    isa         => 'CodeRef',
-    required    => 1,
+parameter biome_slots => (
+    isa         => 'ArrayRef[HashRef[Any]]',
+);
+
+role {
+    my $p = shift;
+    my ($sslots, $bslots) = ($p->data_slots, $p->biome_slots);
+    
+    $sslots ||= [];
+    
+    push @$sslots, 'tagname';
+    
+    has $sslots => (
+        is      => 'rw',
+        isa     => 'Str',
+        # should these have a specific trait for first-class data, maybe for
+        # hash_tree?
     );
-
-sub hash_tree {
-    my ($self) = @_;
-    my $h = {};
-    # do a little introspection using the meta class 
-    for my $att ($self->meta->get_all_attributes) {
-        next unless $att->has_value($self);
-        $h->{$att->name} = $att->get_value($self);
+    
+    if ($bslots) {
+        has $bslots => (
+            is      => 'rw',
+            isa     => 'Biome::Root'
+            # this should have a passed coercion, maybe as a way of
+            # serializing data
+        )        
     }
-    $h;
-}
 
-sub display_text {
-    my ($self, $cb) = @_;
-    $cb ||= $self->DEFAULT_CB;
-    $self->throw("Callback must be a code reference") if ref $cb ne 'CODE';
-    return $cb->($self);
-}
+    requires qw(as_text);
 
-no Biome::Role;
+    has DEFAULT_CB => (
+        is          => 'ro',
+        isa         => 'CodeRef',
+        required    => 1,
+        );
+    
+    has type => (
+        is          => 'ro',
+        isa         => 'Str',
+        default     => sub {
+            my $self = shift;
+            my $str = ref $self;
+            $str =~ s{.*::([^:]+)$}{lc $1}e;
+            $str;
+                        },
+        lazy        => 1
+        );
+
+    method hash_tree => sub {
+        my ($self) = @_;
+        my $h = {};
+        # do a little introspection using the meta class 
+        for my $att ($self->meta->get_all_attributes) {
+            next unless $att->has_value($self);
+            $h->{$att->name} = $att->get_value($self);
+        }
+        $h;
+    };
+
+    method display_text => sub {
+        my ($self, $cb) = @_;
+        $cb ||= $self->DEFAULT_CB;
+        $self->throw("Callback must be a code reference") if ref $cb ne 'CODE';
+        return $cb->($self);
+    };
+};
+
+no MooseX::Role::Parameterized;
 
 1;
 
@@ -50,8 +90,6 @@ __END__
  Returns : a string
  Args    : none
  Status  : Stable
-
-=cut
 
 =head2 display_text
 
@@ -73,8 +111,6 @@ __END__
  Args    : [optional] callback
  Status  : Stable
 
-=cut
-
 =head2 hash_tree
 
  Title   : hash_tree
@@ -85,20 +121,17 @@ __END__
  Args    : none
  Status  : Uncertain
 
-=cut
-
 =head2 tagname
 
  Title   : tagname
  Usage   : $obj->tagname($newval)
  Function: Get/set the tagname for this annotation value.
 
-           Setting this is optional. If set, it obviates the need to
-           provide a tag to Bio::AnnotationCollectionI when adding
-           this object. When obtaining an AnnotationI object from the
-           collection, the collection will set the value to the tag
-           under which it was stored unless the object has a tag
-           stored already.
+           Setting this is optional. If set, it obviates the need to provide a
+           tag to anything that Biome::Role::CollectAnnotation when adding this
+           object. When obtaining an AnnotationI object from the collection, the
+           collection will set the value to the tag under which it was stored
+           unless the object has a tag stored already.
 
  Example :
  Returns : value of tagname (a scalar)

@@ -1,4 +1,4 @@
-package Bio::Moose::Meta::Role;
+package Biome::Meta::Role;
 
 use Moose;
 

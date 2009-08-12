@@ -4,7 +4,7 @@ use Biome::Role;
 use MooseX::AttributeHelpers;
 use List::MoreUtils 'any';
 
-has 'typemap' => (
+has 'type_map' => (
     metaclass => 'Collection::Hash',
     is        => 'rw',
     isa       => 'HashRef[Str]',

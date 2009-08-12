@@ -2,53 +2,17 @@ package Biome::Role::Identify;
 
 use Biome::Role;
 
-requires qw(_build_display_id _build_id _build_object_id);
-
-# possibly move the default to a builder method
-
 has version => (
     is    => 'rw',
     isa   => 'Int'
     );
 
-has authority => (
+# object_id may be moved to Root, as it really is common to any instance and
+# should probably have a default
+has [qw(authority namespace accession_number object_id display_id primary_id)] => (
     is    => 'rw',
     isa   => 'Str'
     );
-
-# Move the following ID-like methods to a separate role? This conflicts with
-# Describe
-
-has namespace => (
-    is          => 'rw',
-    isa         => 'Str'
-    );
-
-has accession_number => (
-    is              => 'rw',
-    isa             => 'Str',
-    default         => 'unknown',
-);
-
-has object_id => (
-    is          => 'rw',
-    isa         => 'Str',
-    builder     => '_build_object_id',
-    lazy        => 1
-    );
-
-has display_id => (
-    is              => 'rw',
-    isa             => 'Str',
-    builder         => '_build_display_id',
-    lazy            => 1
-);
-
-has primary_id => (
-    is              => 'rw',
-    isa             => 'Str',
-    default         => sub { my $self = shift; "$self" }
-);
 
 sub namespace_string {
     my ($self) = @_;
