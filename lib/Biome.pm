@@ -1,4 +1,4 @@
-package Bio::Moose;
+package Biome;
 
 our $VERSION = '0.001';
 
@@ -6,7 +6,10 @@ use Modern::Perl;
 use Moose ();
 use Moose::Exporter;
 
-use Bio::Moose::Meta::Class;
+use Biome::Meta::Class;
+
+# Note there is a bit of checking for Exception::Class here to make it optional.
+# This doesn't appear to be working as intended yet, though, and is a big TODO.
 
 our $EXCEPTION_CLASS = '';
 
@@ -17,7 +20,7 @@ if (exists $ENV{BP_EXCEPTION_CLASS}) {
 } else {
 	eval {use Exception::Class; 1;};
 	if (!$@) {
-		$EXCEPTION_CLASS = 'Bio::Moose::Root::Error';
+		$EXCEPTION_CLASS = 'Biome::Root::Error';
 	}
 }
 
@@ -27,8 +30,8 @@ sub init_meta {
 	shift;
 	my $moose = Moose->init_meta(
 		@_,
-		base_class 	=> 'Bio::Moose::Root',
-		metaclass 	=> 'Bio::Moose::Meta::Class',
+		base_class 	=> 'Biome::Root',
+		metaclass 	=> 'Biome::Meta::Class',
 		);
 	
 	# In original Bio::Root::Root, we explicitly use Error.pm (if present)
@@ -37,7 +40,7 @@ sub init_meta {
 	# allow more flexibility by allowing users some freedom, but what should we
 	# fall back to?
 	
-	# for now, using Bio::Moose::Root::Error (subclass of
+	# for now, using Biome::Root::Error (subclass of
 	# Exception::Class::Base) which has methods lifted from the Moose tests.
 	# This'll need to be made more user-friendly at some point (maybe allow the
 	# Moose default?)
