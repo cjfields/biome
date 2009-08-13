@@ -11,13 +11,13 @@ BEGIN {
 #simple value
 
 my $simple = Biome::Annotation::SimpleValue->new(
-                    -tag_name => 'colour',
+                    -tagname => 'colour',
 					-value   => '1');
 
 does_ok($simple, 'Biome::Role::Annotate');
 is $simple->display_text, 1;
 is $simple->value, 1;
-is $simple->tag_name, 'colour';
+is $simple->tagname, 'colour';
 
 is $simple->value(0), 0;
 is $simple->value, 0;
