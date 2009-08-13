@@ -5,10 +5,10 @@ BEGIN {
     use Test::More tests => 6;
     use Test::Moose;
     use Test::Exception;
-    use_ok('Bio::Moose::Annotation::Comment');
+    use_ok('Biome::Annotation::Comment');
 }
 
-my $comment = Bio::Moose::Annotation::Comment->new(-tag_name => 'mycomment',
+my $comment = Biome::Annotation::Comment->new(-tag_name => 'mycomment',
                                             -text => 'sometext');
 is $comment->text, 'sometext';
 is $comment->value, 'sometext';

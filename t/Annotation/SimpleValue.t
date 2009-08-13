@@ -5,16 +5,16 @@ BEGIN {
     use Test::More tests => 8;
     use Test::Moose;
     use Test::Exception;
-	use_ok('Bio::Moose::Annotation::SimpleValue');
+	use_ok('Biome::Annotation::SimpleValue');
 }
 
 #simple value
 
-my $simple = Bio::Moose::Annotation::SimpleValue->new(
+my $simple = Biome::Annotation::SimpleValue->new(
                     -tag_name => 'colour',
 					-value   => '1');
 
-does_ok($simple, 'Bio::Moose::Role::Annotate');
+does_ok($simple, 'Biome::Role::Annotate');
 is $simple->display_text, 1;
 is $simple->value, 1;
 is $simple->tag_name, 'colour';

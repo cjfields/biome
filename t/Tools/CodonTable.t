@@ -8,16 +8,16 @@ BEGIN {
     use Test::More tests => 40;
     use Test::Moose;
     use Test::Exception;
-	use_ok('Bio::Moose::Tools::CodonTable');
+	use_ok('Biome::Tools::CodonTable');
 }
 
 # create a table object by giving an ID
-my $myCodonTable = Bio::Moose::Tools::CodonTable->new( -id => 16);
+my $myCodonTable = Biome::Tools::CodonTable->new( -id => 16);
 ok defined $myCodonTable;
-isa_ok $myCodonTable, 'Bio::Moose::Tools::CodonTable';
+isa_ok $myCodonTable, 'Biome::Tools::CodonTable';
 
 # defaults to ID 1 "Standard"
-$myCodonTable = Bio::Moose::Tools::CodonTable->new();
+$myCodonTable = Biome::Tools::CodonTable->new();
 is $myCodonTable->id(), 1;
 #
 # change codon table
@@ -30,7 +30,7 @@ my $table = $myCodonTable->tables();
 cmp_ok (keys %{$table}, '>=', 17); # currently 17 known tables
 is $table->{11}, q{Bacterial};
 
-$table = Bio::Moose::Tools::CodonTable->tables;
+$table = Biome::Tools::CodonTable->tables;
 cmp_ok (values %{$table}, '>=', 17); # currently 17 known tables
 is $table->{23}, 'Thraustochytrium Mitochondrial';
 

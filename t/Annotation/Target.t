@@ -5,10 +5,10 @@ BEGIN {
     use Test::More tests => 11;
     use Test::Moose;
     use Test::Exception;
-    use_ok('Bio::Moose::Annotation::Target');
+    use_ok('Biome::Annotation::Target');
 }
 
-my $target = Bio::Moose::Annotation::Target->new(
+my $target = Biome::Annotation::Target->new(
     -database   => 'UniProt',
     -primary_id => 'MySeq',
     -target_id  => 'F321966.1',
@@ -16,8 +16,8 @@ my $target = Bio::Moose::Annotation::Target->new(
     -end        => 200,
     -strand     => 1);
 
-does_ok($target,'Bio::Moose::Role::Annotate');
-does_ok($target,'Bio::Moose::Role::Identify');
+does_ok($target,'Biome::Role::Annotate');
+does_ok($target,'Biome::Role::Identify');
 
 is $target->database(), 'UniProt';
 is $target->start(), 1;
