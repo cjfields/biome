@@ -1,33 +1,43 @@
 package Biome::Annotation::TagTree;
 
+use 5.010;
 use Biome;
 use Moose::Util::TypeConstraints;
+use Data::Stag ();
 
 with 'Biome::Role::Annotate';
 
-use Data::Stag ();
-
 subtype 'VALID_TAGTREE_FORMAT'
     => as 'Str'
-    => where {$_ =~ /(?:xml|indent|sxpr|itext)/ixmso};
+    => where {$_ =~ /(?:xml|indent|sxpr|perl|itext)/ixmso};
 
 # data stag instance
-#class_type 'My::Data::Stag';
-#
-#coerce 'Data::Stag::StagI'
-#    => from 'Str'
-#        => via { Data::Stag->from( 'istr', $_ ) }
-#    => from 'ArrayRef'
-#        => via { Data::Stag->nodify($_) }
-#    ;
+subtype 'Biome::StagI'
+    => as class_type('Data::Stag::StagI');
 
-#subtype 'StagStr'
-#    => as 'Str';
-#
-#coerce 'Str'
-#    => from 'ArrayRef'
-#        => via { my $node = Data::Stag->nodify($_) };
-
+coerce 'Biome::StagI'
+    => from 'Biome::Annotation::TagTree'
+        => via {$_->node->duplicate }
+    => from 'Data::Stag::StagI'
+        => via {$_->duplicate }  # TODO: this isn't working for some reason...
+    => from 'Str'
+        => via {
+            # we have to munge data here, as we have no idea what the format
+            # is expected to be; for now assuming itext
+            my $format;
+            given ($_) {
+                when    (/[^\n]+\s:\s/) { $format = 'itext' }
+                when    (/^</)          { $format = 'xml'   }
+                when    (/^'\(/)        { $format = 'sxpr'  }
+                when    (/^\[/)         { $format = 'perl'  }
+                default                 { $format = 'indent'}
+            }
+            Data::Stag->from( $format, $_ )
+            }
+    => from 'ArrayRef'
+        => via { Data::Stag->nodify($_) }
+    ;
+    
 has '+DEFAULT_CB' => (
     default => sub {sub { $_[0]->value || '' }},
     lazy    => 1
@@ -38,52 +48,31 @@ sub as_text {
     return "TagTree: " . $self->value;
 }
 
+# we should probably allow for other serializable backends, such as JSON, XML,
+# YAML, a simple hash tree, etc.  This works for now.
+
 has 'node' => (
     is          => 'rw',
-    isa         => 'Data::Stag::StagI',
+    isa         => 'Biome::StagI',
     default     => sub { Data::Stag->new() },
     predicate   => 'has_node',
     lazy        => 1,
     handles     => [qw(element data children subnodes get find findnode findval
                     addchild add set unset free hash pairs qmatch tnodes
                     ntnodes get_all_values duplicate)],
-    coerce      => 1
+    coerce      => 1,
+    init_arg    => 'value',
 );
 
-has 'value' => (
-    is          => 'rw',
-    isa         => 'Str',
-    #trigger     => \&_build_value,
-    #lazy        => 1,
-);
+# TODO: value is not a first-class attribute (it is a method here).
+# Can we shadow 'alias' attributes?
 
-# using get/set value also gets/sets node()
-sub _build_value {
-    my ( $self, $value ) = @_;
-    # set mode? This resets the entire tagged database
+sub value {
+    my ($self, $value) = @_;
+    if (defined $value) {
+        $self->node($value); # coercions shoud catch any variants
+    }
     my $format = $self->tagformat;
-
-    if ( ref $value ) {
-        if ( ref $value eq 'ARRAY' ) {
-            # note the tagname() is not used here; it is only used for
-            # storing this AnnotationI in the annotation collection
-            eval { $self->node(Data::Stag->nodify($value)) };
-        }
-        else {
-            # assuming this is blessed; passing on to node() and copy
-            $self->node( $value, 'copy' );
-        }
-    }
-    else {
-        # not trying to guess here for now; we go by the tagformat() setting
-        my $h = Data::Stag->getformathandler($format);
-        eval { $self->node(Data::Stag->from( $format . 'str', $value )) };
-    }
-    $self->throw("Data::Stag error:\n$@") if $@;
-    # get mode?
-    # How do we return a data structure?
-    # for now, we use the output (if there is a Data::Stag node present)
-    # may need to run an eval {} to catch Data::Stag output errors
     $self->node->$format;
 }
 
@@ -92,134 +81,6 @@ has 'tagformat' => (
     isa         => 'VALID_TAGTREE_FORMAT',
     default     => 'itext'
 );
-
-# wondering if we should use MooseX::NonMoose to wrap up the Data::Stag
-# instance.  Removes the delegation hassle...
-
-#sub element {
-#    my $self = shift;
-#    return $self->node->element;
-#}
-#
-#sub data {
-#    my $self = shift;
-#    return $self->node->data;
-#}
-#
-#sub children {
-#    my $self = shift;
-#    return $self->node->children;
-#}
-#
-#sub subnodes {
-#    my $self = shift;
-#    return $self->node->subnodes;
-#}
-#
-#sub get {
-#    my ( $self, @vals ) = @_;
-#    return $self->node->get(@vals);
-#}
-#
-#sub find {
-#    my ( $self, @vals ) = @_;
-#    return $self->node->find(@vals);
-#}
-#
-#sub findnode {
-#    my ( $self, @vals ) = @_;
-#    return $self->node->findnode(@vals);
-#}
-#
-#sub findval {
-#    my ( $self, @vals ) = @_;
-#    return $self->node->findval(@vals);
-#}
-#
-#sub addchild {
-#    my ( $self, @vals ) = @_;
-#
-#    # check for element tag first (if no element, must be empty Data::Stag node)
-#    if ( !$self->element ) {
-#
-#        # try to do the right thing; if more than one element, wrap in array ref
-#        @vals > 1 ? $self->value( \@vals ) : $self->value( $vals[0] );
-#        return $self->{db};
-#    }
-#    elsif ( !$self->node->ntnodes ) {
-#
-#        # if this is a terminal node, can't add to it (use set?)
-#        $self->throw("Can't add child to node; only terminal node is present!");
-#    }
-#    else {
-#        return $self->node->addchild(@vals);
-#    }
-#}
-#
-#sub add {
-#    my ( $self, @vals ) = @_;
-#
-#    # check for empty object and die for now
-#    if ( !$self->node->element ) {
-#        $self->throw("Can't add to terminal element!");
-#    }
-#    return $self->node->add(@vals);
-#}
-#
-#sub set {
-#    my ( $self, @vals ) = @_;
-#
-#    # check for empty object
-#    if ( !$self->node->element ) {
-#        $self->throw("Can't add to tree; empty tree!");
-#    }
-#    return $self->node->set(@vals);
-#}
-#
-#sub unset {
-#    my ( $self, @vals ) = @_;
-#    return $self->node->unset(@vals);
-#}
-#
-#sub free {
-#    my ($self) = @_;
-#    return $self->node->free;
-#}
-#
-#sub hash {
-#    my ($self) = @_;
-#    return $self->node->hash;
-#}
-#
-#sub pairs {
-#    my ($self) = @_;
-#    return $self->node->pairs;
-#}
-#
-#sub qmatch {
-#    my ( $self, @vals ) = @_;
-#    return $self->node->qmatch(@vals);
-#}
-#
-#sub tnodes {
-#    my ($self) = @_;
-#    return $self->node->tnodes;
-#}
-#
-#sub ntnodes {
-#    my ($self) = @_;
-#    return $self->node->ntnodes;
-#}
-#
-#sub get_all_values {
-#    my $self = shift;
-#    my @kids = $self->children;
-#    my @vals;
-#    while ( my $val = shift @kids ) {
-#        ( ref $val ) ? push @kids, $val->children : push @vals, $val;
-#    }
-#    return @vals;
-#}
 
 no Biome;
 no Moose::Util::TypeConstraints;

@@ -20,7 +20,7 @@ use Biome::Annotation::Target;
     
     with 'Biome::Role::ManageTypes';
     
-    has '+typemap' => (
+    has '+type_map' => (
         default     => sub {
             {
             'reference'     => "Biome::Annotation::Reference",

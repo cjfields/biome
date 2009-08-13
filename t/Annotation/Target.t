@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    use Test::More tests => 11;
+    use Test::More tests => 12;
     use Test::Moose;
     use Test::Exception;
     use_ok('Biome::Annotation::Target');
@@ -25,6 +25,7 @@ is $target->end(), 200;
 is $target->strand(), 1;
 is $target->length(), 200;
 is $target->as_text, 'Target=F321966.1 1 200 1';
+is $target->type, 'target';
 
 my $t = $target->hash_tree;
 

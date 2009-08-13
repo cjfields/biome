@@ -8,6 +8,7 @@ BEGIN {
 ###############################
 
 # import Moose magic through meta class (no need to import separately)
+{
 package MyRole1;
 
 use Biome::Role;
@@ -29,8 +30,10 @@ sub bar {
 
 no Biome::Role;
 
+}
 ###############################
 
+{
 # import Moose magic through meta class (no need to import separately)
 package MyRole2;
 
@@ -40,8 +43,9 @@ requires 'bah';
 
 no Biome::Role;
 
+}
 ###############################
-
+{
 package RoleTest;
 
 use Biome;
@@ -53,7 +57,7 @@ sub baz { return 42 };
 sub bah { return 98.6 };
 
 no Biome;
-
+}
 ###############################
 
 package main;

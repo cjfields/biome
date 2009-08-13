@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    use Test::More tests => 8;
+    use Test::More tests => 9;
     use Test::Moose;
     use Test::Exception;
     use_ok('Biome::Annotation::DBLink');
@@ -21,3 +21,5 @@ my $t = $link1->hash_tree;
 
 is $t->{database}, 'TSC';
 is $t->{primary_id}, 'TSC0000030';
+
+is $link1->type, 'dblink';

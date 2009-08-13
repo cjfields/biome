@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    use Test::More tests => 8;
+    use Test::More tests => 12;
     use Test::Moose;
     use Test::Exception;
     use_ok('Biome::Annotation::Reference');
@@ -22,3 +22,8 @@ is $ref->as_text, 'Reference: title line';
 
 my $t = $ref->hash_tree;
 
+is($t->{authors}, 'author line');
+is($t->{title}, 'title line');
+is($t->{database}, 'MEDLINE');
+
+is $ref->type, 'reference';
