@@ -10,7 +10,7 @@ BEGIN {
 # import Moose magic through meta class (no need to import separately)
 package MyRole1;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 requires 'baz';
 
@@ -27,24 +27,24 @@ sub bar {
     return 2;
 }
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 ###############################
 
 # import Moose magic through meta class (no need to import separately)
 package MyRole2;
 
-use Bio::Moose::Role;
+use Biome::Role;
 
 requires 'bah';
 
-no Bio::Moose::Role;
+no Biome::Role;
 
 ###############################
 
 package RoleTest;
 
-use Bio::Moose;
+use Biome;
 
 with qw(MyRole1 MyRole2);
 
@@ -52,7 +52,7 @@ sub baz { return 42 };
 
 sub bah { return 98.6 };
 
-no Bio::Moose;
+no Biome;
 
 ###############################
 
@@ -68,6 +68,6 @@ is($foo->bah, 98.6);
 does_ok($foo, 'MyRole1', 'does MyRole1');
 does_ok($foo, 'MyRole2', 'does MyRole2');
 isa_ok($foo, 'RoleTest');
-isa_ok($foo, 'Bio::Moose::Root');
-isa_ok($foo->meta, 'Bio::Moose::Meta::Class');
+isa_ok($foo, 'Biome::Root');
+isa_ok($foo->meta, 'Biome::Meta::Class');
 
