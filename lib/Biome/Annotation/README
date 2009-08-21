@@ -1,0 +1,9 @@
+Annotation and Annotation Collections
+
+This system is mainly inherited from BioPerl.  Several users and devs
+have previously indicated that this could easily be replaced by something
+that creates a hierarchal structure with a predefined schema, along the lines
+of XML, JSON, or even using an Ontology.
+
+It is very possible this system will be overhauled with that in mind, with an
+eye towards a lightweight implementation with easy serialization.

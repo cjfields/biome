@@ -1,115 +1,38 @@
-package Biome::Role::CollectTags;
+package [[%ask1:module:Biome::Foo]];
 
 use Biome::Role;
 
-use MooseX::AttributeHelpers;
-
-has tag_map => (
-    is          => 'rw',
-    metaclass   => 'Collection::Hash',
-    isa         => 'HashRef[ArrayRef[Str]]',
-    default     => sub { { } },
-    provides    => {
-        #delete  => 'remove_tag',
-        keys    => 'get_all_tags',
-        exists  => 'has_tag',
-        clear   => 'remove_all_tags'
-    },
-    curries     => {
-        get => {
-            get_tag_values  => sub {
-                my ($self, $body, @args) = @_;
-                my $vals = $body->($self,@args);
-                ref $vals ? @{$vals} : $vals;
-            }
-        },
-        set => {
-            set_tag_values  => sub {
-                my ($self, $body, $tag, @vals) = @_;
-                $body->($self, $tag, \@vals);
-            }
-        },
-        delete => {
-            remove_tag      => sub {
-                my ($self, $body, $tag) = @_;
-                my $vals = $body->($self, $tag);
-                ref $vals ? @{$vals} : $vals;
-            }
-        }
-    }
-);
-
-sub add_tag_values {
-    my ($self, $tag, @values) = @_;
-    return unless defined $tag && @values;
-    my $map = $self->tag_map;
-    @values = @{$values[0]} if ref($values[0]) eq 'ARRAY';
-    push @{$map->{$tag}}, @values;
-}
-
-sub get_tagset_values {
-    my ($self, @args) = @_;
-    my @vals = ();
-    foreach my $arg (@args) {
-        if ($self->has_tag($arg)) {
-            push(@vals, $self->get_tag_values($arg));
-        }
-    }
-    return @vals;    
-}
-
-no MooseX::AttributeHelpers;
 no Biome::Role;
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 
 =head1 NAME
 
-Biome::Role::CollectTags - Role for collecting simple tag-value pairs
+[[%ask1]] - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::CollectTags version 0.01.
+This documentation refers to [[%%ask1]] version [[%%ask4:version:0.01]].
 
 =head1 SYNOPSIS
+   
+   package MyFoo;
+   use Biome;
+   
+   with '[[%%ask1]]';
+   # Brief but working code example(s) here showing the most common usage(s)
 
-    package MyCollection;
-    use Biome;
-    with 'Biome::Role::CollectTags';
-    
-    # and later in main...
-    
-    my $tc = MyCollection->new();
-    
-    # add 'bar', 'baz' values to 'foo' tag
-    $tc->add_tag_values('foo', 'bar', 'baz');
-    
-    # retrieves tag names
-    say $tc->get_all_tags;                         # 'foo'
-    
-    # retrieve values for a specific tag
-    say join(',',sort $tc->get_tag_values('foo')); # 'bar,baz';
-    
-    
-    # deletes all values for a tag(key)
-    $tc->remove_tag('values');
-    # check tags (predicate)
-    $tc->has_tag('values');     # undef
-    
-    # replace tag values
-    $tc->set_tag_values('foo', (1,2));
-    say join(',',sort $tc->get_tag_values('foo')); # '1,2'
+   # This section will be as far as many users bother reading,
 
-    $tc->add_tag_values('foo', qw(3 4));
-    say join(',',sort $tc->get_tag_values('foo')); # '1,2,3,4'
-
+   # so make it as educational and exemplary as possible.
 
 =head1 DESCRIPTION
 
-A Biome::Role that acts as a simple tag collection.  Any consumer of this
-role will have the following
+<TODO>
+A full description of the module and its features.
+May include numerous subsections (i.e., =head2, =head3, etc.).
 
 =head1 SUBROUTINES/METHODS
 
@@ -258,11 +181,11 @@ welcome.
 
 =head1 AUTHOR
 
-Chris Fields  (cjfields at bioperl dot org)
+[[%%ask2:author:Chris Fields]]  ([[%%ask3:contact:cjfields at bioperl dot org]])
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) [[%%date:%%Y]] [[%%ask2]] ([[%%ask3]]). All rights reserved.
 
 followed by whatever licence you wish to release it under.
 For Perl code that is often just:

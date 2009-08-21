@@ -4,21 +4,40 @@ use Biome::Role;
 
 # tag methods to be pulled out into another Role (maybe a lightweight
 # annotation collection)
-requires qw(get_nodes
-   get_root_node
-   number_nodes
-   total_branch_length
-   height
-   id
-   score
-   get_leaf_nodes
-   set_tag_value
-   add_tag_value
-   remove_tag
-   remove_all_tags
-   get_all_tags
-   get_tag_values
-   has_tag);
+requires qw(
+    get_Nodes
+    get_root_Node
+    set_root_Node
+    get_leaf_Nodes
+    get_lineage_Nodes
+    number_Nodes
+    find_Nodes
+    find_Node_by_id
+    remove_Node
+    
+    total_branch_length
+    subtree_length
+    height
+    as_text
+    id
+    score
+    
+    splice
+    get_lca
+    merge_lineage
+    contract_linear_paths
+    is_binary
+    is_monophyletic
+    is_paraphyletic
+    force_binary
+    simplify_to_leaves_string
+    distance
+    reroot
+    reroot_at_midpoint
+    move_ids_to_bootstrap
+);
+
+# as_text may be left out
 
 no Biome::Role;
 
