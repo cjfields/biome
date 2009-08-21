@@ -7,13 +7,13 @@ requires qw(
     end
     length
 );  # possibly Biome::Role::Range, but may delineate start/end for a different
-    # range (nodes in a tree or graph, columns in an alignment, indices in an
-    # array, etc).
+    # instance (nodes in a tree or graph, columns in an alignment, indices in an
+    # array, etc).  May need to be aliased as needed.
     
 requires qw(
     display_name
     description
-); # Biome::Role::Describe
+); # possibly Biome::Role::Describe
     
 requires qw(
     add_tag_values
@@ -22,24 +22,44 @@ requires qw(
     get_all_tags
     has_tag
     remove_tag
-    get_tagset_values    
-); # Biome::Role::CollectTags
+    get_tagset_values
+); # possibly Biome::Role::CollectTags
 
 requires qw(
-    primary_tag
-    source_tag
-    score
-    
-    get_Features
-    add_Features
-    attach_instance
-    entire_instance
-    spliced_instance
-    id
-    
-); # specific for this role
+    has_featured_instance
+    entire_featured_instance
+    attach_featured_instance
+    spliced_featured_instance
+); # customized roles for each parent (featured) instance
+   # should be aliased for the specific features instance name
+
+has [qw(primary_tag source_tag id)]   => (
+    isa         => 'Str',
+    is          => 'rw'
+);
+
+has 'score'                 => (
+    isa         => 'Num',
+    is          => 'rw'
+);
+
+has 'sub_Features'  => (
+    is          => 'ro',
+    isa         => 'ArrayRef[Obj]',
+    default     => sub {[]},
+    lazy        => 1,
+    metaclass   => 'Collection::Array',
+    provides    => {
+        'push'      => 'add_Features',
+        'elements'  => 'get_Features',
+        'clear'     => 'delete_Features',
+        'count'     => 'num_Features',
+        }
+);
 
 no Biome::Role;
+
+1;
 
 __END__
 
@@ -60,9 +80,6 @@ This documentation refers to Biome::Role::Feature version 0.01.
     with 'Biome::Role::Feature';
     
     # other comsumer-specific information
-    
-    
-    
 
 =head1 DESCRIPTION
 
@@ -72,13 +89,15 @@ CollectAnnotation, etc.).
 
 =head1 SUBROUTINES/METHODS
 
+TODO
+
 =head1 DIAGNOSTICS
 
-None; abstract class.
+TODO
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-None
+TODO
 
 =head1 DEPENDENCIES
 
@@ -86,7 +105,7 @@ Biome::Role (part of Biome)
 
 =head1 INCOMPATIBILITIES
 
-None known
+TODO
 
 =head1 BUGS AND LIMITATIONS
 
@@ -96,28 +115,19 @@ Patches are welcome.
 
 =head1 EXAMPLES
 
-Many people learn better by example than by explanation, and most learn better
-by a combination of the two. Providing a /demo directory stocked with
-well-commented examples is an excellent idea, but your users might not have
-access to the original distribution, and the demos are unlikely to have been
-installed for them. Adding a few illustrative examples in the documentation
-itself can greatly increase the "learnability" of your code.
+TODO
 
 =head1 FREQUENTLY ASKED QUESTIONS
 
-Incorporating a list of correct answers to common questions may seem like extra
-work (especially when it comes to maintaining that list), but in many cases it
-actually saves time. Frequently asked questions are frequently emailed
-questions, and you already have too much email to deal with. If you find
-yourself repeatedly answering the same question by email, in a newsgroup, on a
-web site, or in person, answer that question in your documentation as well. Not
-only is this likely to reduce the number of queries on that topic you
-subsequently receive, it also means that anyone who does ask you directly can
-simply be directed to read the fine manual.
+TODO
 
 =head1 COMMON USAGE MISTAKES
 
+TODO
+
 =head1 SEE ALSO
+
+TODO
 
 =head1 (DISCLAIMER OF) WARRANTY
 
@@ -127,13 +137,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 ACKNOWLEDGEMENTS
 
-Acknowledging any help you received in developing and improving your software is
-plain good manners. But expressing your appreciation isn't only courteous; it's
-also enlightened self-interest. Inevitably people will send you bug reports for
-your software. But what you'd much prefer them to send you are bug reports
-accompanied by working bug fixes. Publicly thanking those who have already done
-that in the past is a great way to remind people that patches are always
-welcome.
+TODO
 
 =head1 AUTHOR
 
