@@ -7,7 +7,7 @@ use Biome;
 use Biome::Location::WidestCoordPolicy;
 use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy/;
 
-with 'Biome::Role::LocationI';
+with 'Biome::Role::Location';
 
 
 
