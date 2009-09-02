@@ -1,0 +1,98 @@
+=head1 Biome Conventions and Best Practices
+
+=head2 Last updated July 29, 2009
+
+This is a short style guide for Biome. In general, consult Perl Best Practices.
+
+=head1 Perl version
+
+At the moment we are using a minimum perl 5.10.0 and Modern::Perl; perl 5.10.1
+is highly recommended.  We also recommend all warnings and strictures, and
+fully expect that features present in 5.10.1 will be used (smart matching, state
+variables, given/when, defined-or, etc).
+
+=head1 Moose and MooseX
+
+We are currently requiring at least Moose 0.89, but it is safest to use the
+latest release. As for MooseX modules, we are using:
+
+    MooseX::AttributeHelpers
+    MooseX::Types
+    MooseX::ClassAttributes
+    MooseX::Role::Parameterized
+    MooseX::Aliases
+    
+Others may be added along the way. MooseX::AttributeHelpers is to be moved into
+the Moose core, therefore at that point we will remove that module as a
+dependency and bump the required Moose core version.
+
+For the time being, we will not be using MooseX::Declare or
+MooseX::Method::Signatures. This is primarily based on three concerns:
+
+  * Performance - Using MooseX::Declare and/or MooseX::Method::Signatures has
+    been reported to cause a fairly decent performance hit. However, this
+    needs to be substantiated within this framework.
+  
+  * Stability - MooseX::Method::Signatures works best with MooseX::Declare, but
+    both are still considered to be alpha software.
+    
+  * Dependencies - the dependency tree for both modules is quite extensive.
+
+If it is demonstrated that usage of either module isn't detrimental to overall
+performance (a major concern with this project), then we may revisit this at a
+later time.
+
+=head1 Documentation
+
+The best source for an overall picture of how to document code is the
+'Documentation' chapter of PBP.  In general...
+
+  * All modules should eventually contain a BioPerl-style boiler-plate set of
+    docs, including NAME, SYNOPSIS, DESCRIPTION, AUTHOR. Optional sections may
+    be VERSION, DEPENDENCIES, CONFIGURATION/ENVIRONMENT, INCOMPATIBILITIES,
+    BUGS/LIMITATIONS, etc.
+    
+  * All POD should be placed in one place, preferably at the end of the file
+    after the __END__ directive. 
+
+=head1 Attributes
+
+Attributes should be typed where possible (with 'isa' or 'does'). Subtypes
+should go into Biome/Types.pm, should use MooseX::Types, and should be exported.
+We may switch back to simple Moose-based types if they improve performance
+substantially.
+
+=head1 Roles
+
+For the time being Roles in Biome can be either fully implemented, completely
+abstract, or both. They may also be parametric (see Bio::Role::Annotate for a
+simple example using MooseX::Role::Parameterized).
+
+Currently, there is not real convention for naming roles in Biome. At the
+moment, I (cjfields) have been naming roles based on their actions; for
+instance, anything that annotates something will consume the Bio::Role::Annotate
+role:
+
+with 'Bio::Role::Annotate';
+
+This is a bit different than the suggested Moose naming convention for naming
+roles (using 'able' with names, such as Bio::Role::Annotatable). As this hews
+closely with the interfaces within BioPerl (Bio::AnnotatableI), we are open to
+changing this. It is expected that we will settle on a standard convention very
+soon, by the first CPAN release.
+
+=head1 Classes
+
+=head1 Inheritance
+
+We are attempting to flatten the inheritance hierarchy down to a sustainable
+point. However, using roles/traits doesn't fit every situation, and it may be
+easier to initially implement based on simple inheritance.
+
+=head1 Mutability
+
+There are good arguments for and against object mutability. BioPerl actually
+practices a sort of limited mutability, in that you can get/set attributes in
+most cases, but usage of some methods (subseq, for instance) returns a new
+instance of the class with modified attributes.
+
