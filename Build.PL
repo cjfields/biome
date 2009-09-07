@@ -34,7 +34,8 @@ my $build = Module::Build->new(
                             #'MooseX::Params::Validate'      => 0,  # replace rearrange?
                             #'MooseX::Types::Structured'     => 0,  # extended types
                             #'MooseX::Clone'                 => 0   # we have a root clone method, this could replace it
-                            'List::MoreUtils'               => 0
+                            'List::MoreUtils'               => 0, 
+                            'Data::Stag' => 0
                            },
     build_requires      => {
                             'Module::Build'             => 0.2805,
