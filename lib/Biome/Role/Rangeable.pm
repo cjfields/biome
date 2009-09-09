@@ -1,4 +1,4 @@
-package Biome::Role::Range;
+package Biome::Role::Rangeable;
 
 use Biome::Role;
 
@@ -288,8 +288,8 @@ sub _eval_ranges {
     $self->throw("end is undefined in calling instance") if !defined $self->end;    
     for my $obj (@ranges) {
         $self->throw("Not an object") unless ref($obj);
-        $self->throw("Passed object does not implement Biome::Role::Range role")
-            unless $obj->does('Biome::Role::Range');
+        $self->throw("Passed object does not implement Biome::Role::Rangeable role")
+            unless $obj->does('Biome::Role::Rangeable');
         $self->throw("start is undefined in passed instance") if !defined $obj->start;
         $self->throw("end is undefined in passed instance") if !defined $obj->end;
     }

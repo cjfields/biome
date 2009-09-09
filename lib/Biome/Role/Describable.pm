@@ -1,4 +1,4 @@
-package Biome::Role::Describe;
+package Biome::Role::Describable;
 
 use Biome::Role;
 

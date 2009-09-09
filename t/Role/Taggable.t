@@ -13,7 +13,7 @@ BEGIN {
     
     use Biome;
     
-    with 'Biome::Role::CollectTags';
+    with 'Biome::Role::Taggable';
     
     no Biome;
     

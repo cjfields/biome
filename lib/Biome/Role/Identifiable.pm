@@ -1,4 +1,4 @@
-package Biome::Role::Identify;
+package Biome::Role::Identifiable;
 
 use Biome::Role;
 

@@ -1,20 +1,30 @@
-package Biome::Role::CollectTags;
+package Biome::Role::Taggable;
 
 use Biome::Role;
 
-use MooseX::AttributeHelpers;
+use MooseX::AttributeHelpers; # soon to be in Moose core
+use Moose::Util::TypeConstraints;
+
+subtype 'TagMap' => as 'HashRef[ArrayRef[Str]]';
+
+coerce 'TagMap'
+    => from 'HashRef[Str]'
+      => via {
+        my $hash = shift;
+        return { map {$_ => [$hash->{$_}] } sort keys %{$hash} }
+        };
 
 has tag_map => (
     is          => 'rw',
-    metaclass   => 'Collection::Hash',
-    isa         => 'HashRef[ArrayRef[Str]]',
+    traits      => ['MooseX::AttributeHelpers::Trait::Collection::Hash'],
+    isa         => 'TagMap',
     default     => sub { { } },
     provides    => {
-        #delete  => 'remove_tag',
         keys    => 'get_all_tags',
         exists  => 'has_tag',
         clear   => 'remove_all_tags'
     },
+    coerce      => 1,
     curries     => {
         get => {
             get_tag_values  => sub {
