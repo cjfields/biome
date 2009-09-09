@@ -17,7 +17,7 @@ my $build = Module::Build->new(
     dist_abstract       => 'Moose-based implementation of core BioPerl modules',
     license             => 'perl',
     requires            => {'perl'                      => 5.010,
-                            'Moose'                     => '0.87',
+                            'Moose'                     => '0.89_01',
                             # tentative list of MooseX modules
 
                             # I don't think we should include MooseX::Declares,
@@ -31,11 +31,12 @@ my $build = Module::Build->new(
                             'MooseX::ClassAttribute'        => 0,
                             'MooseX::Types'                 => 0,  # may be removed based on benchmarks
                             'MooseX::Role::Parameterized'   => 0,
+                            'MooseX::Aliases'               => 0.03,
                             #'MooseX::Params::Validate'      => 0,  # replace rearrange?
                             #'MooseX::Types::Structured'     => 0,  # extended types
                             #'MooseX::Clone'                 => 0   # we have a root clone method, this could replace it
                             'List::MoreUtils'               => 0, 
-                            'Data::Stag' => 0
+                            'Data::Stag'                    => 0
                            },
     build_requires      => {
                             'Module::Build'             => 0.2805,
