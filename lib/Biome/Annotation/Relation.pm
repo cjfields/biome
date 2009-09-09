@@ -2,7 +2,7 @@ package Bio::Annotation::Relation;
 
 use Biome;
 
-with 'Biome::Role::Annotate';
+with 'Biome::Role::Annotatable';
 
 sub as_text{
    my ($self) = @_;

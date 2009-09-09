@@ -2,8 +2,6 @@ package Bio::Annotation::TypeManager;
 
 use Biome;
 
-
-
 #sub new{
 #   my ($class,@args) = @_;
 #

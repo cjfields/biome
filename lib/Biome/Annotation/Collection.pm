@@ -5,7 +5,7 @@ use Biome;
 # though this is an Annotate consumer, we do not allow extra data or object
 # slots (it implements Annotate so we can nest Collections)
 with 'Biome::Role::CollectAnnotation',
-     'Biome::Role::Annotate' => {
+     'Biome::Role::Annotatable' => {
     'data_slots'        => []
     },
      'Biome::Role::ManageTypes';
@@ -82,7 +82,7 @@ sub add_Annotations {
     my ($self, $key, $object, $archetype) = @_;
     my $map = $self->annotation_map;
     # if there's no key we use the tagname() as key
-    if(ref($key) && $key->does("Biome::Role::Annotate") && (!ref($object))) {
+    if(ref($key) && $key->does("Biome::Role::Annotatable") && (!ref($object))) {
         $archetype = $object if defined($object);
         $object = $key;
         $key = $object->tagname;
@@ -99,8 +99,8 @@ sub add_Annotations {
         $self->throw("Must add an object. Use Biome::Annotation::{Comment,SimpleValue} for simple text additions");
     }
  
-    if( !$object->does("Biome::Role::Annotate") ) {
-        $self->throw("object must be AnnotationI compliant, otherwise we won't add it!");
+    if( !$object->does("Biome::Role::Annotatable") ) {
+        $self->throw("object must use Annotatable Role, otherwise we won't add it!");
     }
  
     # ok, now we are ready! If we don't have an archetype, set it

@@ -1,109 +1,3 @@
-# $Id: OntologyTerm.pm 15549 2009-02-21 00:48:48Z maj $
-#
-# BioPerl module for Bio::Annotation::OntologyTerm
-#
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
-#
-# Cared for by Hilmar Lapp <hlapp at gmx.net>
-#
-# Copyright Hilmar Lapp
-#
-# You may distribute this module under the same terms as perl itself
-
-#
-# (c) Hilmar Lapp, hlapp at gmx.net, 2002.
-# (c) GNF, Genomics Institute of the Novartis Research Foundation, 2002.
-#
-# You may distribute this module under the same terms as perl itself.
-# Refer to the Perl Artistic License (see the license accompanying this
-# software package, or see http://www.perl.com/language/misc/Artistic.html)
-# for the terms under which you may use, modify, and redistribute this module.
-#
-# THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-# WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-# MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-
-# POD documentation - main docs before the code
-
-=head1 NAME
-
-Bio::Annotation::OntologyTerm - An ontology term adapted to AnnotationI
-
-=head1 SYNOPSIS
-
-   use Bio::Annotation::OntologyTerm;
-   use Bio::Annotation::Collection;
-   use Bio::Ontology::Term;
-
-   my $coll = Bio::Annotation::Collection->new();
-
-   # this also implements a tag/value pair, where tag _and_ value are treated
-   # as ontology terms
-   my $annterm = Bio::Annotation::OntologyTerm->new(-label => 'ABC1',
-                                                   -tagname => 'Gene Name');
-   # ontology terms can be added directly - they implicitly have a tag
-   $coll->add_Annotation($annterm);
-
-   # implementation is by composition - you can get/set the term object
-   # e.g.
-   my $term = $annterm->term(); # term is-a Bio::Ontology::TermI
-   print "ontology term ",$term->name()," (ID ",$term->identifier(),
-         "), ontology ",$term->ontology()->name(),"\n";
-   $term = Bio::Ontology::Term->new(-name => 'ABC2',
-                                    -ontology => 'Gene Name');
-   $annterm->term($term);
-
-=head1 DESCRIPTION
-
-Ontology term annotation object
-
-=head1 FEEDBACK
-
-=head2 Mailing Lists
-
-User feedback is an integral part of the evolution of this and other
-Bioperl modules. Send your comments and suggestions preferably to one
-of the Bioperl mailing lists. Your participation is much appreciated.
-
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
-
-=head2 Support 
- 
-Please direct usage questions or support issues to the mailing list:
-  
-L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
-with code and data examples if at all possible.
-
-=head2 Reporting Bugs
-
-Report bugs to the Bioperl bug tracking system to help us keep track
-the bugs and their resolution.  Bug reports can be submitted via
-the web:
-
-  http://bugzilla.open-bio.org/
-
-=head1 AUTHOR - Hilmar Lapp
-
-Email hlapp at gmx.net
-
-
-=head1 APPENDIX
-
-The rest of the documentation details each of the object methods.
-Internal methods are usually preceded with a _
-
-=cut
-
-
-# Let the code begin...
-
-
 package Bio::Annotation::OntologyTerm;
 use strict;
 
@@ -582,3 +476,108 @@ sub remove_secondary_ids {
 
 
 1;
+
+__END__
+
+# $Id: OntologyTerm.pm 15549 2009-02-21 00:48:48Z maj $
+#
+# BioPerl module for Bio::Annotation::OntologyTerm
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+#
+# Cared for by Hilmar Lapp <hlapp at gmx.net>
+#
+# Copyright Hilmar Lapp
+#
+# You may distribute this module under the same terms as perl itself
+
+#
+# (c) Hilmar Lapp, hlapp at gmx.net, 2002.
+# (c) GNF, Genomics Institute of the Novartis Research Foundation, 2002.
+#
+# You may distribute this module under the same terms as perl itself.
+# Refer to the Perl Artistic License (see the license accompanying this
+# software package, or see http://www.perl.com/language/misc/Artistic.html)
+# for the terms under which you may use, modify, and redistribute this module.
+#
+# THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+# MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+
+# POD documentation - main docs before the code
+
+=head1 NAME
+
+Bio::Annotation::OntologyTerm - An ontology term adapted to AnnotationI
+
+=head1 SYNOPSIS
+
+   use Bio::Annotation::OntologyTerm;
+   use Bio::Annotation::Collection;
+   use Bio::Ontology::Term;
+
+   my $coll = Bio::Annotation::Collection->new();
+
+   # this also implements a tag/value pair, where tag _and_ value are treated
+   # as ontology terms
+   my $annterm = Bio::Annotation::OntologyTerm->new(-label => 'ABC1',
+                                                   -tagname => 'Gene Name');
+   # ontology terms can be added directly - they implicitly have a tag
+   $coll->add_Annotation($annterm);
+
+   # implementation is by composition - you can get/set the term object
+   # e.g.
+   my $term = $annterm->term(); # term is-a Bio::Ontology::TermI
+   print "ontology term ",$term->name()," (ID ",$term->identifier(),
+         "), ontology ",$term->ontology()->name(),"\n";
+   $term = Bio::Ontology::Term->new(-name => 'ABC2',
+                                    -ontology => 'Gene Name');
+   $annterm->term($term);
+
+=head1 DESCRIPTION
+
+Ontology term annotation object
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this and other
+Bioperl modules. Send your comments and suggestions preferably to one
+of the Bioperl mailing lists. Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+ 
+Please direct usage questions or support issues to the mailing list:
+  
+L<bioperl-l@bioperl.org>
+  
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via
+the web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Hilmar Lapp
+
+Email hlapp at gmx.net
+
+
+=head1 APPENDIX
+
+The rest of the documentation details each of the object methods.
+Internal methods are usually preceded with a _
+
+=cut
+
