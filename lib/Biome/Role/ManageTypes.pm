@@ -1,20 +1,19 @@
 package Biome::Role::ManageTypes;
 
 use Biome::Role;
-use MooseX::AttributeHelpers;
 use List::MoreUtils 'any';
 
 has 'type_map' => (
-    metaclass => 'Collection::Hash',
+    traits    => ['Hash'],
     is        => 'rw',
     isa       => 'HashRef[Str]',
     # this should be set in the implementation, so using 'required'
     required  => 1,
-    provides  => {
-        exists    => 'exists_in_typemap',
-        keys      => 'types',
-        get       => 'type_for_key',
-        set       => '_add_type_map',
+    handles   => {
+        'exists_in_typemap'     => 'exists',
+        'types'                 => 'keys',
+        'type_for_key'          => 'get',
+        '_add_type_map'         => 'set',
     }
     );
 
@@ -41,7 +40,7 @@ sub has_valid {
     return 1 if any {$_->isa($type) || $_->does($type)} $object->meta->get_all_attributes;
 }
 
-no MooseX::AttributeHelpers;
+no Biome::Role;
 
 1;
 

@@ -27,10 +27,10 @@ use Biome::Annotation::Target;
             'comment'       => "Biome::Annotation::Comment",
             'dblink'        => "Biome::Annotation::DBLink",
             'simplevalue'   => "Biome::Annotation::SimpleValue",
-            'annotate'      => "Biome::Role::Annotate",
-            'identify'      => "Biome::Role::Identify",
-            'describe'      => "Biome::Role::Describe",
-            'range'         => "Biome::Role::Range",
+            'annotate'      => "Biome::Role::Annotatable",
+            'identify'      => "Biome::Role::Identifiable",
+            'describe'      => "Biome::Role::Describable",
+            'range'         => "Biome::Role::Rangeable",
             }
             }
         );
