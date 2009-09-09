@@ -5,7 +5,7 @@ use Biome;
 use Moose::Util::TypeConstraints;
 use Data::Stag ();
 
-with 'Biome::Role::Annotate';
+with 'Biome::Role::Annotatable';
 
 subtype 'VALID_TAGTREE_FORMAT'
     => as 'Str'

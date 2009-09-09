@@ -14,7 +14,7 @@ my $simple = Biome::Annotation::SimpleValue->new(
                     -tagname => 'colour',
 					-value   => '1');
 
-does_ok($simple, 'Biome::Role::Annotate');
+does_ok($simple, 'Biome::Role::Annotatable');
 is $simple->display_text, 1;
 is $simple->value, 1;
 is $simple->tagname, 'colour';

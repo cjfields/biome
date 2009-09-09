@@ -6,8 +6,8 @@ use Biome;
 
 extends 'Biome::Annotation::DBLink';
 
-with 'Biome::Role::Range',
-    'Biome::Role::Annotate' => {
+with 'Biome::Role::Rangeable',
+     'Biome::Role::Annotatable' => {
     data_slots      => [qw(rp rg authors location title medline pubmed
      publisher editor encoded_ref doi consortium gb_reference)]
 };

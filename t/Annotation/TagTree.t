@@ -28,7 +28,7 @@ my $struct = [ 'genenames' => [
 my $ann_struct = Biome::Annotation::TagTree->new(-tagname => 'gn',
 					       -value => $struct);
 
-does_ok($ann_struct, 'Biome::Role::Annotate');
+does_ok($ann_struct, 'Biome::Role::Annotatable');
 my $val = $ann_struct->value;
 like($val, qr/Name: CALM1/,'default itext');
 

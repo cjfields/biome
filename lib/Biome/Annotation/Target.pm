@@ -6,8 +6,8 @@ use Biome;
 
 extends 'Biome::Annotation::DBLink';
 
-with 'Biome::Role::Range',
-     'Biome::Role::Annotate' => {'data_slots' => [qw(target_id)]};
+with 'Biome::Role::Rangeable',
+     'Biome::Role::Annotatable' => {'data_slots' => [qw(target_id)]};
 
 has '+DEFAULT_CB' => (
     default => sub {sub { $_[0]->as_text || ''}},

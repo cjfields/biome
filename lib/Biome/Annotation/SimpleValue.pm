@@ -3,7 +3,7 @@ package Biome::Annotation::SimpleValue;
 
 use Biome;
 
-with 'Biome::Role::Annotate' => {
+with 'Biome::Role::Annotatable' => {
     'data_slots'        => [qw(value term)]
 };
 

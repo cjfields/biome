@@ -4,9 +4,9 @@ package Biome::Annotation::DBLink;
 
 use Biome;
 
-with qw(Biome::Role::Annotate
+with qw(Biome::Role::Annotatable
         Biome::Role::DatabaseLink
-        Biome::Role::Identify);
+        Biome::Role::Identifiable);
 
 has '+DEFAULT_CB' => (
     default     => sub { (($_[0]->database ? $_[0]->database . ':' : '' ) .

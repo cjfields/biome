@@ -16,8 +16,8 @@ my $target = Biome::Annotation::Target->new(
     -end        => 200,
     -strand     => 1);
 
-does_ok($target,'Biome::Role::Annotate');
-does_ok($target,'Biome::Role::Identify');
+does_ok($target,'Biome::Role::Annotatable');
+does_ok($target,'Biome::Role::Identifiable');
 
 is $target->database(), 'UniProt';
 is $target->start(), 1;
