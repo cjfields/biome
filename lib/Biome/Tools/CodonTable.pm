@@ -1,212 +1,26 @@
-# $Id: CodonTable.pm 15549 2009-02-21 00:48:48Z maj $
-#
-# bioperl module for Bio::Tools::CodonTable
-#
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
-#
-# Cared for by Heikki Lehvaslaiho <heikki-at-bioperl-dot-org>
-#
-# Copyright Heikki Lehvaslaiho
-#
-# You may distribute this module under the same terms as perl itself
-
-# POD documentation - main docs before the code
-
-=head1 NAME
-
-Bio::Tools::CodonTable - Codon table object
-
-=head1 SYNOPSIS
-
-  # This is a read-only class for all known codon tables.  The IDs are
-  # the ones used by nucleotide sequence databases.  All common IUPAC
-  # ambiguity codes for DNA, RNA and amino acids are recognized.
-
-  use Bio::Tools::CodonTable;
-
-  # defaults to ID 1 "Standard"
-  $myCodonTable   = Bio::Tools::CodonTable->new();
-  $myCodonTable2  = Bio::Tools::CodonTable->new( -id => 3 );
-
-  # change codon table
-  $myCodonTable->id(5);
-
-  # examine codon table
-  print  join (' ', "The name of the codon table no.", $myCodonTable->id(4),
-           "is:", $myCodonTable->name(), "\n");
-
-  # print possible codon tables
-  $tables = Bio::Tools::CodonTable->tables;
-  while ( ($id,$name) = each %{$tables} ) {
-    print "$id = $name\n";
-  }
-
-  # translate a codon
-  $aa = $myCodonTable->translate('ACU');
-  $aa = $myCodonTable->translate('act');
-  $aa = $myCodonTable->translate('ytr');
-
-  # reverse translate an amino acid
-  @codons = $myCodonTable->revtranslate('A');
-  @codons = $myCodonTable->revtranslate('Ser');
-  @codons = $myCodonTable->revtranslate('Glx');
-  @codons = $myCodonTable->revtranslate('cYS', 'rna');
-
-  # reverse translate an entire amino acid sequence into a IUPAC
-  # nucleotide string
-
-  my $seqobj    = Bio::PrimarySeq->new(-seq => 'FHGERHEL');
-  my $iupac_str = $myCodonTable->reverse_translate_all($seqobj);
-
-  # boolean tests
-  print "Is a start\n"       if $myCodonTable->is_start_codon('ATG');
-  print "Is a terminator\n" if $myCodonTable->is_ter_codon('tar');
-  print "Is a unknown\n"     if $myCodonTable->is_unknown_codon('JTG');
-
-=head1 DESCRIPTION
-
-Codon tables are also called translation tables or genetic codes
-since that is what they represent. A bit more complete picture
-of the full complexity of codon usage in various taxonomic groups
-is presented at the NCBI Genetic Codes Home page.
-
-CodonTable is a BioPerl class that knows all current translation
-tables that are used by primary nucleotide sequence databases
-(GenBank, EMBL and DDBJ). It provides methods to output information
-about tables and relationships between codons and amino acids.
-
-This class and its methods recognized all common IUPAC ambiguity codes
-for DNA, RNA and animo acids. The translation method follows the
-conventions in EMBL and TREMBL databases.
-
-It is a nuisance to separate RNA and cDNA representations of nucleic
-acid transcripts. The CodonTable object accepts codons of both type as
-input and allows the user to set the mode for output when reverse
-translating. Its default for output is DNA.
-
-Note: 
-
-This class deals primarily with individual codons and amino
-acids. However in the interest of speed you can L<translate>
-longer sequence, too. The full complexity of protein translation
-is tackled by L<Bio::PrimarySeqI::translate>.
-
-
-The amino acid codes are IUPAC recommendations for common amino acids:
-
-          A           Ala            Alanine
-          R           Arg            Arginine
-          N           Asn            Asparagine
-          D           Asp            Aspartic acid
-          C           Cys            Cysteine
-          Q           Gln            Glutamine
-          E           Glu            Glutamic acid
-          G           Gly            Glycine
-          H           His            Histidine
-          I           Ile            Isoleucine
-          L           Leu            Leucine
-          K           Lys            Lysine
-          M           Met            Methionine
-          F           Phe            Phenylalanine
-          P           Pro            Proline
-          O           Pyl            Pyrrolysine (22nd amino acid)
-          U           Sec            Selenocysteine (21st amino acid)
-          S           Ser            Serine
-          T           Thr            Threonine
-          W           Trp            Tryptophan
-          Y           Tyr            Tyrosine
-          V           Val            Valine
-          B           Asx            Aspartic acid or Asparagine
-          Z           Glx            Glutamine or Glutamic acid
-          J           Xle            Isoleucine or Valine (mass spec ambiguity)
-          X           Xaa            Any or unknown amino acid
-
-
-It is worth noting that, "Bacterial" codon table no. 11 produces an
-polypeptide that is, confusingly, identical to the standard one. The
-only differences are in available initiator codons.
-
-
-NCBI Genetic Codes home page:
-     http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c
-
-EBI Translation Table Viewer:
-     http://www.ebi.ac.uk/cgi-bin/mutations/trtables.cgi
-
-Amended ASN.1 version with ids 16 and 21 is at:
-     ftp://ftp.ebi.ac.uk/pub/databases/geneticcode/
-
-Thanks to Matteo diTomasso for the original Perl implementation
-of these tables.
-
-=head1 FEEDBACK
-
-=head2 Mailing Lists
-
-User feedback is an integral part of the evolution of this and other
-Bioperl modules. Send your comments and suggestions preferably to the
-Bioperl mailing lists  Your participation is much appreciated.
-
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
-
-=head2 Support 
- 
-Please direct usage questions or support issues to the mailing list:
-  
-L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
-with code and data examples if at all possible.
-
-=head2 Reporting Bugs
-
-Report bugs to the Bioperl bug tracking system to help us keep track
-the bugs and their resolution.  Bug reports can be submitted via the
-web:
-
-  http://bugzilla.open-bio.org/
-
-=head1 AUTHOR - Heikki Lehvaslaiho
-
-Email:  heikki-at-bioperl-dot-org
-
-=head1 APPENDIX
-
-The rest of the documentation details each of the object
-methods. Internal methods are usually preceded with a _
-
-=cut
-
-
-# Let the code begin...
-
 package Biome::Tools::CodonTable;
 
 use Biome;
 use MooseX::ClassAttribute;
-use MooseX::AttributeHelpers;
 
 use Biome::Tools::IUPAC;
 
 # first set internal values for all translation tables
 
 class_has codons => (
-	metaclass   => 'Collection::ImmutableHash',
+	traits      => ['Hash'],
 	isa 		=> 'HashRef',
 	is      	=> 'ro',
 	init_arg	=> undef,
 	lazy		=> 1,
-    provides    => {
-        'get'   => 'get_codon'
+    handles     => {
+        'get_codon'   => 'get'
         },
     builder     => '_build_codons',
 );
 
 class_has reverse_codons  => (
-	metaclass   => 'Collection::ImmutableHash',
+    traits      => ['Hash'],
 	isa 		=> 'HashRef',
 	is      	=> 'ro',
     init_arg    => undef,
@@ -227,14 +41,14 @@ class_has codon_size => (
     );
 
 class_has genetic_code => (
-	metaclass   => 'Collection::Hash',
+    traits      => ['Hash'],
 	isa 		=> 'HashRef',
 	is      	=> 'rw',
     init_arg    => undef,
     lazy        => 1,
-    provides    => {
-        'set'   => '_add_table',
-        'count' => '_code_elements'
+    handles     => {
+        '_add_table'        => 'set',
+        '_code_elements'    => 'count'
         },
     default => sub {
     {
@@ -318,13 +132,6 @@ has id => (
     is   => 'rw',
     default => 1
 );
-
-#BEGIN { 
-    #%IUPAC_DNA = Bio::Tools::IUPAC->iupac_iub();    
-    #%IUPAC_AA = Bio::Tools::IUPAC->iupac_iup();
-    #%THREELETTERSYMBOLS = Bio::SeqUtils->valid_aa(2);
-    #$VALID_PROTEIN = '['.join('',Bio::SeqUtils->valid_aa(0)).']';
-#}
 
 =head2 name
 
@@ -879,8 +686,191 @@ sub _build_codons {
 
 no Biome;
 no MooseX::ClassAttribute;
-no MooseX::AttributeHelpers;
 
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+# $Id: CodonTable.pm 15549 2009-02-21 00:48:48Z maj $
+#
+# bioperl module for Bio::Tools::CodonTable
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+#
+# Cared for by Heikki Lehvaslaiho <heikki-at-bioperl-dot-org>
+#
+# Copyright Heikki Lehvaslaiho
+#
+# You may distribute this module under the same terms as perl itself
+
+# POD documentation - main docs before the code
+
+=head1 NAME
+
+Bio::Tools::CodonTable - Codon table object
+
+=head1 SYNOPSIS
+
+  # This is a read-only class for all known codon tables.  The IDs are
+  # the ones used by nucleotide sequence databases.  All common IUPAC
+  # ambiguity codes for DNA, RNA and amino acids are recognized.
+
+  use Bio::Tools::CodonTable;
+
+  # defaults to ID 1 "Standard"
+  $myCodonTable   = Bio::Tools::CodonTable->new();
+  $myCodonTable2  = Bio::Tools::CodonTable->new( -id => 3 );
+
+  # change codon table
+  $myCodonTable->id(5);
+
+  # examine codon table
+  print  join (' ', "The name of the codon table no.", $myCodonTable->id(4),
+           "is:", $myCodonTable->name(), "\n");
+
+  # print possible codon tables
+  $tables = Bio::Tools::CodonTable->tables;
+  while ( ($id,$name) = each %{$tables} ) {
+    print "$id = $name\n";
+  }
+
+  # translate a codon
+  $aa = $myCodonTable->translate('ACU');
+  $aa = $myCodonTable->translate('act');
+  $aa = $myCodonTable->translate('ytr');
+
+  # reverse translate an amino acid
+  @codons = $myCodonTable->revtranslate('A');
+  @codons = $myCodonTable->revtranslate('Ser');
+  @codons = $myCodonTable->revtranslate('Glx');
+  @codons = $myCodonTable->revtranslate('cYS', 'rna');
+
+  # reverse translate an entire amino acid sequence into a IUPAC
+  # nucleotide string
+
+  my $seqobj    = Bio::PrimarySeq->new(-seq => 'FHGERHEL');
+  my $iupac_str = $myCodonTable->reverse_translate_all($seqobj);
+
+  # boolean tests
+  print "Is a start\n"       if $myCodonTable->is_start_codon('ATG');
+  print "Is a terminator\n" if $myCodonTable->is_ter_codon('tar');
+  print "Is a unknown\n"     if $myCodonTable->is_unknown_codon('JTG');
+
+=head1 DESCRIPTION
+
+Codon tables are also called translation tables or genetic codes
+since that is what they represent. A bit more complete picture
+of the full complexity of codon usage in various taxonomic groups
+is presented at the NCBI Genetic Codes Home page.
+
+CodonTable is a BioPerl class that knows all current translation
+tables that are used by primary nucleotide sequence databases
+(GenBank, EMBL and DDBJ). It provides methods to output information
+about tables and relationships between codons and amino acids.
+
+This class and its methods recognized all common IUPAC ambiguity codes
+for DNA, RNA and animo acids. The translation method follows the
+conventions in EMBL and TREMBL databases.
+
+It is a nuisance to separate RNA and cDNA representations of nucleic
+acid transcripts. The CodonTable object accepts codons of both type as
+input and allows the user to set the mode for output when reverse
+translating. Its default for output is DNA.
+
+Note: 
+
+This class deals primarily with individual codons and amino
+acids. However in the interest of speed you can L<translate>
+longer sequence, too. The full complexity of protein translation
+is tackled by L<Bio::PrimarySeqI::translate>.
+
+
+The amino acid codes are IUPAC recommendations for common amino acids:
+
+          A           Ala            Alanine
+          R           Arg            Arginine
+          N           Asn            Asparagine
+          D           Asp            Aspartic acid
+          C           Cys            Cysteine
+          Q           Gln            Glutamine
+          E           Glu            Glutamic acid
+          G           Gly            Glycine
+          H           His            Histidine
+          I           Ile            Isoleucine
+          L           Leu            Leucine
+          K           Lys            Lysine
+          M           Met            Methionine
+          F           Phe            Phenylalanine
+          P           Pro            Proline
+          O           Pyl            Pyrrolysine (22nd amino acid)
+          U           Sec            Selenocysteine (21st amino acid)
+          S           Ser            Serine
+          T           Thr            Threonine
+          W           Trp            Tryptophan
+          Y           Tyr            Tyrosine
+          V           Val            Valine
+          B           Asx            Aspartic acid or Asparagine
+          Z           Glx            Glutamine or Glutamic acid
+          J           Xle            Isoleucine or Valine (mass spec ambiguity)
+          X           Xaa            Any or unknown amino acid
+
+
+It is worth noting that, "Bacterial" codon table no. 11 produces an
+polypeptide that is, confusingly, identical to the standard one. The
+only differences are in available initiator codons.
+
+
+NCBI Genetic Codes home page:
+     http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c
+
+EBI Translation Table Viewer:
+     http://www.ebi.ac.uk/cgi-bin/mutations/trtables.cgi
+
+Amended ASN.1 version with ids 16 and 21 is at:
+     ftp://ftp.ebi.ac.uk/pub/databases/geneticcode/
+
+Thanks to Matteo diTomasso for the original Perl implementation
+of these tables.
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this and other
+Bioperl modules. Send your comments and suggestions preferably to the
+Bioperl mailing lists  Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+ 
+Please direct usage questions or support issues to the mailing list:
+  
+L<bioperl-l@bioperl.org>
+  
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Heikki Lehvaslaiho
+
+Email:  heikki-at-bioperl-dot-org
+
+=head1 APPENDIX
+
+The rest of the documentation details each of the object
+methods. Internal methods are usually preceded with a _
+
+=cut

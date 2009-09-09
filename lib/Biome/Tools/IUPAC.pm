@@ -1,3 +1,168 @@
+package Biome::Tools::IUPAC;
+
+use Biome;
+use MooseX::ClassAttribute;
+
+# will likely change when AttributeHelpers moves to Moose core
+
+# ambiguity mappings
+class_has iupac_dna => (
+	metaclass   => 'Collection::ImmutableHash',
+	isa 		=> 'HashRef',
+	is      	=> 'ro',
+	init_arg	=> undef,
+	lazy		=> 1,
+	provides    => {
+		'count'		=> 'count_iupac_dna',
+		'get'   	=> 'get_iupac_dna'
+		},
+	default 	=> sub {
+		{
+			A => qw(A),
+			C => qw(C),
+			G => qw(G),
+			T => qw(T),
+			U => qw(U),
+			M => qw(AC),
+			R => qw(AG),
+			W => qw(AT),
+			S => qw(CG),
+			Y => qw(CT),
+			K => qw(GT),
+			V => qw(ACG),
+			H => qw(ACT),
+			D => qw(AGT),
+			B => qw(CGT),
+			X => qw(ACGT),
+			N => qw(ACGT)
+		}
+	}
+	);
+
+class_has iupac_rev_dna => (
+	traits      => ['Hash'],
+	isa 		=> 'HashRef',
+	is      	=> 'ro',
+	init_arg	=> undef,
+	lazy		=> 1,
+	handles    => {
+		'count_iupac_rev_dna'		=> 'count',
+		'get_iupac_rev_dna'    	    => 'get'
+		},
+	default     => sub {
+		{
+			A	=> 'A',
+			T	=> 'T',
+			C	=> 'C',
+			G 	=> 'G',
+			AC	=> 'M',
+			AG	=> 'R',
+			AT	=> 'W',
+			CG	=> 'S',
+			CT	=> 'Y',
+			GT  => 'K',
+			ACG	=> 'V',
+			ACT	=> 'H',
+			AGT	=> 'D',
+			CGT	=> 'B',
+			ACGT=> 'N',
+			N	=> 'N'
+		}
+	}
+);
+
+class_has iupac_aa => (
+	traits      => ['Hash'],
+	isa 		=> 'HashRef',
+	is      	=> 'ro',
+	init_arg	=> undef,
+	lazy		=> 1,
+	handles    => {
+		'count_iupac_aa'		=> 'count',
+		'get_iupac_aa'   	    => 'get'
+		},
+	default 	=> sub {
+		{
+			A => qw(A),
+			B => qw(DN),
+			C => qw(C),
+			D => qw(D),
+			E => qw(E),
+			F => qw(F),
+			G => qw(G),
+			H => qw(H),
+			I => qw(I),
+			J => qw(IL),
+			K => qw(K),
+			L => qw(L),
+			M => qw(M),
+			N => qw(N),
+			O => qw(O),
+			P => qw(P),
+			Q => qw(Q),
+			R => qw(R),
+			S => qw(S),
+			T => qw(T),
+			U => qw(U),
+			V => qw(V),
+			W => qw(W),
+			X => qw(X),
+			Y => qw(Y),
+			Z => qw(EQ),
+			'*' => '*'
+		}
+	}
+);
+
+# convert from 3 to 1 letter code
+# attribute name is considered unstable and kinda goofy
+class_has map_aa_3_1 => (
+	traits      => ['Hash'],
+	isa 		=> 'HashRef',
+	is      	=> 'ro',
+	init_arg	=> undef,
+	lazy		=> 1,
+	default 	=> sub {
+		{
+		'Ala' => 'A', 'Asx' => 'B', 'Cys' => 'C', 'Asp' => 'D',
+		'Glu' => 'E', 'Phe' => 'F', 'Gly' => 'G', 'His' => 'H',
+		'Ile' => 'I', 'Lys' => 'K', 'Leu' => 'L', 'Met' => 'M',
+		'Asn' => 'N', 'Pro' => 'P', 'Gln' => 'Q', 'Arg' => 'R',
+		'Ser' => 'S', 'Thr' => 'T', 'Val' => 'V', 'Trp' => 'W',
+		'Xaa' => 'X', 'Tyr' => 'Y', 'Glx' => 'Z', 'Ter' => '*',
+		'Sec' => 'U', 'Pyl' => 'O', 'Xle' => 'J'			
+		}
+	}
+);
+
+# convert from 1 to 3 letter code
+# attribute name is considered unstable and kinda goofy
+class_has map_aa_1_3 => (
+	traits      => ['Hash'],
+	isa 		=> 'HashRef',
+	is      	=> 'ro',
+	init_arg	=> undef,
+	lazy		=> 1,
+	default 	=> sub {
+		{
+		'A' => 'Ala', 'B' => 'Asx', 'C' => 'Cys', 'D' => 'Asp',
+		'E' => 'Glu', 'F' => 'Phe', 'G' => 'Gly', 'H' => 'His',
+		'I' => 'Ile', 'K' => 'Lys', 'L' => 'Leu', 'M' => 'Met',
+		'N' => 'Asn', 'P' => 'Pro', 'Q' => 'Gln', 'R' => 'Arg',
+		'S' => 'Ser', 'T' => 'Thr', 'V' => 'Val', 'W' => 'Trp',
+		'Y' => 'Tyr', 'Z' => 'Glx', 'X' => 'Xaa', '*' => 'Ter',
+		'U' => 'Sec', 'O' => 'Pyl', 'J' => 'Xle'
+		}
+	}
+);
+
+no MooseX::ClassAttribute;
+no Moose;
+
+1;
+
+__END__
+
 # $Id: IUPAC.pm 15549 2009-02-21 00:48:48Z maj $
 #
 # BioPerl module for IUPAC
@@ -140,169 +305,3 @@ methods. Internal methods are usually preceded with a _
 =cut
 
 
-# Let the code begin...
-
-package Biome::Tools::IUPAC;
-
-use Biome;
-use MooseX::ClassAttribute;
-use MooseX::AttributeHelpers;
-
-# will likely change when AttributeHelpers moves to Moose core
-
-# ambiguity mappings
-class_has iupac_dna => (
-	metaclass   => 'Collection::ImmutableHash',
-	isa 		=> 'HashRef',
-	is      	=> 'ro',
-	init_arg	=> undef,
-	lazy		=> 1,
-	provides    => {
-		'count'		=> 'count_iupac_dna',
-		'get'   	=> 'get_iupac_dna'
-		},
-	default 	=> sub {
-		{
-			A => qw(A),
-			C => qw(C),
-			G => qw(G),
-			T => qw(T),
-			U => qw(U),
-			M => qw(AC),
-			R => qw(AG),
-			W => qw(AT),
-			S => qw(CG),
-			Y => qw(CT),
-			K => qw(GT),
-			V => qw(ACG),
-			H => qw(ACT),
-			D => qw(AGT),
-			B => qw(CGT),
-			X => qw(ACGT),
-			N => qw(ACGT)
-		}
-	}
-	);
-
-class_has iupac_rev_dna => (
-	metaclass   => 'Collection::ImmutableHash',
-	isa 		=> 'HashRef',
-	is      	=> 'ro',
-	init_arg	=> undef,
-	lazy		=> 1,
-	provides    => {
-		'count'		=> 'count_iupac_rev_dna',
-		'get'   	=> 'get_iupac_rev_dna'
-		},
-	default     => sub {
-		{
-			A	=> 'A',
-			T	=> 'T',
-			C	=> 'C',
-			G 	=> 'G',
-			AC	=> 'M',
-			AG	=> 'R',
-			AT	=> 'W',
-			CG	=> 'S',
-			CT	=> 'Y',
-			GT  => 'K',
-			ACG	=> 'V',
-			ACT	=> 'H',
-			AGT	=> 'D',
-			CGT	=> 'B',
-			ACGT=> 'N',
-			N	=> 'N'
-		}
-	}
-);
-
-class_has iupac_aa => (
-	metaclass   => 'Collection::ImmutableHash',
-	isa 		=> 'HashRef',
-	is      	=> 'ro',
-	init_arg	=> undef,
-	lazy		=> 1,
-	provides    => {
-		'count'		=> 'count_iupac_aa',
-		'get'   	=> 'get_iupac_aa'
-		},
-	default 	=> sub {
-		{
-			A => qw(A),
-			B => qw(DN),
-			C => qw(C),
-			D => qw(D),
-			E => qw(E),
-			F => qw(F),
-			G => qw(G),
-			H => qw(H),
-			I => qw(I),
-			J => qw(IL),
-			K => qw(K),
-			L => qw(L),
-			M => qw(M),
-			N => qw(N),
-			O => qw(O),
-			P => qw(P),
-			Q => qw(Q),
-			R => qw(R),
-			S => qw(S),
-			T => qw(T),
-			U => qw(U),
-			V => qw(V),
-			W => qw(W),
-			X => qw(X),
-			Y => qw(Y),
-			Z => qw(EQ),
-			'*' => '*'
-		}
-	}
-);
-
-# convert from 3 to 1 letter code
-# attribute name is considered unstable and kinda goofy
-class_has map_aa_3_1 => (
-	metaclass   => 'Collection::ImmutableHash',
-	isa 		=> 'HashRef',
-	is      	=> 'ro',
-	init_arg	=> undef,
-	lazy		=> 1,
-	default 	=> sub {
-		{
-		'Ala' => 'A', 'Asx' => 'B', 'Cys' => 'C', 'Asp' => 'D',
-		'Glu' => 'E', 'Phe' => 'F', 'Gly' => 'G', 'His' => 'H',
-		'Ile' => 'I', 'Lys' => 'K', 'Leu' => 'L', 'Met' => 'M',
-		'Asn' => 'N', 'Pro' => 'P', 'Gln' => 'Q', 'Arg' => 'R',
-		'Ser' => 'S', 'Thr' => 'T', 'Val' => 'V', 'Trp' => 'W',
-		'Xaa' => 'X', 'Tyr' => 'Y', 'Glx' => 'Z', 'Ter' => '*',
-		'Sec' => 'U', 'Pyl' => 'O', 'Xle' => 'J'			
-		}
-	}
-);
-
-# convert from 1 to 3 letter code
-# attribute name is considered unstable and kinda goofy
-class_has map_aa_1_3 => (
-	metaclass   => 'Collection::ImmutableHash',
-	isa 		=> 'HashRef',
-	is      	=> 'ro',
-	init_arg	=> undef,
-	lazy		=> 1,
-	default 	=> sub {
-		{
-		'A' => 'Ala', 'B' => 'Asx', 'C' => 'Cys', 'D' => 'Asp',
-		'E' => 'Glu', 'F' => 'Phe', 'G' => 'Gly', 'H' => 'His',
-		'I' => 'Ile', 'K' => 'Lys', 'L' => 'Leu', 'M' => 'Met',
-		'N' => 'Asn', 'P' => 'Pro', 'Q' => 'Gln', 'R' => 'Arg',
-		'S' => 'Ser', 'T' => 'Thr', 'V' => 'Val', 'W' => 'Trp',
-		'Y' => 'Tyr', 'Z' => 'Glx', 'X' => 'Xaa', '*' => 'Ter',
-		'U' => 'Sec', 'O' => 'Pyl', 'J' => 'Xle'
-		}
-	}
-);
-
-no MooseX::ClassAttribute;
-no MooseX::AttributeHelpers;
-no Moose;
-
-1;
