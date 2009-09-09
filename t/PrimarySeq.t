@@ -30,8 +30,8 @@ is $seq->accession_number(), 'X677667';
 is $seq->display_id(), 'new-id';
 
 # check Identify, Describe roles
-does_ok($seq,'Biome::Role::Describe');
-does_ok($seq,'Biome::Role::Identify');
+does_ok($seq,'Biome::Role::Describable');
+does_ok($seq,'Biome::Role::Identifiable');
 
 # make sure all methods are implemented
 is $seq->authority("bioperl.org"), "bioperl.org";
