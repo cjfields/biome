@@ -1,0 +1,20 @@
+do{ my $x = {
+       'build_requires' => {
+                             'Module::Build' => '0.2805'
+                           },
+       'conflicts' => {},
+       'requires' => {
+                       'MooseX::Singleton' => 0,
+                       'perl' => '5.01',
+                       'Exception::Class' => 0,
+                       'MooseX::AttributeHelpers' => 0,
+                       'MooseX::Types' => 0,
+                       'Data::Stag' => 0,
+                       'MooseX::Role::Parameterized' => 0,
+                       'MooseX::ClassAttribute' => 0,
+                       'List::MoreUtils' => 0,
+                       'Moose' => '0.87'
+                     },
+       'recommends' => {}
+     };
+$x; }

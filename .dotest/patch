@@ -1,0 +1,337 @@
+---
+ lib/Biome/Role/Location.pm |  281 ++++++++++++++++++++++++--------------------
+ 1 files changed, 152 insertions(+), 129 deletions(-)
+
+diff --git a/lib/Biome/Role/Location.pm b/lib/Biome/Role/Location.pm
+index c93a05297151f29b96c3ad1c76a84e69c7b2322c..390d627f76082128389828174117d44fe12cbab4 100644
+--- a/lib/Biome/Role/Location.pm
++++ b/lib/Biome/Role/Location.pm
+@@ -2,7 +2,8 @@ package Biome::Role::Location;
+ 
+ use Biome::Role;
+ 
+-with 'Biome::Root::Range';
++##at this point making it independent of range
++#with 'Biome::Root::Range';
+ 
+ 
+ =head2 location_type
+@@ -17,6 +18,10 @@ with 'Biome::Root::Range';
+ 
+ requires 'location_type';
+ 
++#for rest of attributes an empty builder method is provided which should be implemented by
++#the consuming class. This approach is kind of a first stab to see how it works(after
++#discussion with cfields in the bioperl mailing list)
++
+ =head2 start
+ 
+   Title   : start
+@@ -43,11 +48,10 @@ See L<Bio::Location::CoordinatePolicy> for more information
+ =cut
+ 
+ has 'start' => ( 
+-	is => 'ro', 
+-	default => sub { 
+-	    my ($self) = @_;	
+-		return $self->coordinate_policy->start($self);
+-	}
++	is => 'rw', 
++	isa => 'Int', 
++	builder => '_build_start', 
++	lazy => 1, 
+ );
+ 
+ =head2 end
+@@ -76,11 +80,150 @@ information
+ =cut
+ 
+ has 'end' => ( 
++	is => 'rw', 
++	isa => 'Int', 
++	builder => '_build_end', 
++	lazy => 1, 
++);
++
++=head2 each_Location
++
++ Title   : each_Location
++ Usage   : @locations = $locObject->each_Location($order);
++ Function: Conserved function call across Location:: modules - will
++           return an array containing the component Location(s) in
++           that object, regardless if the calling object is itself a
++           single location or one containing sublocations.
++ Returns : an array of Bio::LocationI implementing objects
++ Args    : Optional sort order to be passed to sub_Location() for Splits
++
++=cut
++
++has 'each_Location' => ( 
++	is => 'ro', 
++	isa => 'Obj', 
++	builder => '_build_each_Location', 
++	lazy => 1, 
++); 
++
++=head2 to_FTstring
++
++  Title   : to_FTstring
++  Usage   : my $locstr = $location->to_FTstring()
++  Function: returns the FeatureTable string of this location
++  Returns : string
++  Args    : none
++
++=cut
++
++has  'to_FTstring' => ( 
++	is => 'ro', 
++	isa => Str, 
++	builder => '_build_FTstring', 
++	lazy => 1, 
++);
++
++
++=head2 valid_Location
++
++ Title   : valid_Location
++ Usage   : if ($location->valid_location) {...};
++ Function: boolean method to determine whether location is considered valid
++           (has minimum requirements for a specific LocationI implementation)
++ Returns : Boolean value: true if location is valid, false otherwise
++ Args    : none
++
++=cut
++
++has 'valid_Location' => ( 
++	is => 'ro', 
++	isa => Bool, 
++	builder => '_build_valid_Location', 
++	lazy => 1, 
++);
++
++
++=head2 coordinate_policy
++
++  Title   : coordinate_policy
++  Usage   : $policy = $location->coordinate_policy();
++            $location->coordinate_policy($mypolicy); # set may not be possible
++  Function: Get the coordinate computing policy employed by this object.
++
++            See L<Bio::Location::CoordinatePolicyI> for documentation
++            about the policy object and its use.
++
++            The interface *does not* require implementing classes to
++            accept setting of a different policy. The implementation
++            provided here does, however, allow to do so.
++
++            Implementors of this interface are expected to initialize
++            every new instance with a
++            L<Bio::Location::CoordinatePolicyI> object. The
++            implementation provided here will return a default policy
++            object if none has been set yet. To change this default
++            policy object call this method as a class method with an
++            appropriate argument. Note that in this case only
++            subsequently created Location objects will be affected.
++
++  Returns : A L<Bio::Location::CoordinatePolicyI> implementing object.
++  Args    : On set, a L<Bio::Location::CoordinatePolicyI> implementing object.
++
++See L<Bio::Location::CoordinatePolicyI> for more information
++
++
++=cut
++
++requires 'coordinate_policy';
++
++
++=head2 is_remote
++
++ Title   : is_remote
++ Usage   : $is_remote_loc = $loc->is_remote()
++ Function: Whether or not a location is a remote location.
++
++           A location is said to be remote if it is on a different
++           'object' than the object which 'has' this
++           location. Typically, features on a sequence will sometimes
++           have a remote location, which means that the location of
++           the feature is on a different sequence than the one that is
++           attached to the feature. In such a case, $loc->seq_id will
++           be different from $feat->seq_id (usually they will be the
++           same).
++
++           While this may sound weird, it reflects the location of the
++           kind of AB18375:450-900 which can be found in GenBank/EMBL
++           feature tables.
++
++ Example : 
++ Returns : TRUE if the location is a remote location, and FALSE otherwise
++ Args    : 
++
++
++=cut
++
++has 'is_remote' => ( 
++	is => 'rw', 
++	isa => 'Int', 
++);
++
++=head2 flip_strand
++
++  Title   : flip_strand
++  Usage   : $location->flip_strand();
++  Function: Flip-flop a strand to the opposite
++  Returns : None
++  Args    : None
++
++=cut
++
++has 'flip_strand' => ( 
+ 	is => 'ro', 
+ 	default => sub { 
+-	    my ($self) = @_;	
+-		return $self->coordinate_policy->end($self);
+-	}
++		my ($self) = @_;
++		$self->strand($self->strand * -1);
++	},
+ );
+ 
+ 
+@@ -138,25 +281,6 @@ requires 'max_start';
+ requires 'start_pos_type';
+ 
+ 
+-=head2 flip_strand
+-
+-  Title   : flip_strand
+-  Usage   : $location->flip_strand();
+-  Function: Flip-flop a strand to the opposite
+-  Returns : None
+-  Args    : None
+-
+-=cut
+-
+-has 'flip_strand' => ( 
+-	is => 'ro', 
+-	default => sub { 
+-		my ($self) = @_;
+-		$self->strand($self->strand * -1);
+-	},
+-);
+-
+-
+ =head2 min_end
+ 
+   Title   : min_end
+@@ -225,107 +349,6 @@ requires 'end_pos_type';
+ requires 'seq_id';
+ 
+ 
+-=head2 is_remote
+-
+- Title   : is_remote
+- Usage   : $is_remote_loc = $loc->is_remote()
+- Function: Whether or not a location is a remote location.
+-
+-           A location is said to be remote if it is on a different
+-           'object' than the object which 'has' this
+-           location. Typically, features on a sequence will sometimes
+-           have a remote location, which means that the location of
+-           the feature is on a different sequence than the one that is
+-           attached to the feature. In such a case, $loc->seq_id will
+-           be different from $feat->seq_id (usually they will be the
+-           same).
+-
+-           While this may sound weird, it reflects the location of the
+-           kind of AB18375:450-900 which can be found in GenBank/EMBL
+-           feature tables.
+-
+- Example : 
+- Returns : TRUE if the location is a remote location, and FALSE otherwise
+- Args    : 
+-
+-
+-=cut
+-
+-requires 'is_remote';
+-
+-=head2 coordinate_policy
+-
+-  Title   : coordinate_policy
+-  Usage   : $policy = $location->coordinate_policy();
+-            $location->coordinate_policy($mypolicy); # set may not be possible
+-  Function: Get the coordinate computing policy employed by this object.
+-
+-            See L<Bio::Location::CoordinatePolicyI> for documentation
+-            about the policy object and its use.
+-
+-            The interface *does not* require implementing classes to
+-            accept setting of a different policy. The implementation
+-            provided here does, however, allow to do so.
+-
+-            Implementors of this interface are expected to initialize
+-            every new instance with a
+-            L<Bio::Location::CoordinatePolicyI> object. The
+-            implementation provided here will return a default policy
+-            object if none has been set yet. To change this default
+-            policy object call this method as a class method with an
+-            appropriate argument. Note that in this case only
+-            subsequently created Location objects will be affected.
+-
+-  Returns : A L<Bio::Location::CoordinatePolicyI> implementing object.
+-  Args    : On set, a L<Bio::Location::CoordinatePolicyI> implementing object.
+-
+-See L<Bio::Location::CoordinatePolicyI> for more information
+-
+-
+-=cut
+-
+-requires 'coordinate_policy';
+-
+-=head2 to_FTstring
+-
+-  Title   : to_FTstring
+-  Usage   : my $locstr = $location->to_FTstring()
+-  Function: returns the FeatureTable string of this location
+-  Returns : string
+-  Args    : none
+-
+-=cut
+-
+-requires  'to_FTstring'; 
+-
+-=head2 each_Location
+-
+- Title   : each_Location
+- Usage   : @locations = $locObject->each_Location($order);
+- Function: Conserved function call across Location:: modules - will
+-           return an array containing the component Location(s) in
+-           that object, regardless if the calling object is itself a
+-           single location or one containing sublocations.
+- Returns : an array of Bio::LocationI implementing objects
+- Args    : Optional sort order to be passed to sub_Location() for Splits
+-
+-=cut
+-
+-requires 'each_Location';
+-
+-
+-=head2 valid_Location
+-
+- Title   : valid_Location
+- Usage   : if ($location->valid_location) {...};
+- Function: boolean method to determine whether location is considered valid
+-           (has minimum requirements for a specific LocationI implementation)
+- Returns : Boolean value: true if location is valid, false otherwise
+- Args    : none
+-
+-=cut
+-
+-requires 'valid_Location';
+ 
+ 
+ 
+-- 
+1.5.3.7
+
+
