@@ -2,45 +2,14 @@
 
 package BioMe::Location::Simple;
 use MooseX::AttributeHelpers;
-extends 'BioMe::Location::Atomic';
+use Biome;
+use Biome::Location::WidestCoordPolicy;
+use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy/;
 
-has 'rangeencode' = ( 
-	metaclass => 'Collection::Hash', 
-	is => 'rw', 
-	isa => 'HashRef[Str], 
-	lazy => 1, 
-	builder => '_build_range_encoding', 
-	provides => { 
-		exists => 'has_encoding', 
-		keys => 'encoding_types', 
-		get => 'decode', 
-		set => 'encode'
-	}
-);
+with 'Biome::Role::Location';
 
-sub _build_range_encoding { 
-	my ($self) = @_;
 
-my %range_encode = (
-    '\.\.' => 'EXACT',
-    '\^'   => 'IN-BETWEEN', 
-    'EXACT'      => '..',
-    'IN-BETWEEN' => '^'
-);
 
-$self->encode(%range_encode);
-}
-
-sub new {
-    my ( $class, @args ) = @_;
-    my $self = $class->SUPER::new(@args);
-
-    my ($locationtype) = $self->_rearrange( [qw(LOCATION_TYPE)], @args );
-
-    $locationtype && $self->location_type($locationtype);
-
-    return $self;
-}
 
 =head2 start
 
@@ -53,21 +22,18 @@ sub new {
 
 =cut
 
-sub start {
-    my ( $self, $value ) = @_;
-    $self->{'_start'} = $value if defined $value;
-
+sub _build_start {
+    my ( $self ) = @_;
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
-          . $self->{'_start'}
+          . $self->start
           . "] and ["
-          . $self->{'_end'}
+          . $self->end
           . "]" )
-      if defined $self->{'_start'}
-      && defined $self->{'_end'}
+      if $self->has_start
+      && $self->has_end
       && $self->location_type eq 'IN-BETWEEN'
-      && ( $self->{'_end'} - 1 != $self->{'_start'} );
-    return $self->{'_start'};
+      && ( $self->end - 1 != $self->start );
 }
 
 =head2 end
@@ -85,33 +51,32 @@ sub start {
 
 =cut
 
-sub end {
-    my ( $self, $value ) = @_;
 
-    $self->{'_end'} = $value if defined $value;
-
+sub _build_end {
+    my ( $self ) = @_;
     #assume end is the same as start if not defined
-    if ( !defined $self->{'_end'} ) {
-        if ( !defined $self->{'_start'} ) {
+    if ( !$self->has_end ) {
+        if ( !$self->has_tart ) {
             $self->warn('Calling end without a defined start position');
             return;
         }
         $self->warn('Setting start equal to end');
-        $self->{'_end'} = $self->{'_start'};
+        $self->end($self->start);
     }
+
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
-          . $self->{'_start'}
+          . $self->start
           . "] and ["
-          . $self->{'_end'}
+          . $self->end
           . "]" )
-      if defined $self->{'_start'}
-      && defined $self->{'_end'}
+      if $self->has_start
+      && $self->has_end
       && $self->location_type eq 'IN-BETWEEN'
-      && ( $self->{'_end'} - 1 != $self->{'_start'} );
+      && ( $self->end - 1 != $self->start );
 
-    return $self->{'_end'};
 }
+
 
 =head2 strand
 
@@ -123,6 +88,8 @@ sub end {
           : using $loc->strand($strand)
 
 =cut
+
+
 
 =head2 length
 
@@ -346,6 +313,47 @@ sub trunc {
 
     return $out;
 }
+
+has 'rangeencode' = ( 
+	metaclass => 'Collection::Hash', 
+	is => 'rw', 
+	isa => 'HashRef[Str], 
+	lazy => 1, 
+	builder => '_build_range_encoding', 
+	provides => { 
+		exists => 'has_encoding', 
+		keys => 'encoding_types', 
+		get => 'decode', 
+		set => 'encode'
+	}
+);
+
+=head2 _build_range_encoding
+
+  Title   : _build_range_encoding
+  Usage   : 
+  Function: 
+  Returns : 
+  Args    : 
+
+=cut
+
+
+
+sub _build_range_encoding { 
+	my ($self) = @_;
+
+my %range_encode = (
+    '\.\.' => 'EXACT',
+    '\^'   => 'IN-BETWEEN', 
+    'EXACT'      => '..',
+    'IN-BETWEEN' => '^'
+);
+
+$self->encode(%range_encode);
+}
+
+
 
 
 no BioMe;

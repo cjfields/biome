@@ -5,7 +5,7 @@
 package Biome::Location::Atomic;
 use Biome;
 use Biome::Location::WidestCoordPolicy;
-use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy/;
+use Biome::Types qw/Int Str CoordinatePolicy/;
 
 with 'Biome::Role::Location';
 
@@ -25,12 +25,7 @@ with 'Biome::Role::Location';
 
 =cut
 
-has [qw/start end/] => ( 
-	is => 'rw', 
-	isa => 'Int', 
-);
-
-after 'start' => sub {
+sub _build_start {
   my ($self,  $value ) = @_;	
   $self->min_start($value) ;
 }
@@ -46,7 +41,7 @@ after 'start' => sub {
 
 =cut
 
-after 'end' => sub {
+sub _build_end {
   my ($self,  $value ) = @_;	
   $self->min_end($value) ;
 }
@@ -62,10 +57,6 @@ after 'end' => sub {
 
 =cut
 
-has 'strand' => ( 
-	is => 'rw', 
-	isa => SequenceStrand, 
-);
 
 =head2 seq_id
 
@@ -198,27 +189,6 @@ has [qw /start_pos_type end_pos_type location_type/]  => (
 );
 
 
-=head2 is_remote
-
- Title   : is_remote
- Usage   : $self->is_remote($newval)
- Function: Getset for is_remote value
- Returns : value of is_remote
- Args    : newvalue (optional)
-
-
-=cut
-
-sub is_remote {
-   my $self = shift;
-   if( @_ ) {
-       my $value = shift;
-       $self->{'is_remote'} = $value;
-   }
-   return $self->{'is_remote'};
-
-}
-
 =head2 each_Location
 
  Title   : each_Location
@@ -233,7 +203,7 @@ sub is_remote {
 
 =cut
 
-sub each_Location {
+sub _build_each_Location {
    my ($self) = @_;
    return ($self);
 }
@@ -248,9 +218,7 @@ sub each_Location {
 
 =cut
 
-has 'to_FTstring'  => (
-	is => 'ro', 
-	default => sub { 
+sub _build_FTstring {  
     	my($self) = @_;
     	if( $self->start == $self->end ) {
 			return $self->start;
@@ -260,8 +228,7 @@ has 'to_FTstring'  => (
 			$str = sprintf("complement(%s)", $str);
     	}
     	return $str;
-	}
-);
+}
 
 =head2 valid_Location
 
@@ -274,14 +241,11 @@ has 'to_FTstring'  => (
 
 =cut
 
-has 'valid_Location' => (
-	is => 'ro', 
-	default => sub { 
+sub _build_valid_Location { 
 		my ($self) = @_;
     	return 1 if $self->start && $self->end;
     	return 0;
-	},
-);
+}
 
 =head2 coordinate_policy
 
