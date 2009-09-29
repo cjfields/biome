@@ -12,7 +12,7 @@ my $ref = Biome::Annotation::Reference->new( -authors  => 'author line',
 					   -title    => 'title line',
 					   -location => 'location line',
 					   -start    => 12);
-does_ok($ref,'Biome::Role::Annotatable');
+does_ok($ref,'Biome::Role::Annotate');
 is $ref->authors, 'author line';
 is $ref->title,  'title line';
 is $ref->location, 'location line';
