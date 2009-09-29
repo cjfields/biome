@@ -4,7 +4,7 @@ package Biome::Annotation::DBLink;
 
 use Biome;
 
-with qw(Biome::Role::Annotatable
+with qw(Biome::Role::Annotate
         Biome::Role::DatabaseLink
         Biome::Role::Identifiable);
 
