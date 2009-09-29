@@ -22,6 +22,7 @@ has 'strict' => (
     default => $ENV{BIOME_STRICT} || 0
     );
 
+# this overrides the base BUILDARGS, where we deal with '-' named args
 sub BUILDARGS {
     my ($class, @args) = @_;
     
@@ -34,7 +35,7 @@ sub BUILDARGS {
             Class::MOP::class_of($class)->throw_error(
                 "Odd-number of parameters passed to new(). Arguments must be ".
                 "named parameters or a hash reference of named parameters",
-                data => $args[0] );            
+                data => $args[0] );
         }
     }
     
@@ -44,6 +45,8 @@ sub BUILDARGS {
         $key =~ tr/\055//d if index($key,'-') == 0; #deletes all dashes!
         $params->{$key} = shift @args;
     }
+    
+    #print "$_ : ".$params->{$_}."\n" for sort keys %$params;
 
     return $params;
 }

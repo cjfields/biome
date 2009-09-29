@@ -3,8 +3,8 @@ package Biome::PrimarySeq;
 use Biome;
 
 with 'Biome::Role::PrimarySeq',
-     'Biome::Role::Describe', 
-     'Biome::Role::Identify'; 
+     'Biome::Role::Describable', 
+     'Biome::Role::Identifiable'; 
 
 # validate sequences by default (we might make this optional to speed things up)
 after 'rawseq'  => sub {

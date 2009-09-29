@@ -313,7 +313,6 @@ requires  'to_FTstring';
 
 requires 'each_Location';
 
-
 =head2 valid_Location
 
  Title   : valid_Location
@@ -326,8 +325,6 @@ requires 'each_Location';
 =cut
 
 requires 'valid_Location';
-
-
 
 no Biome::Role;
 

@@ -1,19 +1,21 @@
 package Biome::Role::Feature;
 
 use Biome::Role;
+use Moose::Util::TypeConstraints;
+use MooseX::Aliases;
 
 requires qw(
     start
     end
     length
-);  # possibly Biome::Role::Range, but may delineate start/end for a different
+);  # possibly Biome::Role::Locatable, but may delineate boundaries for a different
     # instance (nodes in a tree or graph, columns in an alignment, indices in an
-    # array, etc).  May need to be aliased as needed.
+    # array, etc). May need to be aliased as needed.
     
 requires qw(
     display_name
     description
-); # possibly Biome::Role::Describe
+); # Biome::Role::Describable
     
 requires qw(
     add_tag_values
@@ -23,38 +25,31 @@ requires qw(
     has_tag
     remove_tag
     get_tagset_values
-); # possibly Biome::Role::CollectTags
+); # Biome::Role::Taggable
 
-requires qw(
-    has_featured_instance
-    entire_featured_instance
-    attach_featured_instance
-    spliced_featured_instance
-); # customized roles for each parent (featured) instance
-   # should be aliased for the specific features instance name
-
-has [qw(primary_tag source_tag id)]   => (
+has 'primary_tag'   => (
     isa         => 'Str',
-    is          => 'rw'
+    is          => 'rw',
 );
 
-has 'score'                 => (
-    isa         => 'Num',
-    is          => 'rw'
+has 'source_tag'    => (
+    isa         => 'Str',
+    is          => 'rw',
 );
 
-has 'sub_Features'  => (
-    is          => 'ro',
-    isa         => 'ArrayRef[Obj]',
-    default     => sub {[]},
-    lazy        => 1,
-    metaclass   => 'Collection::Array',
-    provides    => {
-        'push'      => 'add_Features',
-        'elements'  => 'get_Features',
-        'clear'     => 'delete_Features',
-        'count'     => 'num_Features',
-        }
+has 'score'         => (
+    isa         => 'Str',
+    is          => 'rw',    
+    );
+
+has 'primary_id'    => (
+    isa         => 'Str',
+    is          => 'rw',
+);
+
+has 'attached_id'   => (
+    isa         => 'Str',
+    is          => 'rw',
 );
 
 no Biome::Role;
@@ -65,8 +60,8 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Feature - Role that describes the basic attributes specific
-for Features.
+Biome::Role::Feature - Role that describes the basic attributes and methods
+needed for describing any feature.
 
 =head1 VERSION
 
@@ -101,7 +96,7 @@ TODO
 
 =head1 DEPENDENCIES
 
-Biome::Role (part of Biome)
+TODO
 
 =head1 INCOMPATIBILITIES
 

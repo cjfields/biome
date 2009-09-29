@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    use Test::More tests => 12;
+    use Test::More tests => 13;
     use Test::Moose;
     use Test::Exception;
 }
@@ -49,5 +49,6 @@ $tc->add_tag_values('bar', qw(boo hoo));
 
 # get_tagset_values
 is(join(',',sort $tc->get_tagset_values(qw(foo bar))),'1,2,3,4,boo,hoo');
-$tc->remove_tag('foo');
+@vals = $tc->remove_tag('foo');
 is(join(',',sort $tc->get_tagset_values(qw(foo bar))),'boo,hoo');
+is(join(',',@vals),'1,2,3,4');
