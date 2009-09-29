@@ -17,24 +17,32 @@ my $build = Module::Build->new(
     dist_abstract       => 'Moose-based implementation of core BioPerl modules',
     license             => 'perl',
     requires            => {'perl'                      => 5.010,
-                            'Moose'                     => '0.89_01',
-                            # tentative list of MooseX modules
-
-                            # I don't think we should include MooseX::Declares,
-                            # MooseX::Method::Signatures. As nice as they are,
-                            # as both have a ton of additional dependencies
-                            # beyond Moose and are still alpha software
-
-                            'MooseX::AttributeHelpers'      => 0,  # extended attributes
-                            'Exception::Class'              => 0,  # may be removed as a 'requires' when made optional
-                            'MooseX::Singleton'             => 0,  
+                            
+                            # needed for Native Types (replacement for MXAH)
+                            'Moose'                         => '0.90',
+                            # tentative list of MooseX modules, for comments
+                            # see CONVENTIONS
+                            'Exception::Class'              => 0,  
+                            'MooseX::Singleton'             => 0,
+                            
+                            # use sparingly (instances where this is used may be
+                            # switched over to something simpler)
                             'MooseX::ClassAttribute'        => 0,
-                            'MooseX::Types'                 => 0,  # may be removed based on benchmarks
-                            'MooseX::Role::Parameterized'   => 0,
-                            'MooseX::Aliases'               => 0.03,
-                            #'MooseX::Params::Validate'      => 0,  # replace rearrange?
+                            
+                            # compat with Moose 0.90
+                            'MooseX::Types'                 => 0.20,
                             #'MooseX::Types::Structured'     => 0,  # extended types
-                            #'MooseX::Clone'                 => 0   # we have a root clone method, this could replace it
+                            
+                            # Flexibility for attribute definitions
+                            'MooseX::Role::Parameterized'   => 0,
+                            
+                            # init, attribute, method aliases
+                            'MooseX::Aliases'               => 0.03,
+                            
+                            # not used ATM, but worth considering
+                            #'MooseX::Params::Validate'      => 0,  # replace rearrange?
+
+                            # general use
                             'List::MoreUtils'               => 0, 
                             'Data::Stag'                    => 0
                            },
