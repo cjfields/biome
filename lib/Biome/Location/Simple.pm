@@ -51,7 +51,6 @@ sub _build_start {
 
 =cut
 
-
 sub _build_end {
     my ( $self ) = @_;
     #assume end is the same as start if not defined
@@ -77,7 +76,6 @@ sub _build_end {
 
 }
 
-
 =head2 strand
 
   Title   : strand
@@ -88,8 +86,6 @@ sub _build_end {
           : using $loc->strand($strand)
 
 =cut
-
-
 
 =head2 length
 
@@ -136,18 +132,6 @@ sub length {
 
 =cut
 
-=head2 start_pos_type
-
-  Title   : start_pos_type
-  Usage   : my $start_pos_type = $location->start_pos_type();
-  Function: Get start position type (ie <,>, ^).
-
-  Returns : type of position coded as text 
-            ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
-  Args    : none
-
-=cut
-
 =head2 min_end
 
   Title   : min_end
@@ -171,6 +155,24 @@ sub length {
 
 =cut
 
+has [qw /min_start max_start min_end max_end/] => (
+	is => 'rw', 
+	isa => Int, 
+);
+
+
+=head2 start_pos_type
+
+  Title   : start_pos_type
+  Usage   : my $start_pos_type = $location->start_pos_type();
+  Function: Get start position type (ie <,>, ^).
+
+  Returns : type of position coded as text 
+            ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
+  Args    : none
+
+=cut
+
 =head2 end_pos_type
 
   Title   : end_pos_type
@@ -183,6 +185,12 @@ sub length {
 
 =cut
 
+
+has [qw /start_pos_type end_pos_type/]  => (
+	is => 'ro', 
+	default => 'EXACT', 
+);
+
 =head2 location_type
 
   Title   : location_type
@@ -193,7 +201,7 @@ sub length {
 
 =cut
 
-sub location_type {
+sub _build_location_type {
     my ( $self, $value ) = @_;
 
     if ( defined $value || !defined $self->{'_location_type'} ) {
