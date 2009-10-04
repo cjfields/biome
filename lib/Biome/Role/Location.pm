@@ -1,6 +1,7 @@
 package Biome::Role::Location;
 
 use Biome::Role;
+use Biome::Types qw/SequenceStrand/;
 
 ##at this point making it independent of range
 #with 'Biome::Root::Range';
@@ -16,7 +17,13 @@ use Biome::Role;
 
 =cut
 
-requires 'location_type';
+has 'location_type' => (
+	is => 'rw', 
+	isa => Str, 
+	builder => '_build_location_type', 
+	predicate => 'has_location_type', 
+	lazy => 1, 
+);
 
 #for rest of attributes an empty builder method is provided which should be implemented by
 #the consuming class. This approach is kind of a first stab to see how it works(after
@@ -51,6 +58,7 @@ has 'start' => (
 	is => 'rw', 
 	isa => 'Int', 
 	builder => '_build_start', 
+	predicate => 'has_start', 
 	lazy => 1, 
 );
 
@@ -83,6 +91,7 @@ has 'end' => (
 	is => 'rw', 
 	isa => 'Int', 
 	builder => '_build_end', 
+	predicate => 'has_end', 
 	lazy => 1, 
 );
 
@@ -207,6 +216,24 @@ has 'is_remote' => (
 	is => 'rw', 
 	isa => 'Int', 
 );
+
+=head2 strand
+
+  Title   : strand
+  Usage   : $strand = $loc->strand();
+  Function: get/set the strand of this range
+  Returns : the strandidness (-1, 0, +1)
+  Args    : optionaly allows the strand to be set
+          : using $loc->strand($strand)
+
+=cut
+
+has 'strand' => ( 
+	is => 'rw', 
+	isa => SequenceStrand, 
+);
+
+
 
 =head2 flip_strand
 
