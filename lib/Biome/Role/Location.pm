@@ -17,13 +17,9 @@ use Biome::Types qw/SequenceStrand/;
 
 =cut
 
-has 'location_type' => (
-	is => 'rw', 
-	isa => Str, 
-	builder => '_build_location_type', 
-	predicate => 'has_location_type', 
-	lazy => 1, 
-);
+requires 'location_type';
+
+
 
 #for rest of attributes an empty builder method is provided which should be implemented by
 #the consuming class. This approach is kind of a first stab to see how it works(after
@@ -110,7 +106,6 @@ has 'end' => (
 
 has 'each_Location' => ( 
 	is => 'ro', 
-	isa => 'Obj', 
 	builder => '_build_each_Location', 
 	lazy => 1, 
 ); 
@@ -127,7 +122,6 @@ has 'each_Location' => (
 
 has  'to_FTstring' => ( 
 	is => 'ro', 
-	isa => Str, 
 	builder => '_build_FTstring', 
 	lazy => 1, 
 );
@@ -146,7 +140,6 @@ has  'to_FTstring' => (
 
 has 'valid_Location' => ( 
 	is => 'ro', 
-	isa => Bool, 
 	builder => '_build_valid_Location', 
 	lazy => 1, 
 );
@@ -373,7 +366,12 @@ requires 'end_pos_type';
 
 =cut
 
-requires 'seq_id';
+has 'seq_id' => ( 
+	is => 'rw', 
+	isa => Str, 
+);
+
+
 
 
 =head2 valid_Location

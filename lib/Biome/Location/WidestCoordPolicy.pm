@@ -4,6 +4,7 @@
 
 package BioMe::Location::WidestCoordPolicy;
 use Biome;
+use Biome::Types qw/StartPosition EndPosition/;
 
 with 'Biome::Role::Location::CoordinatePolicy';
 
@@ -17,20 +18,18 @@ with 'Biome::Role::Location::CoordinatePolicy';
   Function: Get the integer-valued start coordinate of the given location as
             computed by this computation policy.
   Returns : A positive integer number.
-  Args    : A Bio::LocationI implementing object.
+  Args    : A Bio::Role::Location consuming object.
 
 =cut
 
-sub start {
-    my ($self,$loc) = @_;
 
-    # For performance reasons we don't check that it's indeed a Bio::LocationI
-    # object. Hopefully, Location-object programmers are smart enough.
-    my $pos = $loc->min_start();
-    # if min is not defined or equals 0 we resort to max
-    $pos = $loc->max_start() if(! $pos);
-    return $pos;
-}
+has 'start' => (
+is => 'ro', 
+isa => StartPosition, 
+coerce => 1, 
+);
+
+
 
 =head2 end
 
@@ -43,16 +42,13 @@ sub start {
 
 =cut
 
-sub end {
-    my ($self,$loc) = @_;
 
-    # For performance reasons we don't check that it's indeed a Bio::LocationI
-    # object. Hopefully, Location-object programmers are smart enough.
-    my $pos = $loc->max_end();
-    # if max is not defined or equals 0 we resort to min
-    $pos = $loc->min_end() if(! $pos);
-    return $pos;
-}
+has 'end' => (
+is => 'ro', 
+isa => EndPosition, 
+coerce => 1, 
+);
+
 
 no BioMe;
 

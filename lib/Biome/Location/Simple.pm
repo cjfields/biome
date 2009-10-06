@@ -4,7 +4,7 @@ package BioMe::Location::Simple;
 use MooseX::AttributeHelpers;
 use Biome;
 use Biome::Location::WidestCoordPolicy;
-use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy/;
+use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy SimpleLocationType/;
 
 with 'Biome::Role::Location';
 
@@ -201,35 +201,54 @@ has [qw /start_pos_type end_pos_type/]  => (
 
 =cut
 
-sub _build_location_type {
-    my ( $self, $value ) = @_;
+has 'location_type' => (
+	is => 'rw', 
+	isa => SimpleLocationType, 
+);
 
-    if ( defined $value || !defined $self->{'_location_type'} ) {
-        $value = 'EXACT' unless defined $value;
-        $value = uc $value;
-        if ( !defined $RANGEDECODE{$value} ) {
-            $value = '\^'   if $value eq '^';
-            $value = '\.\.' if $value eq '..';
-            $value = $RANGEENCODE{$value};
-        }
-        $self->throw(
-            "Did not specify a valid location type. [$value] is no good")
-          unless defined $value;
-        $self->{'_location_type'} = $value;
-    }
-    $self->throw( "Only adjacent residues when location type "
+before 'location_type' => sub {
+my ($self, $value) = @_;
+$self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
-          . $self->{'_start'}
+          . $self->start
           . "] and ["
-          . $self->{'_end'}
+          . $self->end
           . "]" )
-      if $self->{'_location_type'} eq 'IN-BETWEEN'
-      && defined $self->{'_start'}
-      && defined $self->{'_end'}
-      && ( $self->{'_end'} - 1 != $self->{'_start'} );
+      if $value eq 'IN-BETWEEN'
+      && $self->has_start
+      && $self->has_end
+      && ( $self->end - 1 != $self->start );
 
-    return $self->{'_location_type'};
 }
+
+around 'location_type' => sub {
+my ($orig,  $self,  $value) = @_;
+if ($value eq '^' || $value eq '..') {
+$value = $self->decode($value); 
+} 
+return $self->$orig($value);
+}
+
+=head2 each_Location
+
+ Title   : each_Location
+ Usage   : @locations = $locObject->each_Location($order);
+ Function: Conserved function call across Location:: modules - will
+           return an array containing the component Location(s) in
+           that object, regardless if the calling object is itself a
+           single location or one containing sublocations.
+ Returns : an array of Bio::LocationI implementing objects - for
+           Simple locations, the return value is just itself.
+ Args    : 
+
+=cut
+
+sub _build_each_Location {
+   my ($self) = @_;
+   return ($self);
+}
+
+
 
 =head2 is_remote
 
@@ -252,7 +271,7 @@ sub _build_location_type {
 
 =cut
 
-sub to_FTstring {
+sub _build_FTstring {
     my ($self) = @_;
 
     my $str;
@@ -260,7 +279,7 @@ sub to_FTstring {
         $str = $self->start;
     }
     else {
-        $str = $self->start . $RANGEDECODE{ $self->location_type } . $self->end;
+        $str = $self->start . $self->location_type . $self->end;
     }
     if ( $self->is_remote() && $self->seq_id() ) {
         $str = $self->seq_id() . ":" . $str;
@@ -283,6 +302,52 @@ sub to_FTstring {
  Args    : none
 
 =cut
+
+
+sub _build_valid_Location { 
+		my ($self) = @_;
+    	return 1 if $self->start && $self->end;
+    	return 0;
+}
+
+
+=head2 coordinate_policy
+
+  Title   : coordinate_policy
+  Usage   : $policy = $location->coordinate_policy();
+            $location->coordinate_policy($mypolicy); # set may not be possible
+  Function: Get the coordinate computing policy employed by this object.
+
+            See L<Bio::Location::CoordinatePolicyI> for documentation
+            about the policy object and its use.
+
+            The interface *does not* require implementing classes to
+            accept setting of a different policy. The implementation
+            provided here does, however, allow to do so.
+
+            Implementors of this interface are expected to initialize
+            every new instance with a
+            L<Bio::Location::CoordinatePolicyI> object. The
+            implementation provided here will return a default policy
+            object if none has been set yet. To change this default
+            policy object call this method as a class method with an
+            appropriate argument. Note that in this case only
+            subsequently created Location objects will be affected.
+
+  Returns : A L<Bio::Location::CoordinatePolicyI> implementing object.
+  Args    : On set, a L<Bio::Location::CoordinatePolicyI> implementing object.
+
+See L<Bio::Location::CoordinatePolicyI> for more information
+
+
+=cut
+
+has 'coordinate_policy' => (
+	is => 'rw', 
+	isa => 'CoordinatePolicy', 
+	default => sub { Biome::Location::WidestCoordinatePolicy->new() }, 
+);
+
 
 # comments, not function added by jason
 #
@@ -352,8 +417,8 @@ sub _build_range_encoding {
 	my ($self) = @_;
 
 my %range_encode = (
-    '\.\.' => 'EXACT',
-    '\^'   => 'IN-BETWEEN', 
+    '..' => 'EXACT',
+    '^'   => 'IN-BETWEEN', 
     'EXACT'      => '..',
     'IN-BETWEEN' => '^'
 );
