@@ -2,11 +2,10 @@
 # Let the code begin...
 
 
-package BioMe::Location::WidestCoordPolicy;
+package Biome::Location::WidestCoordPolicy;
 use Biome;
 use Biome::Types qw/StartPosition EndPosition/;
 
-with 'Biome::Role::Location::CoordinatePolicy';
 
 # the following code could be made more type check with Moose,  have to play around with
 # it later. For the time being its looks fine
@@ -49,8 +48,9 @@ isa => EndPosition,
 coerce => 1, 
 );
 
+with 'Biome::Role::Location::CoordinatePolicy';
 
-no BioMe;
+no Biome;
 
 __PACKAGE__->meta->make_immutable;
 

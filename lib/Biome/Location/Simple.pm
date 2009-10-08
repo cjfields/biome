@@ -1,15 +1,9 @@
 # Let the code begin...
 
-package BioMe::Location::Simple;
-use MooseX::AttributeHelpers;
+package Biome::Location::Simple;
 use Biome;
 use Biome::Location::WidestCoordPolicy;
 use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy SimpleLocationType/;
-
-with 'Biome::Role::Location';
-
-
-
 
 =head2 start
 
@@ -23,17 +17,17 @@ with 'Biome::Role::Location';
 =cut
 
 sub _build_start {
-    my ( $self ) = @_;
+    my ($self) = @_;
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
-          . $self->start
+          . $self->start()
           . "] and ["
-          . $self->end
+          . $self->end()
           . "]" )
-      if $self->has_start
-      && $self->has_end
-      && $self->location_type eq 'IN-BETWEEN'
-      && ( $self->end - 1 != $self->start );
+      if $self->has_start()
+      && $self->has_end()
+      && $self->location_type() eq 'IN-BETWEEN'
+      && ( $self->end() - 1 != $self->start() );
 }
 
 =head2 end
@@ -52,7 +46,8 @@ sub _build_start {
 =cut
 
 sub _build_end {
-    my ( $self ) = @_;
+    my ($self) = @_;
+
     #assume end is the same as start if not defined
     if ( !$self->has_end ) {
         if ( !$self->has_tart ) {
@@ -60,7 +55,7 @@ sub _build_end {
             return;
         }
         $self->warn('Setting start equal to end');
-        $self->end($self->start);
+        $self->end( $self->start );
     }
 
     $self->throw( "Only adjacent residues when location type "
@@ -100,11 +95,11 @@ sub _build_end {
 
 sub length {
     my ($self) = @_;
-    if ( $self->location_type eq 'IN-BETWEEN' ) {
+    if ( $self->location_type() eq 'IN-BETWEEN' ) {
         return 0;
     }
     else {
-        return abs( $self->end - $self->start ) + 1;
+        return abs( $self->end() - $self->start() ) + 1;
     }
 
 }
@@ -156,10 +151,9 @@ sub length {
 =cut
 
 has [qw /min_start max_start min_end max_end/] => (
-	is => 'rw', 
-	isa => Int, 
+    is  => 'rw',
+    isa => Int,
 );
-
 
 =head2 start_pos_type
 
@@ -185,10 +179,9 @@ has [qw /min_start max_start min_end max_end/] => (
 
 =cut
 
-
-has [qw /start_pos_type end_pos_type/]  => (
-	is => 'ro', 
-	default => 'EXACT', 
+has [qw /start_pos_type end_pos_type/] => (
+    is      => 'ro',
+    default => 'EXACT',
 );
 
 =head2 location_type
@@ -202,32 +195,44 @@ has [qw /start_pos_type end_pos_type/]  => (
 =cut
 
 has 'location_type' => (
-	is => 'rw', 
-	isa => SimpleLocationType, 
+    is  => 'rw',
+    isa => SimpleLocationType,
+    default => 'EXACT', 
+    lazy => 1, 
 );
 
 before 'location_type' => sub {
-my ($self, $value) = @_;
-$self->throw( "Only adjacent residues when location type "
+    my ( $self, $value ) = @_;
+    return if !$value;
+    $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
-          . $self->start
+          . $self->start()
           . "] and ["
-          . $self->end
+          . $self->end()
           . "]" )
       if $value eq 'IN-BETWEEN'
-      && $self->has_start
-      && $self->has_end
-      && ( $self->end - 1 != $self->start );
-
-}
+      && $self->has_start()
+      && $self->has_end()
+      && ( $self->end() - 1 != $self->start() );
+    my %range_encode = (
+        '..'         => 'EXACT',
+        '^'          => 'IN-BETWEEN',
+        'EXACT'      => '..',
+        'IN-BETWEEN' => '^'
+    );
+    $self->encode(%range_encode);
+};
 
 around 'location_type' => sub {
-my ($orig,  $self,  $value) = @_;
-if ($value eq '^' || $value eq '..') {
-$value = $self->decode($value); 
-} 
-return $self->$orig($value);
-}
+    my ( $orig, $self, $value ) = @_;
+    if (!$value) { 
+    	return $self->$orig();
+    }
+    if ( $value eq '^' || $value eq '..' ) {
+        $value = $self->decode($value);
+    }
+    return $self->$orig($value);
+};
 
 =head2 each_Location
 
@@ -244,11 +249,9 @@ return $self->$orig($value);
 =cut
 
 sub _build_each_Location {
-   my ($self) = @_;
-   return ($self);
+    my ($self) = @_;
+    return ($self);
 }
-
-
 
 =head2 is_remote
 
@@ -303,13 +306,11 @@ sub _build_FTstring {
 
 =cut
 
-
-sub _build_valid_Location { 
-		my ($self) = @_;
-    	return 1 if $self->start && $self->end;
-    	return 0;
+sub _build_valid_Location {
+    my ($self) = @_;
+    return 1 if $self->start && $self->end;
+    return 0;
 }
-
 
 =head2 coordinate_policy
 
@@ -343,11 +344,23 @@ See L<Bio::Location::CoordinatePolicyI> for more information
 =cut
 
 has 'coordinate_policy' => (
-	is => 'rw', 
-	isa => 'CoordinatePolicy', 
-	default => sub { Biome::Location::WidestCoordinatePolicy->new() }, 
+    is      => 'rw',
+    isa     => CoordinatePolicy,
+    default => sub { Biome::Location::WidestCoordPolicy->new() },
 );
 
+has 'rangeencode' => (
+    traits  => ['Hash'],
+    is      => 'rw',
+    isa     => 'HashRef[Str]',
+    default => sub { {} },
+    handles => {
+        decode         => 'get',
+        encode         => 'set',
+        has_encoding   => 'exists',
+        encoding_types => 'keys',
+    },
+);
 
 # comments, not function added by jason
 #
@@ -387,49 +400,9 @@ sub trunc {
     return $out;
 }
 
-has 'rangeencode' = ( 
-	metaclass => 'Collection::Hash', 
-	is => 'rw', 
-	isa => 'HashRef[Str], 
-	lazy => 1, 
-	builder => '_build_range_encoding', 
-	provides => { 
-		exists => 'has_encoding', 
-		keys => 'encoding_types', 
-		get => 'decode', 
-		set => 'encode'
-	}
-);
+with 'Biome::Role::Location';
 
-=head2 _build_range_encoding
-
-  Title   : _build_range_encoding
-  Usage   : 
-  Function: 
-  Returns : 
-  Args    : 
-
-=cut
-
-
-
-sub _build_range_encoding { 
-	my ($self) = @_;
-
-my %range_encode = (
-    '..' => 'EXACT',
-    '^'   => 'IN-BETWEEN', 
-    'EXACT'      => '..',
-    'IN-BETWEEN' => '^'
-);
-
-$self->encode(%range_encode);
-}
-
-
-
-
-no BioMe;
+no Biome;
 
 __PACKAGE__->meta->make_immutable;
 

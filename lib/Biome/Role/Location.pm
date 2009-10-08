@@ -223,6 +223,7 @@ has 'is_remote' => (
 
 has 'strand' => ( 
 	is => 'rw', 
+	required => 1, 
 	isa => SequenceStrand, 
 );
 
@@ -368,24 +369,12 @@ requires 'end_pos_type';
 
 has 'seq_id' => ( 
 	is => 'rw', 
-	isa => Str, 
+	isa => 'Str', 
 );
 
 
 
 
-=head2 valid_Location
-
- Title   : valid_Location
- Usage   : if ($location->valid_location) {...};
- Function: boolean method to determine whether location is considered valid
-           (has minimum requirements for a specific LocationI implementation)
- Returns : Boolean value: true if location is valid, false otherwise
- Args    : none
-
-=cut
-
-requires 'valid_Location';
 
 no Biome::Role;
 

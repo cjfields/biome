@@ -15,9 +15,11 @@ use MooseX::Types -declare => [qw(
 							   SequenceAlphabet
                                CoordinatePolicy
                                SimpleLocationType
-                               Location
                                StartPosition
                                EndPosition
+                               Location
+                               Int
+                               Str
 							   )];
 
 use MooseX::Types::Moose qw(Int Str Object);
@@ -52,26 +54,26 @@ subtype Location,
 	where { $_->meta->does_role('Biome::Role::Location')}, 
 	message { "The object should consume Biome::Role::Location role"};
 
-subtype StartPosition as Int;
-subtype EndPosition as Int;
+subtype StartPosition,  as Int;
+subtype EndPosition,  as Int;
 
-coerce StartPosition 
-	from Location
+coerce StartPosition,  
+	from Location, 
 	 	via {
 			my $pos = $_->min_start();
 			$pos = $_->max_start() if !$pos;
 			return $pos;
 		};
 
-coerce EndPosition 
-	from Location
+coerce EndPosition,  
+	from Location, 
 	 	via {
 			my $pos = $_->max_end();
 			$pos = $_->min_end() if !$pos;
 			return $pos;
 		};
 
-enum SimpleLocationType => ('EXACT',  'IN-BETWEEN',  '^',  '..');
+enum SimpleLocationType ,   ('EXACT',  'IN-BETWEEN',  '^',  '..');
 	
 no MooseX::Types;
 no MooseX::Types::Moose;
