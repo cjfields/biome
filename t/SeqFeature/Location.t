@@ -31,7 +31,7 @@ my $f = Biome::Location::Simple->new(-verbose => 1,
 			       -strand  => 1);
 
 is($f->length, 81, 'Positive length');
-is($f->strand,-1);
+is($f->strand,-1,  'Negative strand' );
 
 # Test Bio::Location::Exact
 my $exact = Biome::Location::Simple->new(-start    => 10, 

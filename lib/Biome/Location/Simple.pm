@@ -62,10 +62,10 @@ around 'start' => sub {
 =cut
 
 has 'end' => (
-    is         => 'rw',
-    isa        => 'Int',
-    builder => '_build_end',
-    predicate => 'has_end', 
+    is        => 'rw',
+    isa       => 'Int',
+    builder   => '_build_end',
+    predicate => 'has_end',
 );
 
 sub _build_end {
@@ -102,7 +102,7 @@ around 'end' => sub {
       if $self->has_location_type
       && $self->location_type eq 'IN-BETWEEN'
       && $self->has_start()
-      && ( ($value - 1) != $self->start() );
+      && ( ( $value - 1 ) != $self->start() );
 
     return $self->$orig($value);
 };
@@ -271,10 +271,10 @@ has [qw /start_pos_type end_pos_type/] => (
 =cut
 
 has 'location_type' => (
-    is      => 'rw',
-    isa     => SimpleLocationType,
-    predicate => 'has_location_type', 
-    default => 'EXACT', 
+    is        => 'rw',
+    isa       => SimpleLocationType,
+    predicate => 'has_location_type',
+    default   => 'EXACT',
 );
 
 before 'location_type' => sub {
@@ -292,11 +292,12 @@ before 'location_type' => sub {
 
 around 'location_type' => sub {
     my ( $orig, $self, $value ) = @_;
-    $DB::single = 1;
     if ( !$value ) {
         return $self->$orig();
     }
-    $DB::single = 1;
+    #if ( $self->has_end ) {
+    #    print 'end: ', $self->end, "\n";
+    #}
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
           . $self->start()

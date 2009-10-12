@@ -1,7 +1,7 @@
 package Biome::Role::Location;
 
 use Biome::Role;
-use Biome::Types qw/SequenceStrand/;
+use Biome::Types qw/SequenceStrand CoordinatePolicy/;
 
 ##at this point making it independent of range
 #with 'Biome::Root::Range';
@@ -46,17 +46,12 @@ requires 'location_type';
   Returns : A positive integer value.
   Args    : none
 
-See L<Bio::Location::CoordinatePolicy> for more information
+See L<Biome::Role::Location::CoordinatePolicy> for more information
 
 =cut
 
-has 'start' => ( 
-	is => 'rw', 
-	isa => 'Int', 
-	builder => '_build_start', 
-	predicate => 'has_start', 
-	lazy => 1, 
-);
+requires 'start' ; 
+
 
 =head2 end
 
@@ -83,13 +78,7 @@ information
 
 =cut
 
-has 'end' => ( 
-	is => 'rw', 
-	isa => 'Int', 
-	builder => '_build_end', 
-	predicate => 'has_end', 
-	lazy => 1, 
-);
+requires 'end';
 
 =head2 each_Location
 
@@ -144,6 +133,12 @@ has 'valid_Location' => (
 	lazy => 1, 
 );
 
+sub _build_valid_Location {
+    my ($self) = @_;
+    return 1 if $self->start && $self->end;
+    return 0;
+}
+
 
 =head2 coordinate_policy
 
@@ -176,7 +171,7 @@ See L<Bio::Location::CoordinatePolicyI> for more information
 
 =cut
 
-requires 'coordinate_policy';
+requires 'coordinate_policy' ;
 
 
 =head2 is_remote
@@ -221,13 +216,7 @@ has 'is_remote' => (
 
 =cut
 
-has 'strand' => ( 
-	is => 'rw', 
-	required => 1, 
-	isa => SequenceStrand, 
-);
-
-
+requires 'strand';
 
 =head2 flip_strand
 
@@ -239,13 +228,7 @@ has 'strand' => (
 
 =cut
 
-has 'flip_strand' => ( 
-	is => 'ro', 
-	default => sub { 
-		my ($self) = @_;
-		$self->strand($self->strand * -1);
-	},
-);
+requires 'flip_strand';
 
 
 =head2 min_start

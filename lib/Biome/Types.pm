@@ -17,9 +17,8 @@ use MooseX::Types -declare => [qw(
                                SimpleLocationType
                                StartPosition
                                EndPosition
+                               SplitType
                                Location
-                               Int
-                               Str
 							   )];
 
 use MooseX::Types::Moose qw(Int Str Object);
@@ -75,6 +74,11 @@ coerce EndPosition,
 
 enum SimpleLocationType ,   ('EXACT',  'IN-BETWEEN',  '^',  '..');
 	
+subtype SplitType,  as Str; 
+coerce SplitType, 
+	from Str, 
+		via { uc $_ };
+
 no MooseX::Types;
 no MooseX::Types::Moose;
 

@@ -5,8 +5,6 @@ package Biome::Role::Location::SplitLocation;
 
 use Biome::Role;
 
-with 'Biome::Role::Location';
-
 
 =head2 sub_Location
 
