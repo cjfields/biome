@@ -3,7 +3,7 @@
 package Biome::Location::Simple;
 use Biome;
 use Biome::Location::WidestCoordPolicy;
-use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy SimpleLocationType/;
+use Biome::Types qw/SequenceStrand CoordinatePolicy SimpleLocationType/;
 
 =head2 start
 
@@ -16,19 +16,35 @@ use Biome::Types qw/SequenceStrand Int Str CoordinatePolicy SimpleLocationType/;
 
 =cut
 
-sub _build_start {
-    my ($self) = @_;
+has 'start' => (
+    is        => 'rw',
+    isa       => 'Int',
+    predicate => 'has_start',
+);
+
+after 'start' => sub {
+    my ( $self, $value ) = @_;
+    return if !$value;
+    $self->max_start($value);
+    $self->min_start($value);
+};
+
+around 'start' => sub {
+    my ( $orig, $self, $value ) = @_;
+    return $self->$orig if !$value;
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
-          . $self->start()
+          . $value
           . "] and ["
-          . $self->end()
+          . $self->start
           . "]" )
-      if $self->has_start()
+      if $self->has_location_type
+      && $self->location_type eq 'IN-BETWEEN'
       && $self->has_end()
-      && $self->location_type() eq 'IN-BETWEEN'
-      && ( $self->end() - 1 != $self->start() );
-}
+      && ( $self->end() - 1 != $value );
+
+    return $self->$orig($value);
+};
 
 =head2 end
 
@@ -45,31 +61,51 @@ sub _build_start {
 
 =cut
 
+has 'end' => (
+    is         => 'rw',
+    isa        => 'Int',
+    builder => '_build_end',
+    predicate => 'has_end', 
+);
+
 sub _build_end {
     my ($self) = @_;
 
     #assume end is the same as start if not defined
     if ( !$self->has_end ) {
-        if ( !$self->has_tart ) {
+        if ( !$self->has_start ) {
             $self->warn('Calling end without a defined start position');
             return;
         }
         $self->warn('Setting start equal to end');
-        $self->end( $self->start );
+        return $self->start;
     }
 
+}
+
+after 'end' => sub {
+    my ( $self, $value ) = @_;
+    return if !$value;
+    $self->max_end($value);
+    $self->min_end($value);
+};
+
+around 'end' => sub {
+    my ( $orig, $self, $value ) = @_;
+    return $self->$orig if !$value;
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
-          . $self->start
+          . $self->start()
           . "] and ["
-          . $self->end
+          . $value
           . "]" )
-      if $self->has_start
-      && $self->has_end
+      if $self->has_location_type
       && $self->location_type eq 'IN-BETWEEN'
-      && ( $self->end - 1 != $self->start );
+      && $self->has_start()
+      && ( ($value - 1) != $self->start() );
 
-}
+    return $self->$orig($value);
+};
 
 =head2 strand
 
@@ -81,6 +117,45 @@ sub _build_end {
           : using $loc->strand($strand)
 
 =cut
+
+has 'strand' => (
+    is        => 'rw',
+    predicate => 'has_strand',
+    isa       => SequenceStrand,
+);
+
+around 'strand' => sub {
+    my ( $orig, $self ) = @_;
+    if ( !$self->has_start() || !$self->has_end() ) {
+        return;
+    }
+    my $start = $self->start();
+    my $end   = $self->end();
+    if ( $start > $end ) {
+        $self->warn(
+"When building a location, start ($start) is expected to be less than end ($end), "
+              . "however it was not. Switching start and end and setting strand to -1"
+        );
+        $self->$orig(-1);
+    }
+};
+
+=head2 flip_strand
+
+  Title   : flip_strand
+  Usage   : $location->flip_strand();
+  Function: Flip-flop a strand to the opposite
+  Returns : None
+  Args    : None
+
+=cut
+
+sub flip_strand {
+    my ($self) = @_;
+    if ( $self->has_strand() ) {
+        $self->strand( $self->strand * -1 );
+    }
+}
 
 =head2 length
 
@@ -152,7 +227,7 @@ sub length {
 
 has [qw /min_start max_start min_end max_end/] => (
     is  => 'rw',
-    isa => Int,
+    isa => 'Int',
 );
 
 =head2 start_pos_type
@@ -181,6 +256,7 @@ has [qw /min_start max_start min_end max_end/] => (
 
 has [qw /start_pos_type end_pos_type/] => (
     is      => 'ro',
+    isa     => 'Str',
     default => 'EXACT',
 );
 
@@ -195,25 +271,16 @@ has [qw /start_pos_type end_pos_type/] => (
 =cut
 
 has 'location_type' => (
-    is  => 'rw',
-    isa => SimpleLocationType,
+    is      => 'rw',
+    isa     => SimpleLocationType,
+    predicate => 'has_location_type', 
     default => 'EXACT', 
-    lazy => 1, 
 );
 
 before 'location_type' => sub {
     my ( $self, $value ) = @_;
     return if !$value;
-    $self->throw( "Only adjacent residues when location type "
-          . "is IN-BETWEEN. Not ["
-          . $self->start()
-          . "] and ["
-          . $self->end()
-          . "]" )
-      if $value eq 'IN-BETWEEN'
-      && $self->has_start()
-      && $self->has_end()
-      && ( $self->end() - 1 != $self->start() );
+    return if !$self->has_encoding();
     my %range_encode = (
         '..'         => 'EXACT',
         '^'          => 'IN-BETWEEN',
@@ -225,9 +292,22 @@ before 'location_type' => sub {
 
 around 'location_type' => sub {
     my ( $orig, $self, $value ) = @_;
-    if (!$value) { 
-    	return $self->$orig();
+    $DB::single = 1;
+    if ( !$value ) {
+        return $self->$orig();
     }
+    $DB::single = 1;
+    $self->throw( "Only adjacent residues when location type "
+          . "is IN-BETWEEN. Not ["
+          . $self->start()
+          . "] and ["
+          . $self->end()
+          . "]" )
+      if $value eq 'IN-BETWEEN'
+      && $self->has_start()
+      && $self->has_end()
+      && ( $self->end() - 1 != $self->start() );
+
     if ( $value eq '^' || $value eq '..' ) {
         $value = $self->decode($value);
     }
@@ -306,12 +386,6 @@ sub _build_FTstring {
 
 =cut
 
-sub _build_valid_Location {
-    my ($self) = @_;
-    return 1 if $self->start && $self->end;
-    return 0;
-}
-
 =head2 coordinate_policy
 
   Title   : coordinate_policy
@@ -357,8 +431,10 @@ has 'rangeencode' => (
     handles => {
         decode         => 'get',
         encode         => 'set',
-        has_encoding   => 'exists',
+        get_encoding   => 'exists',
+        has_encoding   => 'count',
         encoding_types => 'keys',
+
     },
 );
 
