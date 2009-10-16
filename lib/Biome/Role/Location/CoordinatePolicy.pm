@@ -2,8 +2,6 @@
 
 
 package Biome::Role::Location::CoordinatePolicy;
-use strict;
-
 use Biome::Role;
 
 =head2 start

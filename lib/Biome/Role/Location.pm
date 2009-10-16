@@ -1,7 +1,7 @@
 package Biome::Role::Location;
 
 use Biome::Role;
-use Biome::Types qw/SequenceStrand/;
+use Biome::Types qw/SequenceStrand CoordinatePolicy/;
 
 ##at this point making it independent of range
 #with 'Biome::Root::Range';
@@ -17,13 +17,9 @@ use Biome::Types qw/SequenceStrand/;
 
 =cut
 
-has 'location_type' => (
-	is => 'rw', 
-	isa => Str, 
-	builder => '_build_location_type', 
-	predicate => 'has_location_type', 
-	lazy => 1, 
-);
+requires 'location_type';
+
+
 
 #for rest of attributes an empty builder method is provided which should be implemented by
 #the consuming class. This approach is kind of a first stab to see how it works(after
@@ -50,17 +46,12 @@ has 'location_type' => (
   Returns : A positive integer value.
   Args    : none
 
-See L<Bio::Location::CoordinatePolicy> for more information
+See L<Biome::Role::Location::CoordinatePolicy> for more information
 
 =cut
 
-has 'start' => ( 
-	is => 'rw', 
-	isa => 'Int', 
-	builder => '_build_start', 
-	predicate => 'has_start', 
-	lazy => 1, 
-);
+requires 'start' ; 
+
 
 =head2 end
 
@@ -87,13 +78,7 @@ information
 
 =cut
 
-has 'end' => ( 
-	is => 'rw', 
-	isa => 'Int', 
-	builder => '_build_end', 
-	predicate => 'has_end', 
-	lazy => 1, 
-);
+requires 'end';
 
 =head2 each_Location
 
@@ -110,7 +95,6 @@ has 'end' => (
 
 has 'each_Location' => ( 
 	is => 'ro', 
-	isa => 'Obj', 
 	builder => '_build_each_Location', 
 	lazy => 1, 
 ); 
@@ -127,7 +111,6 @@ has 'each_Location' => (
 
 has  'to_FTstring' => ( 
 	is => 'ro', 
-	isa => Str, 
 	builder => '_build_FTstring', 
 	lazy => 1, 
 );
@@ -146,10 +129,15 @@ has  'to_FTstring' => (
 
 has 'valid_Location' => ( 
 	is => 'ro', 
-	isa => Bool, 
 	builder => '_build_valid_Location', 
 	lazy => 1, 
 );
+
+sub _build_valid_Location {
+    my ($self) = @_;
+    return 1 if $self->start && $self->end;
+    return 0;
+}
 
 
 =head2 coordinate_policy
@@ -183,7 +171,7 @@ See L<Bio::Location::CoordinatePolicyI> for more information
 
 =cut
 
-requires 'coordinate_policy';
+requires 'coordinate_policy' ;
 
 
 =head2 is_remote
@@ -228,12 +216,7 @@ has 'is_remote' => (
 
 =cut
 
-has 'strand' => ( 
-	is => 'rw', 
-	isa => SequenceStrand, 
-);
-
-
+requires 'strand';
 
 =head2 flip_strand
 
@@ -245,13 +228,7 @@ has 'strand' => (
 
 =cut
 
-has 'flip_strand' => ( 
-	is => 'ro', 
-	default => sub { 
-		my ($self) = @_;
-		$self->strand($self->strand * -1);
-	},
-);
+requires 'flip_strand';
 
 
 =head2 min_start
@@ -373,21 +350,14 @@ requires 'end_pos_type';
 
 =cut
 
-requires 'seq_id';
+has 'seq_id' => ( 
+	is => 'rw', 
+	isa => 'Str', 
+);
 
 
-=head2 valid_Location
 
- Title   : valid_Location
- Usage   : if ($location->valid_location) {...};
- Function: boolean method to determine whether location is considered valid
-           (has minimum requirements for a specific LocationI implementation)
- Returns : Boolean value: true if location is valid, false otherwise
- Args    : none
 
-=cut
-
-requires 'valid_Location';
 
 no Biome::Role;
 
