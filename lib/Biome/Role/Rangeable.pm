@@ -1,14 +1,8 @@
 package Biome::Role::Rangeable;
 
 use Biome::Role;
-
-# not sure about implementing these yet:
-
-#overlap_extent
-#disconnected_ranges
-#offset_stranded
-
 use Biome::Types qw(SequenceStrand);
+use Biome::Trait::Attribute::Fuzzy;
 
 # should start/end be required? 
 has start   => (
@@ -17,8 +11,7 @@ has start   => (
     trigger => sub {
         my ($self, $start) = @_;
         my $end = $self->end;
-        # convert to a throw()        
-        die("$start is greater than $end\n") if
+        $self->throw("$start is greater than $end\n") if
             defined $end && $start > $end;
     }
 );
@@ -29,8 +22,7 @@ has end     => (
     trigger => sub {
         my ($self, $end) = @_;
         my $start = $self->start;
-        # convert to a throw()
-        die("$end is less than $start\n") if
+        $self->throw("$end is less than $start\n") if
             defined $start && $end < $start;
     }
 );

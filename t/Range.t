@@ -4,20 +4,10 @@ use strict;
 
 BEGIN { 
     use lib '.';
-    use Test::More tests => 97;
+    use Test::More tests => 98;
     use Test::Moose;
     use Test::Exception;
-}
-
-{
-    package MyRange;
-    
-    use Biome;
-    
-    with 'Biome::Role::Rangeable';
-    
-    no Biome;
-    __PACKAGE__->meta->make_immutable;
+    use_ok('Biome::Range');
 }
 
 =head1 Ranges
@@ -74,14 +64,14 @@ my @ranges;
 
 for my $s (@spans) {
     for my $strand (reverse (-1..1)) {
-        push @ranges, MyRange->new(start  => $s->[0],
+        push @ranges, Biome::Range->new(start  => $s->[0],
                                    end    => $s->[1],
                                    strand => $strand);
     }
 }
 
 does_ok($ranges[0],'Biome::Role::Rangeable', 'Range role');
-isa_ok($ranges[0],'MyRange', 'MyRange class');
+isa_ok($ranges[0],'Biome::Range', 'Biome::Range class');
 ok(!$ranges[0]->isa('Biome::Role::Rangeable'), 'Role consumed by class');
 is($ranges[0]->start, 1);
 is($ranges[0]->end, 100);

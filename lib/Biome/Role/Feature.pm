@@ -2,30 +2,16 @@ package Biome::Role::Feature;
 
 use Biome::Role;
 use Moose::Util::TypeConstraints;
-use MooseX::Aliases;
+
+with 'Biome::Role::Taggable',
+     'Biome::Role::Describable',
+     'Biome::Role::Feature::Collection';
 
 requires qw(
-    start
-    end
-    length
-);  # possibly Biome::Role::Locatable, but may delineate boundaries for a different
-    # instance (nodes in a tree or graph, columns in an alignment, indices in an
-    # array, etc). May need to be aliased as needed.
-    
-requires qw(
-    display_name
-    description
-); # Biome::Role::Describable
-    
-requires qw(
-    add_tag_values
-    get_tag_values
-    set_tag_values
-    get_all_tags
-    has_tag
-    remove_tag
-    get_tagset_values
-); # Biome::Role::Taggable
+    location
+); # possibly Biome::Role::Locatable, but may delineate boundaries for a
+   # different instance (nodes in a tree or graph, columns in an alignment,
+   # indices in an array, etc). May need to be aliased as needed.
 
 has 'primary_tag'   => (
     isa         => 'Str',
@@ -84,7 +70,7 @@ CollectAnnotation, etc.).
 
 =head1 SUBROUTINES/METHODS
 
-TODO
+
 
 =head1 DIAGNOSTICS
 
