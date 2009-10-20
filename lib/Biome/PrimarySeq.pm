@@ -7,7 +7,7 @@ with 'Biome::Role::PrimarySeq',
      'Biome::Role::Identifiable'; 
 
 # validate sequences by default (we might make this optional to speed things up)
-after 'rawseq'  => sub {
+after 'raw_seq'  => sub {
     $_[0]->validate_seq($_[1])
 };
 
@@ -22,4 +22,5 @@ has '+display_name'    => (
     );
 
 no Biome;
+
 __PACKAGE__->meta->make_immutable;

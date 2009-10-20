@@ -13,7 +13,7 @@ BEGIN {
 
 # simple get/set
 my $seq = Biome::PrimarySeq->new(
-                    -rawseq           => '----TTGGTGG---CGTCA--ACT---',
+                    -raw_seq          => '----TTGGTGG---CGTCA--ACT---',
                     -display_id       => 'new-id',
                     -alphabet         => 'dna',
                     -accession_number => 'X677667',
@@ -80,7 +80,7 @@ is($seq->subseq(-start => 7, -end => 15, -strand => 1), 'G---CGTCA--ACT');
 
 my $trunc = $seq->trunc(-start => 1, -end => 4);
 does_ok $trunc, 'Biome::Role::PrimarySeq';
-is $trunc->rawseq(), 'TTGG' || diag("Expecting TTGG. Got ".$trunc->seq());
+is $trunc->raw_seq(), 'TTGG' || diag("Expecting TTGG. Got ".$trunc->seq());
 is $trunc->length(), 4;
 
 # TODO: Locations NYI
@@ -151,40 +151,40 @@ $seq->strict(0);
 # use non-standard codon table where terminator is read as Q
 $seq->seq('ATGGTGGCGTCAACTTAG'); # ATG GTG GCG TCA ACT TAG
 $aa = $seq->translate(-codontable_id => 6);
-is $aa->rawseq, 'MVASTQ' or diag("Translation: ". $aa->seq);
+is $aa->raw_seq, 'MVASTQ' or diag("Translation: ". $aa->seq);
 
 # insert an odd character instead of terminating with *
 $aa = $seq->translate(-terminator => 'X');
-is $aa->rawseq, 'MVASTX' or diag("Translation: ". $aa->seq);
+is $aa->raw_seq, 'MVASTX' or diag("Translation: ". $aa->seq);
 
 # change frame from default
 $aa = $seq->translate(-frame => 1); # TGG TGG CGT CAA CTT AG
-is $aa->rawseq, 'WWRQL' or diag("Translation: ". $aa->seq);
+is $aa->raw_seq, 'WWRQL' or diag("Translation: ". $aa->seq);
 
 $aa = $seq->translate(-frame => 2); # GGT GGC GTC AAC TTA G
-is $aa->rawseq, 'GGVNL' or diag("Translation: ". $aa->seq);
+is $aa->raw_seq, 'GGVNL' or diag("Translation: ". $aa->seq);
 
 # TTG is initiator in Standard codon table? Afraid so.
 $seq->seq("ggggggttgtagcccc"); # ttg tag
 $aa = $seq->translate(-orf => 1);
-is $aa->rawseq, 'L*' or diag("Translation: ". $aa->seq);
+is $aa->raw_seq, 'L*' or diag("Translation: ". $aa->seq);
 
 # Replace L at 1st position with M by setting complete to 1 
-$seq->rawseq("ggggggttgtagcccc"); # ttg tag
+$seq->raw_seq("ggggggttgtagcccc"); # ttg tag
 $aa = $seq->translate(-orf => 1,
                              -complete => 1);
-is $aa->rawseq, 'M' or diag("Translation: ". $aa->seq);
+is $aa->raw_seq, 'M' or diag("Translation: ". $aa->seq);
 
 # Ignore non-ATG initiators (e.g. TTG) in codon table
-$seq->rawseq("ggggggttgatgtagcccc"); # atg tag
+$seq->raw_seq("ggggggttgatgtagcccc"); # atg tag
 $aa = $seq->translate(-orf => 1,
                              -start => "atg",
                              -complete => 1);
-is $aa->rawseq, 'M' or diag("Translation: ". $aa->seq);
+is $aa->raw_seq, 'M' or diag("Translation: ". $aa->seq);
 
 
 # test for character '?' in the sequence string
-is $seq->rawseq('TTGGTGGCG?CAACT'), 'TTGGTGGCG?CAACT';
+is $seq->raw_seq('TTGGTGGCG?CAACT'), 'TTGGTGGCG?CAACT';
 
 # test for some aliases
 # implementation-specific, see above for Biome::PrimarySeq
@@ -212,7 +212,7 @@ ok(!$seq->can('id'), 'we do not use the generic id()');
 
 # alphabet has a type constraint
 dies_ok {Biome::PrimarySeq->new(
-	-rawseq           => '----TTGGTGG---CGTCA--ACT---',
+	-raw_seq           => '----TTGGTGG---CGTCA--ACT---',
 	-display_id       => 'new-id',
 	-alphabet         => 'foo')} 'alphabet is a contrained type';
 

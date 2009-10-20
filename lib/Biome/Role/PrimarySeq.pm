@@ -7,7 +7,7 @@ use Biome::Tools::CodonTable;
 
 # greedy method, guaranteed to return a raw sequence
 # may need make this into a separate method as opposed to an attribute
-has rawseq => (
+has raw_seq => (
     is    => 'rw',
     isa   => 'Str',
 );
@@ -38,15 +38,15 @@ has symbols => (
     isa  => 'HashRef[Str]',
     default => sub { {
         'RESIDUE' => 'A-Za-z\*\?=',
-        'GAP'     => '\-\.~'
+        'GAP'     => '-\.~'
     } }
     );
 
-# alias for rawseq, to disambiguate use of this from returning an object
+# alias for raw_seq, to disambiguate use of this from returning an object
 # Note this isn't a first-class attribute (just an alias for one)
 sub seq {
     my $self = shift;
-    $self->rawseq(@_);
+    $self->raw_seq(@_);
 }
 
 # returns raw subsequence; trunc() calls this for objects
@@ -89,7 +89,7 @@ sub subseq {
         $start--;
         $end--;
         my $seqstr;
-        my $rawseq = $self->rawseq;
+        my $rawseq = $self->raw_seq;
         if ($self->has_gaps) {
             my $gs = ${$self->symbols}{GAP};
             # map gaps prior and post start/end
@@ -147,23 +147,23 @@ sub revcom {
         $revseq =~ tr/tT/uU/;
     }
     
-    my $out = $self->clone(-rawseq => $revseq);
+    my $out = $self->clone(-raw_seq => $revseq);
     return $out;
 }
 
 sub has_gaps {
     my $self = shift;
     my @gap_sym = split('',${$self->symbols}{GAP});
-    my $rawseq = $self->rawseq;
+    my $rawseq = $self->raw_seq;
     for my $g (@gap_sym) {
-        return 1 if (index($self->rawseq, $g) >= 0);
+        return 1 if (index($rawseq, $g) >= 0);
     }
     return 0;
 }
 
 sub trunc {
     my ($self) = shift;
-    return $self->clone(-rawseq => $self->subseq(@_));
+    return $self->clone(-raw_seq => $self->subseq(@_));
 }
 
 sub translate {
@@ -212,7 +212,7 @@ sub translate {
         my ($start, $end) = ($offset, $self->length);
         ($seq) = $self->subseq($start, $end);
     } else {
-        ($seq) = $self->rawseq();
+        ($seq) = $self->raw_seq();
     }
     
     # ignore frame if an ORF is supposed to be found
@@ -227,11 +227,10 @@ sub translate {
     
     # TODO:
     # Preferentially, CodonTable::translate should handle gaps but currently
-    # doesn't; discussion on what to do here
+    # doesn't; discussion on what to do here.  Gaps are removed for now.
     
-    # TODO:
-    # this should be normalized to whatever symbols are used for gaps...
-    $seq =~ tr/-//d;
+    my $gs = ${$self->symbols}{GAP};
+    $seq =~ s/[$gs]+//g;
     
     # Translate it
     my $output = $codonTable->translate($seq);
@@ -267,7 +266,7 @@ sub translate {
     }
 
     return $self->clone(
-                -rawseq     => $output,
+                -raw_seq     => $output,
                 -alphabet   => 'protein',
                   );
 }
@@ -275,7 +274,7 @@ sub translate {
 # account for sequences with gaps
 sub length {
     my $self = shift;
-    my $len = $self->rawseq();
+    my $len = $self->raw_seq();
     if ($self->has_gaps) {
         my $gs = ${$self->symbols}{GAP};
         $len =~ s{[$gs]}{}g;
