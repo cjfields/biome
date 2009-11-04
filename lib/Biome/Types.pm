@@ -11,8 +11,14 @@ package Biome::Types;
 use MooseX::Types -declare => [qw(
 							   SequenceStrand
 							   SequenceStrandInt
-							   SequenceStrandChar
+							   SequenceStrandSymbol
 							   SequenceAlphabet
+                               
+                               LocationSymbol
+                               LocationType
+                               
+                               PositionType
+                               
                                CoordinatePolicy
                                SimpleLocationType
                                StartPosition
@@ -21,28 +27,62 @@ use MooseX::Types -declare => [qw(
                                Location
 							   )];
 
-use MooseX::Types::Moose qw(Int Str Object);
+use MooseX::Types::Moose qw(Int Str Object Any);
 
-subtype SequenceStrandInt,
+subtype SequenceStrand,
 	as Int,
 	where {$_ >= -1 && $_ <= 1},
-	message { "Strand must be -1 <= strand <= 1, not $_"};
+	message { "Strand can be -1, 0, or 1, not $_"};
 
-subtype SequenceStrandChar,
+subtype SequenceStrandSymbol,
 	as Str,
 	where { /^(?:[\+\-\.])$/},
-	message { "Strand must be -1 <= strand <= 1, not $_"};
+	message { "Strand symbol can be one of [-.+], not $_"};
+    
+    
+my %STRAND_SYMBOL = (
+    '+'     => 1,
+    '.'     => 0,
+    '-'     => -1
+);
 
-# allow either Int or Str-based
-subtype SequenceStrand,
-	as SequenceStrandInt|SequenceStrandChar;
+coerce SequenceStrand,
+    from SequenceStrandSymbol,
+    via {$STRAND_SYMBOL{$_}};
 
 subtype SequenceAlphabet,
 	as Str,
 	where { /^(?:dna|rna|protein)$/xism }, # do we want more?
 	message { "Strand must be 'dna', 'rna', or 'protein'"};
 
-#an object which consumes the 'Biome::Role::Location::CoordinatePolicy' role
+my %VALID_LOCATION_SYMBOL = (
+    '..'         => 'EXACT',
+    '<'          => 'BEFORE',
+    '>'          => 'AFTER',
+    '.'          => 'WITHIN',
+    '^'          => 'BETWEEN',
+    '?'          => 'UNCERTAIN'
+);
+
+my %VALID_LOCATION_TYPE = map {$_ => 1}
+    qw(EXACT BEFORE AFTER WITHIN BETWEEN UNCERTAIN);
+
+subtype LocationSymbol,
+    as Str,
+    where {exists $VALID_LOCATION_SYMBOL{$_}},
+    message {"Unknown Location symbol $_"};
+    
+subtype LocationType,
+    as Str,
+    where {exists $VALID_LOCATION_TYPE{$_}},
+    message {"Unknown Location type $_"};
+
+coerce LocationType,
+    from LocationSymbol,
+    via {$VALID_LOCATION_SYMBOL{$_}};
+
+enum PositionType, (qw(INCLUSIVE EXCLUSIVE AVERAGE));
+
 subtype CoordinatePolicy,
 	as Object,
 	where { $_->meta->does_role('Biome::Role::Location::CoordinatePolicy')}, 
@@ -54,6 +94,7 @@ subtype Location,
 	message { "The object should consume Biome::Role::Location role"};
 
 subtype StartPosition,  as Int;
+
 subtype EndPosition,  as Int;
 
 coerce StartPosition,  
