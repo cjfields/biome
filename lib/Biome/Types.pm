@@ -16,6 +16,8 @@ use MooseX::Types -declare => [qw(
                                
                                LocationSymbol
                                LocationType
+                               SplitLocationType
+                               FuzzyPosition
                                
                                PositionType
                                
@@ -64,8 +66,20 @@ my %VALID_LOCATION_SYMBOL = (
     '?'          => 'UNCERTAIN'
 );
 
+my %SYMBOL_MAP = (
+    'EXACT'     => '..',
+    'BEFORE'    => '<',
+    'AFTER'     => '>',
+    'WITHIN'    => '.',
+    'BETWEEN'   => '^',
+    'UNCERTAIN' => '?'
+);
+
 my %VALID_LOCATION_TYPE = map {$_ => 1}
     qw(EXACT BEFORE AFTER WITHIN BETWEEN UNCERTAIN);
+
+# TODO: some of these could probably be redef. as enums, but it makes coercion
+# easier, needs checking
 
 subtype LocationSymbol,
     as Str,
@@ -80,6 +94,23 @@ subtype LocationType,
 coerce LocationType,
     from LocationSymbol,
     via {$VALID_LOCATION_SYMBOL{$_}};
+
+coerce LocationSymbol,
+    from LocationType,
+    via {$SYMBOL_MAP{$_}};
+
+subtype FuzzyPosition,
+    as Str,
+    where { /^[\?<]?\d+(?:[\.\^]\d+)?/ },
+    message {"Not a fuzzy position type : $_"};
+
+my %VALID_SPLIT_LOCATION_TYPE = map {$_ => 1}
+    qw(JOIN ORDER BOND);
+    
+subtype SplitLocationType,
+    as Str,
+    where {exists $VALID_SPLIT_LOCATION_TYPE{$_}},
+    message {"Unknown Split Location type $_"};
 
 enum PositionType, (qw(INCLUSIVE EXCLUSIVE AVERAGE));
 

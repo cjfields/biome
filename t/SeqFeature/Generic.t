@@ -37,7 +37,7 @@ is $feat->start, 40, 'start of feature location';
 is $feat->end, 80, 'end of feature location';
 is $feat->strand, 1, 'strand of feature location';
 is $feat->length, 41, 'length of feature location';
-isa_ok $feat->location, 'Biome::Range';
+isa_ok $feat->location, 'Biome::Segment::Simple';
 does_ok $feat->location, 'Biome::Role::Rangeable';
 
 # Taggable
