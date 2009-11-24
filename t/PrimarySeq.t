@@ -172,14 +172,14 @@ is $aa->raw_seq, 'L*' or diag("Translation: ". $aa->seq);
 # Replace L at 1st position with M by setting complete to 1 
 $seq->raw_seq("ggggggttgtagcccc"); # ttg tag
 $aa = $seq->translate(-orf => 1,
-                             -complete => 1);
+                    -complete => 1);
 is $aa->raw_seq, 'M' or diag("Translation: ". $aa->seq);
 
 # Ignore non-ATG initiators (e.g. TTG) in codon table
 $seq->raw_seq("ggggggttgatgtagcccc"); # atg tag
 $aa = $seq->translate(-orf => 1,
-                             -start => "atg",
-                             -complete => 1);
+                    -start => "atg",
+                    -complete => 1);
 is $aa->raw_seq, 'M' or diag("Translation: ". $aa->seq);
 
 
