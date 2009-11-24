@@ -9,6 +9,7 @@ has 'type_map' => (
     isa       => 'HashRef[Str]',
     # this should be set in the implementation, so using 'required'
     required  => 1,
+    default   => sub {{}},
     handles   => {
         'exists_in_typemap'     => 'exists',
         'types'                 => 'keys',

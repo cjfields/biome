@@ -46,15 +46,13 @@ sub BUILDARGS {
         $params->{$key} = shift @args;
     }
     
-    #print "$_ : ".$params->{$_}."\n" for sort keys %$params;
-
     return $params;
 }
 
 sub warn {
     my ($self,$string) = @_;
 
-    my $strict = $self->strict;
+    my $strict = $self->strict || $self->verbose;
 
     my $header = "\n--------------------- WARNING ---------------------\nMSG: ";
     my $footer =   "---------------------------------------------------\n";

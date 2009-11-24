@@ -3,16 +3,15 @@ package Biome::Role::Locatable;
 use Biome::Role;
 
 # default to a generic Range for now
-use Biome::Range;
+use Biome::Segment::Simple;
 
 # this allows anything that does Biome::Role::Rangeable to work here
-# This would normally indicate to 'handles' that 
 has 'location'  => (
-    does        => 'Biome::Role::Rangeable',
+    does        => 'Biome::Role::Segment',
     is          => 'rw',
     handles     => [qw(start end strand length)],
     lazy        => 1,
-    default     => sub {Biome::Range->new()}
+    default     => sub {Biome::Segment::Simple->new()}
     );
 
 no Biome::Role;

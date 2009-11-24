@@ -11,7 +11,7 @@ with 'Biome::Role::CollectAnnotation',
      'Biome::Role::ManageTypes';
 
 has '+type_map' => (
-    default => sub { {} }
+    default => sub { {} },
 );
 
 has 'annotation_map' => (

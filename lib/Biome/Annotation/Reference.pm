@@ -4,10 +4,10 @@ package Biome::Annotation::Reference;
 
 use Biome;
 
-extends 'Biome::Annotation::DBLink';
+extends qw(Biome::Annotation::DBLink
+           Biome::Range);
 
-with 'Biome::Role::Rangeable',
-     'Biome::Role::Annotate' => {
+with 'Biome::Role::Annotate' => {
     data_slots      => [qw(rp rg authors location title medline pubmed
      publisher editor encoded_ref doi consortium gb_reference)]
 };

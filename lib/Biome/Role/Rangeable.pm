@@ -2,42 +2,29 @@ package Biome::Role::Rangeable;
 
 use Biome::Role;
 use Biome::Types qw(SequenceStrand);
-use Biome::Trait::Attribute::Fuzzy;
 
-# should start/end be required? 
-has start   => (
-    isa     => 'Int',
-    is      => 'rw',
-    trigger => sub {
-        my ($self, $start) = @_;
-        my $end = $self->end;
-        $self->throw("$start is greater than $end\n") if
-            defined $end && $start > $end;
-    }
-);
-
-has end     => (
-    isa     => 'Int',
-    is      => 'rw',
-    trigger => sub {
-        my ($self, $end) = @_;
-        my $start = $self->start;
-        $self->throw("$end is less than $start\n") if
-            defined $start && $end < $start;
-    }
-);
+requires 'length';
 
 has strand  => (
     isa     => SequenceStrand,
     is      => 'rw',
     default => 0,
+    coerce  => 1
 );
 
-sub length {
-    my $self = shift;
-    my ($st, $end) = ($self->start, $self->end);
-    return ($st == 0 && $end == 0) ? 0 : $end - $st + 1;
-}
+has start   => (
+    is      => 'rw',
+);
+
+has end     => (
+    is      => 'rw',
+);
+
+#sub length {
+#    my $self = shift;
+#    my ($st, $end) = ($self->start, $self->end);
+#    return ($st == 0 && $end == 0) ? 0 : abs($end - $st + 1);
+#}
 
 # returns true if strands are equal and non-zero
 our %VALID_STRAND_TESTS = (

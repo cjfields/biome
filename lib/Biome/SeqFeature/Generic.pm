@@ -14,14 +14,8 @@ sub BUILD {
 with 'Biome::Role::Locatable';
 with 'Biome::Role::SeqFeature';
 
+# this has to be aliased here due to late binding of attributes
 alias 'seq_id'              => 'attached_id';
-
-alias 'get_SeqFeatures'     => 'get_Features';
-alias 'add_SeqFeatures'     => 'add_Features';
-alias 'remove_SeqFeatures'  => 'remove_Features';
-alias 'num_SeqFeatures'     => 'num_Features';
-
-with 'Biome::Role::SeqFeature';  # note this has to come after the aliasing
 
 no Biome;
 

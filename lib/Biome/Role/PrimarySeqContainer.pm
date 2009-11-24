@@ -25,17 +25,9 @@ sub primary_seq {
                        -strand  => $self->strand);
 }
 
-#sub raw_spliced_seq {
-#    shift->throw_not_implemented
-#}
-
-#sub bioSeq {
-#    shift->throw_not_implemented
-#}
-
-#sub spliced_Seq {
-#    shift->throw_not_implemented
-#}
+sub spliced_seq {
+    # need to define how this is called
+}
 
 no Biome::Role;
 
