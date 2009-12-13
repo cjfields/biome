@@ -16,6 +16,21 @@ use Biome::Types qw/SequenceStrand CoordinatePolicy SimpleLocationType/;
 
 =cut
 
+sub BUILD {
+    my $self = shift;
+    if ( $self->has_start && $self->has_end && $self->has_location_type ) {
+        $self->throw( "Only adjacent residues when location type "
+              . "is IN-BETWEEN. Not ["
+              . $self->start
+              . "] and ["
+              . $self->end
+              . "]" )
+          if $self->location_type eq 'IN-BETWEEN'
+          && ( $self->end() - 1 != $self->start );
+    }
+
+}
+
 has 'start' => (
     is        => 'rw',
     isa       => 'Int',
@@ -29,22 +44,37 @@ after 'start' => sub {
     $self->min_start($value);
 };
 
-around 'start' => sub {
-    my ( $orig, $self, $value ) = @_;
-    return $self->$orig if !$value;
+before 'start' => sub {
+    my ( $self, $value ) = @_;
+    return if !$value;
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
           . $value
           . "] and ["
-          . $self->start
+          . $self->end
           . "]" )
       if $self->has_location_type
       && $self->location_type eq 'IN-BETWEEN'
       && $self->has_end()
       && ( $self->end() - 1 != $value );
-
-    return $self->$orig($value);
 };
+
+#around 'start' => sub {
+#    my ( $orig, $self, $value ) = @_;
+#    return $self->$orig if !$value;
+#    $self->throw( "Only adjacent residues when location type "
+#          . "is IN-BETWEEN. Not ["
+#          . $value
+#          . "] and ["
+#          . $self->start
+#          . "]" )
+#      if $self->has_location_type
+#      && $self->location_type eq 'IN-BETWEEN'
+#      && $self->has_end()
+#      && ( $self->end() - 1 != $value );
+#
+#    return $self->$orig($value);
+#};
 
 =head2 end
 
@@ -66,6 +96,7 @@ has 'end' => (
     isa       => 'Int',
     builder   => '_build_end',
     predicate => 'has_end',
+    lazy      => 1,
 );
 
 sub _build_end {
@@ -90,9 +121,9 @@ after 'end' => sub {
     $self->min_end($value);
 };
 
-around 'end' => sub {
-    my ( $orig, $self, $value ) = @_;
-    return $self->$orig if !$value;
+before 'end' => sub {
+    my ( $self, $value ) = @_;
+    return if !$value;
     $self->throw( "Only adjacent residues when location type "
           . "is IN-BETWEEN. Not ["
           . $self->start()
@@ -103,9 +134,24 @@ around 'end' => sub {
       && $self->location_type eq 'IN-BETWEEN'
       && $self->has_start()
       && ( ( $value - 1 ) != $self->start() );
-
-    return $self->$orig($value);
 };
+
+#around 'end' => sub {
+#    my ( $orig, $self, $value ) = @_;
+#    return $self->$orig if !$value;
+#    $self->throw( "Only adjacent residues when location type "
+#          . "is IN-BETWEEN. Not ["
+#          . $self->start()
+#          . "] and ["
+#          . $value
+#          . "]" )
+#      if $self->has_location_type
+#      && $self->location_type eq 'IN-BETWEEN'
+#      && $self->has_start()
+#      && ( ( $value - 1 ) != $self->start() );
+#
+#    return $self->$orig($value);
+#};
 
 =head2 strand
 
@@ -275,11 +321,24 @@ has 'location_type' => (
     isa       => SimpleLocationType,
     predicate => 'has_location_type',
     default   => 'EXACT',
+    lazy      => 1,
 );
 
 before 'location_type' => sub {
     my ( $self, $value ) = @_;
     return if !$value;
+
+    $self->throw( "Only adjacent residues when location type "
+          . "is IN-BETWEEN. Not ["
+          . $self->start()
+          . "] and ["
+          . $self->end()
+          . "]" )
+      if $value eq 'IN-BETWEEN'
+      && $self->has_start()
+      && $self->has_end()
+      && ( $self->end() - 1 != $self->start() );
+
     return if !$self->has_encoding();
     my %range_encode = (
         '..'         => 'EXACT',
@@ -295,20 +354,20 @@ around 'location_type' => sub {
     if ( !$value ) {
         return $self->$orig();
     }
+
     #if ( $self->has_end ) {
     #    print 'end: ', $self->end, "\n";
     #}
-    $self->throw( "Only adjacent residues when location type "
-          . "is IN-BETWEEN. Not ["
-          . $self->start()
-          . "] and ["
-          . $self->end()
-          . "]" )
-      if $value eq 'IN-BETWEEN'
-      && $self->has_start()
-      && $self->has_end()
-      && ( $self->end() - 1 != $self->start() );
-
+    #$self->throw( "Only adjacent residues when location type "
+    #      . "is IN-BETWEEN. Not ["
+    #      . $self->start()
+    #      . "] and ["
+    #      . $self->end()
+    #      . "]" )
+    #  if $value eq 'IN-BETWEEN'
+    #  && $self->has_start()
+    #  && $self->has_end()
+    #  && ( $self->end() - 1 != $self->start() );
     if ( $value eq '^' || $value eq '..' ) {
         $value = $self->decode($value);
     }
