@@ -4,6 +4,10 @@ use Biome;
 
 with 'Biome::Role::Rangeable';
 
+sub length {
+    return $_[0]->end - $_[0]->start + 1;
+}
+
 no Biome;
 
 __PACKAGE__->meta->make_immutable();
