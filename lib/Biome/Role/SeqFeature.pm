@@ -3,12 +3,12 @@ package Biome::Role::SeqFeature;
 use Biome::Role;
 use MooseX::Aliases;
 
-with ('Biome::Role::Feature', 'Biome::Role::PrimarySeqContainer');
+with 'Biome::Role::Feature', 'Biome::Role::PrimarySeqContainer';
 
-# minimal required methods to define location of SeqFeature on a Seq string note
-# that this doesn't have to come from the location (eg these could be defined in
-# the implementation, and these could inform the location instead of vice
-# versa).
+# minimal required methods to define location of SeqFeature on a Seq string.
+# Note that this doesn't have to come from the location (eg these could be
+# defined in the implementation, and these could inform the location instead of
+# vice versa).
 
 requires qw(
     start

@@ -3,8 +3,6 @@ package Biome::Role::Rangeable;
 use Biome::Role;
 use Biome::Types qw(SequenceStrand);
 
-requires 'length';
-
 has strand  => (
     isa     => SequenceStrand,
     is      => 'rw',
@@ -14,17 +12,17 @@ has strand  => (
 
 has start   => (
     is      => 'rw',
+    isa     => 'Int',
 );
 
 has end     => (
     is      => 'rw',
+    isa     => 'Int'
 );
 
-#sub length {
-#    my $self = shift;
-#    my ($st, $end) = ($self->start, $self->end);
-#    return ($st == 0 && $end == 0) ? 0 : abs($end - $st + 1);
-#}
+sub length {
+    $_[0]->end - $_[0]->start + 1;
+}
 
 # returns true if strands are equal and non-zero
 our %VALID_STRAND_TESTS = (
@@ -263,14 +261,15 @@ sub to_string {
 # called as instance method only; does slow things down a bit...
 sub _eval_ranges {
     my ($self, @ranges) = @_;
-    $self->throw("start is undefined in calling instance") if !defined $self->start;
-    $self->throw("end is undefined in calling instance") if !defined $self->end;    
-    for my $obj (@ranges) {
+    #$self->throw("start is undefined in calling instance") if !defined $self->start;
+    #$self->throw("end is undefined in calling instance") if !defined $self->end;    
+    for my $obj ($self, @ranges) {
         $self->throw("Not an object") unless ref($obj);
-        $self->throw("Passed object does not implement Biome::Role::Rangeable role")
-            unless $obj->does('Biome::Role::Rangeable');
-        $self->throw("start is undefined in passed instance") if !defined $obj->start;
-        $self->throw("end is undefined in passed instance") if !defined $obj->end;
+        $self->throw("start is undefined in instance ".$obj->to_string) if !defined $obj->start;
+        $self->throw("end is undefined in instance ".$obj->to_string) if !defined $obj->end;
+        $self->throw('Rangeable equality or set methods not '.
+                     'implemented yet for fuzzy locations') if
+            $self->does('Bio::Range::Segment') && $self->is_fuzzy;
     }
 }
 

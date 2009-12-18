@@ -4,8 +4,6 @@ use Biome::Role;
 
 use Moose::Util::TypeConstraints;
 
-use Path::Class qw(file dir);
-
 # attributes
 has 'file' => (
     isa         => 'PathClassFile',

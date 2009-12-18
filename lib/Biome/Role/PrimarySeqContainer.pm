@@ -26,7 +26,7 @@ sub primary_seq {
 }
 
 sub spliced_seq {
-    # need to define how this is called
+    $_[0]->throw_not_implemented;
 }
 
 no Biome::Role;

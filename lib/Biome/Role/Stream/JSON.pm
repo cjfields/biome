@@ -1,18 +1,6 @@
-package Biome::Role::Locatable;
+package Biome::Role::Stream::JSON;
 
 use Biome::Role;
-
-# default to a generic Range for now
-use Biome::Segment::Simple;
-
-# this allows anything that does Biome::Role::Rangeable to work here
-has 'location'  => (
-    does        => 'Biome::Role::Rangeable',
-    is          => 'rw',
-    handles     => [qw(start end strand length)],
-    lazy        => 1,
-    default     => sub {Biome::Segment::Simple->new()}
-    );
 
 no Biome::Role;
 
@@ -22,15 +10,15 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Locatable - Simple role for anything that has a Location.
+Biome::Role::Stream::JSON - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::Locatable version 0.01.
+This documentation refers to Biome::Role::Stream::JSON version Biome::Role.
 
 =head1 SYNOPSIS
 
-   with 'Biome::Role::Locatable';
+   with 'Biome::Role::Stream::JSON';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,

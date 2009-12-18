@@ -7,12 +7,6 @@ with 'Biome::Role::Taggable',
      'Biome::Role::Describable',
      'Biome::Role::Feature::Collection';
 
-requires qw(
-    location
-); # possibly Biome::Role::Locatable, but may delineate boundaries for a
-   # different instance (nodes in a tree or graph, columns in an alignment,
-   # indices in an array, etc). May need to be aliased as needed.
-
 has 'primary_tag'   => (
     isa         => 'Str',
     is          => 'rw',
