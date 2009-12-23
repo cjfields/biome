@@ -70,9 +70,9 @@ rmdir $test_dir or die "Could not delete dir '$test_dir': $!\n";
 # tests for handle read and write abilities
 #############################################
 
-my ($handle,$file) = $io->tempfile;
-ok $handle;
-ok $file;
+#my ($handle,$file) = $io->tempfile;
+#ok $handle;
+#ok $file;
 
 done_testing;
 

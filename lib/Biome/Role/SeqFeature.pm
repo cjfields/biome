@@ -1,9 +1,27 @@
 package Biome::Role::SeqFeature;
 
 use Biome::Role;
-use MooseX::Aliases;
 
-with 'Biome::Role::Feature', 'Biome::Role::PrimarySeqContainer';
+=head1
+
+A SeqFeature has these Roles:
+
+1) either Rangeable or Locatable (and delegates to the Location).
+2) is Identifiable and Describable
+3) contains tag-value pairs (Taggable)
+4) is linked to, or contains, a PrimarySeq (PrimarySeqContainer)
+
+And possibly: 
+
+5) may contain annotations (Annotatable)
+
+=cut
+
+with qw(Biome::Role::Taggable
+        Biome::Role::Describable
+        Biome::Role::Identifiable
+        Biome::Role::PrimarySeqContainer
+        Biome::Role::SeqFeature::Collection);
 
 # minimal required methods to define location of SeqFeature on a Seq string.
 # Note that this doesn't have to come from the location (eg these could be
@@ -17,11 +35,16 @@ requires qw(
     length
 );
 
-# attached instance info (in this case, sequence info)
-alias 'get_SeqFeatures'     => 'get_Features';
-alias 'add_SeqFeatures'     => 'add_Features';
-alias 'remove_SeqFeatures'  => 'remove_Features';
-alias 'num_SeqFeatures'     => 'num_Features';
+has 'seq_id'    => (
+    isa         => 'Str',
+    is          => 'rw'
+);
+
+# this could be a tag/value pair, might be easier to store...
+has 'score'         => (
+    isa         => 'Str',
+    is          => 'rw',
+);
 
 no Biome::Role;
 

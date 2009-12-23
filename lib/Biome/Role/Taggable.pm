@@ -29,6 +29,17 @@ has tag_map => (
     coerce      => 1,
 );
 
+# should these be delegated to reserved tag/value pairs?  
+has 'primary_tag'   => (
+    isa         => 'Str',
+    is          => 'rw',
+);
+
+has 'source_tag'    => (
+    isa         => 'Str',
+    is          => 'rw',
+);
+
 sub get_tag_values {
     my ($self, @args) = @_;
     my $vals = $self->_get_tag_values(@args);

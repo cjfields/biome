@@ -26,7 +26,7 @@ my $feat = Biome::SeqFeature::Generic->new(
 				       );
 
 # Generic Feature
-does_ok($feat, 'Biome::Role::Feature');
+does_ok($feat, 'Biome::Role::SeqFeature');
 is $feat->primary_tag, 'exon', 'primary tag';
 is $feat->source_tag, 'internal', 'source tag';
 
@@ -48,7 +48,7 @@ is join(',',$feat->get_tag_values('silly')), '20', 'tag 2';
 
 # SeqFeature
 does_ok($feat, 'Biome::Role::SeqFeature');
-does_ok($feat, 'Biome::Role::Feature::Collection');
+does_ok($feat, 'Biome::Role::SeqFeature::Collection');
 is $feat->seq_id, 'ABCD1234', 'attached_id';
 
 # PrimarySeqContainer

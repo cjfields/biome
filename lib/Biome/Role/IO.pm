@@ -5,14 +5,26 @@ use Biome::Role;
 use Moose::Util::TypeConstraints;
 
 # attributes
-has 'file' => (
-    isa         => 'PathClassFile',
-    is          => 'rw',
+has file    => (
+    is      => 'rw',
+    isa     => 'Str',
+    trigger => sub {
+        my ($self, $new) = @_;
+        if ($self->fh) {
+            close($self->fh);
+            $self->_clear_fh
+        }
+        open(my $newfh, '<', $new) || die "Can't open file:$!";
+        $self->_set_fh($newfh);
+    }
 );
 
-has 'fh' => (
-    isa         => 'FileHandle',
-    is          => 'rw',
+has fh      => (
+    is      => 'ro',
+    isa     => 'FileHandle',
+    writer  => '_set_fh',
+    clearer => '_clear_fh',
+    init_arg => undef,
 );
 
 #has 'close_file'    => (
@@ -20,7 +32,7 @@ has 'fh' => (
 #    is          => 'rw',
 #    default     => 1
 #);
-#
+
 #has 'flush' => (
 #    isa         => 'Bool',
 #    is          => 'rw',
@@ -87,15 +99,15 @@ has 'fh' => (
 #    }
 #);
 
-#has 'FILESPEC_LOADED' => (
-#    is          => 'ro',
-#    isa         => 'Bool',
-#    lazy        => 1,
-#    default     => sub {
-#        Class::MOP::load_class('File::Spec');
-#        Class::MOP::is_class_loaded('File::Spec') ? 1 : 0;
-#    }
-#);
+has 'FILESPEC_LOADED' => (
+    is          => 'ro',
+    isa         => 'Bool',
+    lazy        => 1,
+    default     => sub {
+        Class::MOP::load_class('File::Spec');
+        Class::MOP::is_class_loaded('File::Spec') ? 1 : 0;
+    }
+);
 
 #has 'TEMPDIR' => (
 #    is          => 'ro',

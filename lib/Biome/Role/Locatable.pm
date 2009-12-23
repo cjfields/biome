@@ -12,7 +12,7 @@ has 'location'  => (
     handles     => [qw(start end strand length)],
     lazy        => 1,
     default     => sub {Biome::Segment::Simple->new()}
-    );
+);
 
 no Biome::Role;
 

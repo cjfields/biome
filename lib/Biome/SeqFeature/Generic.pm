@@ -1,11 +1,10 @@
 package Biome::SeqFeature::Generic;
 
 use Biome;
-use MooseX::Aliases;
 
 sub BUILD {
     my ($self, $params) = @_;
-    # role delegation with attributes using 'handles' doesn't work as expected
+    # role delegation with attributes using 'handles' doesn't work
     for my $delegate (qw(start end strand seq_id)) {
         $self->$delegate($params->{$delegate}) if exists $params->{$delegate};
     }
@@ -14,13 +13,7 @@ sub BUILD {
 with 'Biome::Role::Locatable';
 with 'Biome::Role::SeqFeature';
 
-# this has to be aliased here due to late binding of attributes
-alias 'seq_id'              => 'attached_id';
-
 no Biome;
-
-# apparently, init. with aliases in roles doesn't work when using immutable;
-# should test this for optimization (lots of features will be made)
 
 __PACKAGE__->meta->make_immutable;
 
