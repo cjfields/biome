@@ -11,12 +11,6 @@ requires 'next_member';    # lazy, iteratively returns object
 has 'member_map' => (
     is          => 'rw',
     isa         => 'HashRef[Any]',
-    handles     => {
-        # get_member_ids
-        # size
-        # add_member
-        # delete_member
-        }
 );
 
 has 'cluster_score' => (
@@ -32,7 +26,8 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Cluster - Simple role for defining a cluster or group of objects
+Biome::Role::Cluster - Simple role for defining a cluster or grouping of
+objects.
 
 =head1 VERSION
 
@@ -54,11 +49,11 @@ consuming classes that wish to group objects based on specified properties.
 
 Though not required, implementations are encouraged to have a lazy or memory-
 efficient way for accessing instance data, for instance using a remote/local
-database or using a 'lazy' implementation with iteration. With this in mind, the
-default role methods simply store the ID in a hash with a simple Bool as the
-value. Implementations can cache/store the member in this hash, but it is up to
-the implementation to properly disambiguate between stored instances and the
-simple default bool value.
+database or using iteration. With this in mind, the default role methods simply
+store the ID in a hash with a simple Bool as the value. Implementations can
+cache/store the member in this hash, but it is up to the implementation to
+properly disambiguate between stored instances and the simple default bool
+value.
 
 For instance, the method next_Cluster is used to iterate through the various
 objects in this Cluster using an optional filter, whereas get_members may be
