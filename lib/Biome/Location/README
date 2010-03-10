@@ -1,0 +1,269 @@
+=head1 Locations in BioPerl
+
+It is difficult to discuss what we mean by 'locations' without also briefly
+mentioning sequence features. The current BioPerl implementation splits all
+sequence annotations found in a sequence record into two general groups: those
+that pertain to the sequence as a whole (thus implementing
+Bio::AnnotationI), and those that are isolated to particular regions, or
+'locations', of a sequence (thus implementing {{PM|Bio::SeqFeatureI}}). A group
+of classes ('''Bio::Location''') was devised in order to describe simple
+locations in a generic way. 
+
+=head2 How location data is handled in BioPerl
+
+{{PM|Bio::Factory::FTLocationFactory}}
+
+Where does <tt>gap</tt> fit in here (found in CONTIG files), or do we plan on supporting it?
+
+==Coordinates==
+
+Definition of start/end coordinates, coordinate policies, etc.
+
+=Types of Locations=
+
+The following all implement {{PM|Bio::LocationI}}.
+
+==Simple==
+
+{{PM|Bio::Location::Atomic}}
+
+{{PM|Bio::Location::Simple}}
+
+==Fuzzy==
+
+{{PM|Bio::Location::Fuzzy}}
+
+===Deprecated fuzzy location types===
+
+==Split==
+
+At this time, all split locations are handled by one class ({{PM|Bio::Location::Split}}), which implements methods from {{PM|Bio::Location::SplitLocationI}} and {{PM|Bio::LocationI}}.  
+
+===<tt>join(location,location, ... location)</tt>===
+
+The indicated elements should be joined (placed end-to-end) to form one contiguous sequence.  Far and away the most common split location type.  Use of this operator implies that the locations are meant to be joined together in the order listed.
+
+There are some ambiguities in the way this location type is handled in BioPerl, particularly re: circular sequences where the location is split across the origin.  
+
+'''Examples''':<font color="blue">'''Simple subLocations'''</font>
+
+NCBI and EBI currently use differing but syntactically similar versions of a split location string on the complement strand.
+
+From GenBank : [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AL137247 AL137247]
+
+                     ...
+     mRNA            complement(join(3207..4831,5834..5902,8881..8969,
+                     9276..9403,29535..29764))
+                     /locus_tag="RP11-298P3.2-001"
+                     /note="match: ESTs: AA890530 AI675036 AI701009 AI916535
+                     AW592106 BE479269 BE645120 BE672552 BM145066 BM996077
+                     R61510
+                     match: cDNAs: AL049787 BC022188 BQ003364 U50527"
+                     ...
+
+From EMBL : [http://www.ebi.ac.uk/cgi-bin/emblfetch?style=html&id=AL137247&Submit=Go AL137247]
+
+<pre>
+                     ...
+FT   mRNA            join(complement(29535..29764),complement(9276..9403),
+FT                   complement(8881..8969),complement(5834..5902),
+FT                   complement(3207..4831))
+FT                   /locus_tag="RP11-298P3.2-001"
+FT                   /note="match: ESTs: AA890530 AI675036 AI701009 AI916535
+FT                   AW592106 BE479269 BE645120 BE672552 BM145066 BM996077
+FT                   R61510"
+FT                   /note="match: cDNAs: AL049787 BC022188 BQ003364 U50527"
+                     ...
+</pre>
+
+'''Examples''':<font color="blue">'''Remote subLocations'''</font>
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AF130134 AF130134] :
+
+                     ...
+     mRNA            join(AF130124.1:<2563..2964,AF130125.1:21..157,
+                     AF130126.1:12..174,AF130127.1:21..112,AF130128.1:21..162,
+                     AF130128.1:281..595,AF130128.1:661..842,
+                     AF130128.1:916..1030,AF130129.1:21..115,
+                     AF130130.1:21..165,AF130131.1:21..125,AF130132.1:21..428,
+                     AF130132.1:492..746,AF130133.1:21..168,
+                     AF130133.1:232..401,AF130133.1:475..906,
+                     AF130133.1:970..1107,AF130133.1:1176..1367,21..>128)
+                     ...
+
+NCBI uses EMBL-like location strings (see above) when some of the sublocations are remote and complementary.
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AL137247 AL137247] :
+                     ...
+     mRNA            join(complement(AL353665.13:2815..2862),
+                     complement(AL353665.13:453..500),
+                     complement(AL353665.13:112..273),complement(47990..48111),
+                     complement(44019..45757),complement(40283..40368),
+                     complement(37992..38036),complement(34048..34603))
+                     /locus_tag="RP11-298P3.4-001"
+                     /note="match: ESTs: AA593603 AA737293 AA778631 AI718289
+                     AU137161 AV726785 AW243426 BM055268 BM887924
+                     match: cDNAs: AL049802 AL049802.1 U50529 U50529.1"
+                     ...
+
+'''Example''': <font color="blue">'''Split location in circular sequence'''</font> [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=NC_002754] (''S. solfataricus'' genome)
+
+     CDS             join(2991448..2992245,1..252)
+                     /locus_tag="SSO12256"
+                     /note="Similar to cellulose synthase homologs ydaM and
+                     icaA, probably involved in cell wall biogenesis or
+                     intercellular adhesion; Cell Envelope, Surface
+                     polysaccharides and lipopolysaccharides"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="Glycosyltransferase, putative"
+                     /protein_id="NP_341577.1"
+                     /db_xref="GI:15896972"
+                     /db_xref="GeneID:1455270"
+                     /translation="MIVPVKNEERVLPRLLDRLVNLEYDKSKYEIIVVEDGSTDRTFQ
+                     ICKEYEIKYNNLIRCYSLPRANVPNGKSRALNFALRISKGEIIGIFDGDTVPRLDILE
+                     YVEPKFEDITVGAVQGKLVPINVRESVTSRLAAIEELIYEYSIAGRAKVGLFVPIEGT
+                     CSFIRKSIIMELGGWNEYSLTEDLDISLKIVNKGCKIVYSPTTISWREVPVSLRVLIR
+                     QRLRWYRGHLEVQLGKLRKIDLRIIDGILIVLTPFFMVLNLVNYSLVLVYSSSLYIVA
+                     ASLVSLASLLSLLLIILIARRHMIEYFYMIPSFVYMNFIVALNFTAIFLELIRAPRVW
+                     VKTERSAKVTGEVMG"
+
+===<tt>order(location,location, ... location)</tt>===
+
+The elements can be found in the specified order (5' to 3' direction), but nothing is implied about the reasonableness about joining them.
+
+Not as commonly used, but necessary to describe the locations of features like repeated sequences, etc.  Note that one might think you could assign a strand for the split location object, you are allowed to have different strands for the sublocations using this operator.
+
+'''Examples''':<font color="blue">'''Simple subLocations'''</font>
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AF006691 AF006691]:
+
+                     ...
+     repeat_region   order(912..1918,20410..21416)
+                     /rpt_type=direct
+                     ...
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AF264948 AF264948]:
+                     ...
+     repeat_region   order(11375..11410,15692..15727)
+                     /note="similar to inverted repeats found in IS911"
+                     /rpt_type=direct
+                     ...
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=NC_003384 NC_003384]:
+
+     ...
+     repeat_region   complement(order(153546..153558,154281..154293))
+                     /rpt_type=inverted
+     repeat_region   complement(order(159639..159653,160446..160460))
+                     /rpt_type=inverted
+     repeat_region   complement(order(160655..160668,161461..161474))
+                     /rpt_type=inverted
+     ...
+
+'''Examples''':<font color="blue">'''Simple subLocations with mixed strands'''</font>
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AF264948 AF264948]:
+
+     ...
+     primer_bind     order(3..26,complement(964..987))
+     ...
+
+'''Examples''':<font color="blue">'''Remote subLocations'''</font>
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AF081826 AF081826]:
+
+     ...
+     gene            order(complement(1009..>1260),complement(AF081827.1:<1..177))
+                     /gene="csgD"
+     ...
+
+===<tt>bond(location,location...location)</tt>===
+
+Found in protein files.  These generally are used to describe disulfide bonds.  Some of these location types imply that the order of the location is important (see the example below for 1XDA_D).  
+
+Note that this split location type is not described in the GenBank/EMBL/DDBJ Feature Table definition, presumably because it pertains to protein sequences, not nucleotide sequences.
+
+'''Examples''':<font color="blue">'''Simple subLocations'''</font>
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=protein&val=230350 1TGS_Z]:
+
+     ...
+     Bond            bond(115,216)
+                     /bond_type="disulfide"
+     SecStr          120..126
+                     /sec_str_type="sheet"
+                     /note="strand 11"
+     Bond            bond(122,189)
+                     /bond_type="disulfide"
+     ...
+
+'''Examples''':<font color="blue">'''Complex subLocations'''</font>
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=protein&val=230350 1TGS_Z]:
+
+     ...
+     Het             join(bond(58),bond(60),bond(60),bond(63),bond(68),
+                     bond(68),bond(68))
+                     /heterogen="( CA, 800 ) Calcium Ion"
+     ...
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=protein&val=1XDA_D 1XDA_D]:
+
+     ...
+     Het             join(bond(29),bond(29),bond(3),bond(3))
+                     /heterogen="(MYR,  39 )"
+     Region          4..>29
+                     /region_name="IlGF"
+                     /note="Insulin / insulin-like growth factor / relaxin
+                     family; smart00078"
+                     /db_xref="CDD:47425"
+     Het             join(bond(29),bond(29))
+                     /heterogen="(MYR,  39 )"
+     ...
+
+'''Examples''':<font color="blue">'''Remote subLocations'''</font>
+
+There are no apparent remote sublocations used for bonds.  If a link to another sequence is implied, it apparently is indicated in the feature tags, not in the location string.
+
+From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=protein&val=54037403 P67973_1], whale insulin:
+
+     ...
+     Bond            bond(7,7)
+                     /gene="INS"
+                     /bond_type="disulfide"
+                     /experiment="experimental evidence, no additional details
+                     recorded"
+                     /note="Interchain (between B and A chains)."
+     Bond            bond(19,20)
+                     /gene="INS"
+                     /bond_type="disulfide"
+                     /experiment="experimental evidence, no additional details
+                     recorded"
+                     /note="Interchain (between B and A chains)."
+     ...
+
+===Deprecated split locations===
+
+The following split location operators were in GenBank releases prior to rel. 122 and older EMBL releases, but have long since been removed.  They are not supported in BioPerl.
+
+====<tt>group</tt>====
+
+ group(location, location, .. location): The elements are related and
+ should be grouped together, but no order is implied.
+
+This differs from <tt>order</tt> in that there is no 5'->3' order of the sublocations.  
+
+====<tt>one-of</tt>====
+
+ one-of(location, location, .. location): The element can be any one,
+ but only one, of the items listed.
+
+These elements were used at one point for describing split locations where the exact position of one sublocation was uncertain but could be picked from a group.  These were mainly encountered with genes that were alternatively spliced but were also used for describing variation data.  Now the individually spliced genes are described in separate sequence features, using regular <tt>join</tt> or <tt>order</tt> operators.
+
+Of note, there are still a few of these sequences in GenBank: accession
+[http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=ATU39449 ATU39449] is an example (at least for the time being).  One might also encounter these in the annotation COMMENTS section:
+
+[http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=22622125 BD076522.1]
+
+[http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=2169739 E01483.1]

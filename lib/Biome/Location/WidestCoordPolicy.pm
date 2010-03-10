@@ -23,9 +23,9 @@ use Biome::Types qw/StartPosition EndPosition/;
 
 
 has 'start' => (
-is => 'ro', 
-isa => StartPosition, 
-coerce => 1, 
+    is => 'ro', 
+    isa => StartPosition, 
+    coerce => 1, 
 );
 
 
