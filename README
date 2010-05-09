@@ -4,4 +4,4 @@ This is an experimental implementation of BioPerl classes in Moose.  It may
 Note: The name of the distribution may change at some point in the near future. As
 (rightfully) pointed out by Robert Buels, Bio::Moose is not the best name as we
 don't name distributions on how they are implemented, but on what they do.
-However, as Bio is currently taken, we are open to other possibilities.
+However, as Bio is currently taken, we are open to other possibilities. 
