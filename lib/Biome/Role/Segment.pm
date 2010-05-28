@@ -19,9 +19,11 @@ has 'start_pos_type'    => (
     coerce          => 1,
     trigger         => sub {
         my ($self, $v) = @_;
+        return unless $self->end && $self->start;
         $self->throw("Start position can't have type $v") if $v eq 'AFTER';
-        if ($v eq 'IN-BETWEEN' && abs($self->end - $self->start) != 1 ) {
-            $self->throw("length of segment with IN-BETWEEN position type cannot be larger than 1");
+        if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
+                         "cannot be larger than 1");
         }
     }
 );
@@ -34,11 +36,10 @@ has 'end_pos_type'      => (
     coerce          => 1,
     trigger         => sub {
         my ($self, $v) = @_;
+        return unless $self->end && $self->start;
         $self->throw("End position can't have type $v") if $v eq 'BEFORE';
-        if ($v eq 'IN-BETWEEN' &&
-            $self->valid_Segment &&
-            abs($self->end - $self->start) != 1 ) {
-            $self->throw("length of segment with IN-BETWEEN position type z".
+        if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
                          " cannot be larger than 1");
         }
     }
@@ -74,23 +75,33 @@ around length => sub {
     }
 };
 
-after start => sub {
-    my ($self) = @_;
-    if ($self->start_pos_type eq 'IN-BETWEEN' &&
-        abs($self->end - $_[0]) != 1 ) {
-        $self->throw("length of segment with IN-BETWEEN position type ".
-                     "cannot be larger than 1; got ".abs($self->end - $_[0]));
+has 'start' => (
+    isa         => 'Int',
+    is          => 'rw',
+    trigger     => sub {
+        my ($self, $start) = @_;
+        my $end = $self->end;
+        return unless $start && $end;
+        if ($self->start_pos_type eq 'IN-BETWEEN' &&
+            (abs($end - $start) != 1 )) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
+                         "cannot be larger than 1; got ".abs($end - $start));
     }
-};
+});
 
-after end => sub {
-    my ($self) = @_;
-    if ($self->end_pos_type eq 'IN-BETWEEN' &&
-        abs($_[0] - $self->start) != 1 ) {
-        $self->throw("length of segment with IN-BETWEEN position type ".
-                     "cannot be larger than 1; got ".abs($_[0] - $self->start));
-    }    
-};
+has 'end' => (
+    isa         => 'Int',
+    is          => 'rw',
+    trigger     => sub {
+        my ($self, $end) = @_;
+        my $start = $self->start;
+        return unless $start && $end;
+        if ($self->end_pos_type eq 'IN-BETWEEN' &&
+            (abs($end - $start) != 1) ) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
+                         "cannot be larger than 1; got ".abs($end - $start));
+    }
+});
 
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
