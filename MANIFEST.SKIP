@@ -1,5 +1,5 @@
 
-#!start included /opt/perl/lib/5.10.1/ExtUtils/MANIFEST.SKIP
+#!start included /opt/perl512/lib/5.12.1/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -9,6 +9,12 @@
 \B\.git\b
 \B\.gitignore\b
 \b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
 
 # Avoid Makemaker generated and utility files.
 \bMANIFEST\.bak
@@ -22,6 +28,10 @@
 # Avoid Module::Build generated and utility files.
 \bBuild$
 \b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
 
 # Avoid temp and backup files.
 ~$
@@ -29,10 +39,19 @@
 \#$
 \b\.#
 \.bak$
+\.tmp$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
 
 # Avoid Devel::Cover files.
 \bcover_db\b
-#!end included /opt/perl/lib/5.10.1/ExtUtils/MANIFEST.SKIP
+#!end included /opt/perl512/lib/5.12.1/ExtUtils/MANIFEST.SKIP
 
 # Avoid configuration metadata file
 ^MYMETA\.
@@ -48,3 +67,7 @@
 
 # Avoid archives of this distribution
 \bBiome-[\d\.\_]+
+
+# No unimplemented modules/roles
+\bunimplemented/
+
