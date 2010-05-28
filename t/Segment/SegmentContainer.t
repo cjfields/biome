@@ -62,15 +62,15 @@ is ($f->to_FTstring, 'complement(20..100)','full FT string');
 my $exact = Biome::Segment::Simple->new(
                     -start         => 10, 
                     -end           => 11,
-                    -segment_type  => 'BETWEEN',
+                    -segment_type  => 'IN-BETWEEN',
                     -strand        => 1,
                     -seq_id        => 'my2');
 
-is($exact->start, 10, 'Biome::Segment::Simple BETWEEN');
+is($exact->start, 10, 'Biome::Segment::Simple IN-BETWEEN');
 is($exact->end, 11);
 is($exact->seq_id, 'my2');
 is($exact->length, 0);
-is($exact->segment_type, 'BETWEEN');
+is($exact->segment_type, 'IN-BETWEEN');
 
 is ($exact->pos_string('start'), '10', 'start pos_string');
 is ($exact->pos_string('end'), '11', 'end pos_string');
@@ -84,14 +84,14 @@ $exact = Biome::Segment::Simple->new(
                     -strand        => '+', 
                     -seq_id        => 'my2');
 
-is($exact->start, 10, 'Bio::Segment::Simple BETWEEN');
+is($exact->start, 10, 'Bio::Segment::Simple IN-BETWEEN');
 is($exact->end, 11);
 is($exact->strand, 1, 'strand coerced');
 is($exact->seq_id, 'my2');
 is($exact->length, 0);
-is($exact->segment_type, 'BETWEEN');
-is($exact->start_pos_type, 'BETWEEN');
-is($exact->end_pos_type, 'BETWEEN');
+is($exact->segment_type, 'IN-BETWEEN');
+is($exact->start_pos_type, 'IN-BETWEEN');
+is($exact->end_pos_type, 'IN-BETWEEN');
 
 is($exact->pos_string('start'), '10', 'start pos_string');
 is($exact->pos_string('end'), '11', 'end pos_string');
