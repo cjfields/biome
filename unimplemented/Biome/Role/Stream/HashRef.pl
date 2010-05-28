@@ -1,86 +1,8 @@
-package Biome::Role::Segment::SegmentContainer;
+package Biome::Role::Stream::HashRef;
 
 use Biome::Role;
-use Biome::Segment::Simple;
 
-# this is a role mainly for consistency with BioPerl's locations.
-
-has     'segments'  => (
-    is          => 'rw',
-    isa         => 'ArrayRef[Biome::Segment::Simple]',
-    handles     => {
-        add_subSegment      => 'push',
-        subSegments         => 'elements',
-        remove_subSegments  => 'clear',
-        get_subSegment      => 'get',
-        num_subSegments     => 'count',
-    }
-);
-
-has     'split_type'    => (
-    isa         => 'Str',
-    is          => 'rw',
-);
-
-has     'maps_to_single'    => (
-    isa         => 'Bool',
-    is          => 'rw'
-);
-
-has     'guide_strand'      => (
-    is          => 'rw',
-    isa         => 'Int',
-    lazy        => 1,
-    default     => 0,
-);
-
-sub start {
-    my ($self, $start) = @_;
-    if ($start) {
-        $self->warn("This is a container of Segments; manipulate each simple segment start() individually");
-    }
-    shift->get_Segment(1)->start()
-}
-
-sub end {
-    my ($self, $end) = @_;
-    if ($end) {
-        $self->warn("This is a container of Segments; manipulate each simple segment end() individually");
-    }
-    shift->get_Segment(-1)->end()
-}
-
-sub strand {
-    my ($self, $str) = @_;
-    if ($str) {
-        $self->warn("This is a container of Segments; manipulate each simple segment strand() individually");
-    }
-    my ($strand, $lstrand);
-    foreach my $loc ($self->sub_Segment()) {
-        # we give up upon any location that's remote or doesn't have
-        # the strand specified, or has a differing one set than 
-        # previously seen.
-        # calling strand() is potentially expensive if the subloc is also
-        # a split location, so we cache it
-        $lstrand = $loc->strand();
-        if((! $lstrand) ||
-           ($strand && ($strand != $lstrand)) ||
-           $loc->is_remote()) {
-            $strand = undef;
-            last;
-        } elsif(! $strand) {
-            $strand = $lstrand;
-        }
-    }
-    return $strand;
-}
-
-sub flip_strand {
-    my $self = shift;
-    foreach my $loc ($self->subSegment()) {
-        $loc->flip_strand;    
-    }
-}
+requires 'next_chunk';
 
 no Biome::Role;
 
@@ -90,15 +12,15 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Segment::Split - <One-line description of module's purpose>
+Biome::Role::Stream::HashRef - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::Segment::Split version Biome::Role.
+This documentation refers to Biome::Role::Stream::HashRef version Biome::Role.
 
 =head1 SYNOPSIS
 
-   with 'Biome::Role::Segment::Split';
+   with 'Biome::Role::Stream::HashRef';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,

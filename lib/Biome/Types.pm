@@ -62,7 +62,7 @@ my %VALID_LOCATION_SYMBOL = (
     '<'          => 'BEFORE',
     '>'          => 'AFTER',
     '.'          => 'WITHIN',
-    '^'          => 'BETWEEN',
+    '^'          => 'IN-BETWEEN',
     '?'          => 'UNCERTAIN'
 );
 
@@ -71,12 +71,12 @@ my %SYMBOL_MAP = (
     'BEFORE'    => '<',
     'AFTER'     => '>',
     'WITHIN'    => '.',
-    'BETWEEN'   => '^',
+    'IN-BETWEEN'   => '^',
     'UNCERTAIN' => '?'
 );
 
 my %VALID_LOCATION_TYPE = map {$_ => 1}
-    qw(EXACT BEFORE AFTER WITHIN BETWEEN UNCERTAIN);
+    qw(EXACT BEFORE AFTER WITHIN IN-BETWEEN UNCERTAIN);
 
 # TODO: some of these could probably be redef. as enums, but it makes coercion
 # easier, needs checking
@@ -145,7 +145,7 @@ coerce EndPosition,
 		};
 
 enum SimpleLocationType ,   ('EXACT',  'IN-BETWEEN',  '^',  '..');
-	
+
 subtype SplitType,  as Str; 
 coerce SplitType, 
 	from Str, 
