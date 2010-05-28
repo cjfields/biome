@@ -3,18 +3,17 @@ package Biome::Tools::IUPAC;
 use Biome;
 use MooseX::ClassAttribute;
 
-# will likely change when AttributeHelpers moves to Moose core
-
 # ambiguity mappings
 class_has iupac_dna => (
-	metaclass   => 'Collection::ImmutableHash',
+	traits      => ['Hash'],
+	isa 		=> 'HashRef',
 	isa 		=> 'HashRef',
 	is      	=> 'ro',
 	init_arg	=> undef,
 	lazy		=> 1,
-	provides    => {
-		'count'		=> 'count_iupac_dna',
-		'get'   	=> 'get_iupac_dna'
+	handles     => {
+		'count_iupac_dna'   => 'count',
+		'get_iupac_dna'     => 'get'
 		},
 	default 	=> sub {
 		{
