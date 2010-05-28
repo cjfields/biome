@@ -1,6 +1,9 @@
 package Biome::Tools::IUPAC;
 
 use Biome;
+
+# may need to think about whether we want this as a class attribute or
+# as simple exportable data
 use MooseX::ClassAttribute;
 
 # ambiguity mappings
