@@ -71,3 +71,5 @@
 # No unimplemented modules/roles
 \bunimplemented/
 
+# skip unimplemented tests
+t/*.x

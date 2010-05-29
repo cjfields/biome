@@ -61,6 +61,7 @@ lib/Biome/Role/Segment/SegmentContainer.pm
 lib/Biome/Role/Segment/Split.pm
 lib/Biome/Role/SeqAnalysisParser.pm
 lib/Biome/Role/SeqFeature.pm
+lib/Biome/Role/SeqFeature/Collection
 lib/Biome/Role/SeqFeature/Collection.pm
 lib/Biome/Role/SimpleAnalysis.pm
 lib/Biome/Role/Stream/Hash.pm
@@ -101,11 +102,11 @@ t/Range.t
 t/Role.t
 t/Role/Delegate.t
 t/Role/IO.t
+t/Role/IO.x
 t/Role/ManageTypes.t
 t/Role/Taggable.t
 t/Segment/SegmentContainer.t
 t/Segment/Simple.t
-t/Segment/Split.x
 t/SeqFeature/Generic.t
 t/SeqFeature/Location.t
 t/Tools/CodonTable.t
