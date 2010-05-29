@@ -13,3 +13,4 @@ cover_db
 pod2htm*.tmp
 .emacs.*
 blib*
+*.bak
