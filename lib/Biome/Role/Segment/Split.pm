@@ -1,37 +1,31 @@
-package Biome::Role::Segment::SegmentContainer;
+package Biome::Role::Segment::Split;
 
 use Biome::Role;
 use Biome::Segment::Simple;
 
-# this is a role mainly for consistency with BioPerl's locations.
+#with 'Biome::Role::Rangeable';
 
 has     'segments'  => (
     is          => 'rw',
     isa         => 'ArrayRef[Biome::Segment::Simple]',
+    lazy        => 1,
+    default     => sub {[Biome::Segment::Simple->new()]},
     handles     => {
         add_subSegment      => 'push',
         subSegments         => 'elements',
-        remove_subSegments  => 'clear',
-        get_subSegment      => 'get',
-        num_subSegments     => 'count',
+        remove_Segments     => 'clear',
+        get_Segment         => 'get',
     }
 );
 
 has     'split_type'    => (
     isa         => 'Str',
-    is          => 'rw',
+    is          => 'rw'
 );
 
 has     'maps_to_single'    => (
     isa         => 'Bool',
     is          => 'rw'
-);
-
-has     'guide_strand'      => (
-    is          => 'rw',
-    isa         => 'Int',
-    lazy        => 1,
-    default     => 0,
 );
 
 sub start {
@@ -73,13 +67,6 @@ sub strand {
         }
     }
     return $strand;
-}
-
-sub flip_strand {
-    my $self = shift;
-    foreach my $loc ($self->subSegment()) {
-        $loc->flip_strand;    
-    }
 }
 
 no Biome::Role;

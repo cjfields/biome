@@ -22,14 +22,14 @@ BEGIN {
     no Biome;
 }
 
-my %real_types = map {$_ => 1} qw(. .. ^ ? < > EXACT WITHIN BETWEEN BEFORE AFTER UNCERTAIN);
+my %real_types = map {$_ => 1} qw(. .. ^ ? < > EXACT WITHIN IN-BETWEEN BEFORE AFTER UNCERTAIN);
 
 my %symbols = (
     '..'         => 'EXACT',
     '<'          => 'BEFORE',
     '>'          => 'AFTER',
     '.'          => 'WITHIN',
-    '^'          => 'BETWEEN',
+    '^'          => 'IN-BETWEEN',
     '?'          => 'UNCERTAIN'
     );
 

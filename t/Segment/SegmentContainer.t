@@ -3,13 +3,11 @@ use warnings;
 
 BEGIN {
     use lib '.';
-    use Test::More;
+    use Test::More tests => 62;
     use Test::Moose;
     use Test::Exception;
     use_ok('Biome::Segment::Simple');
 }
-
-# this implementation should cover both Simple and Fuzzy implementations
 
 =head1 Segments
 
@@ -38,7 +36,6 @@ is($simple->start_pos_type, 'EXACT', 'pos_type is EXACT for start');
 is($simple->end_pos_type, 'EXACT', 'pos_type is EXACT for end');
 ok($simple->valid_Segment);
 is($simple->segment_type, 'EXACT',  'has a default segment type');
-ok(!$simple->is_fuzzy);
 
 is ($simple->pos_string('start'), '10', 'start pos_string');
 is ($simple->pos_string('end'), '20', 'end pos_string');
@@ -51,8 +48,8 @@ is ($simple->to_FTstring, '10..20', 'full FT string');
 # test that even when end < start that length is always positive
 my $f = Biome::Segment::Simple->new(
         -strict  => -1,
-        -start   => 100, 
-        -end     => 20, 
+        -start   => 100,
+        -end     => 20,
         -strand  => 1);
 
 is($f->length, 81, 'Positive length');
@@ -63,10 +60,10 @@ is ($f->pos_string('end'), '100', 'end pos_string');
 is ($f->to_FTstring, 'complement(20..100)','full FT string');
 
 my $exact = Biome::Segment::Simple->new(
-                    -start         => 10,
+                    -start         => 10, 
                     -end           => 11,
                     -segment_type  => 'IN-BETWEEN',
-                    -strand        => 1, 
+                    -strand        => 1,
                     -seq_id        => 'my2');
 
 is($exact->start, 10, 'Biome::Segment::Simple IN-BETWEEN');
@@ -74,7 +71,6 @@ is($exact->end, 11);
 is($exact->seq_id, 'my2');
 is($exact->length, 0);
 is($exact->segment_type, 'IN-BETWEEN');
-ok(!$exact->is_fuzzy);
 
 is ($exact->pos_string('start'), '10', 'start pos_string');
 is ($exact->pos_string('end'), '11', 'end pos_string');
@@ -114,13 +110,9 @@ is($exact->end, 20);
 is($exact->strand, 1, 'strand coerced');
 is($exact->seq_id, 'my2');
 is($exact->length, 11);
-
-# this doesn't seem correct, shouldn't it be 'FUZZY' or 'UNCERTAIN'?
 is($exact->segment_type, 'EXACT');
-
 is($exact->start_pos_type, 'BEFORE');
 is($exact->end_pos_type, 'AFTER');
-ok($exact->is_fuzzy);
 
 is($exact->pos_string('start'), '<10', 'start pos_string');
 is($exact->pos_string('end'), '20>', 'end pos_string');
@@ -163,120 +155,114 @@ throws_ok { $exact = $exact = Biome::Segment::Simple->new(
                     -strand         => '+') }
     qr/End position can't have type BEFORE/,
     'Check end_pos_type constraint';
-  
-  
-throws_ok {$exact = Biome::Segment::Simple->new(-start         => 10, 
-                                   -end           => 12,
-                                   -segment_type => 'IN-BETWEEN')}
-    qr/length of segment with IN-BETWEEN/,
-    'IN-BETWEEN must have length of 1';  
-
-# fuzzy location tests
-my $fuzzy = Biome::Segment::Simple->new(
-                                     -start    => 10,
-                                     -start_pos_type => '<',
-                                     -end      => 20,
-                                     -strand   => 1, 
-                                     -seq_id   =>'my2');
-
-is($fuzzy->strand, 1, 'Biome::Segment::Simple tests');
-is($fuzzy->start, 10);
-is($fuzzy->end,20);
-#ok(!defined $fuzzy->min_start);
-#is($fuzzy->max_start, 10);
-#is($fuzzy->min_end, 20);
-#is($fuzzy->max_end, 20);
-is($fuzzy->segment_type, 'EXACT');
-is($fuzzy->start_pos_type, 'BEFORE');
-is($fuzzy->end_pos_type, 'EXACT');
-is($fuzzy->seq_id, 'my2');
-is($fuzzy->seq_id('my3'), 'my3');
-
+    
 =head1 Old BioPerl tests
 
 These will gradually be converted over and used as a test base
 
 =cut
 
-#($loc) = $fuzzy->each_Location();
-#ok($loc);
-#is("$loc", "$fuzzy");
-#
-## split location tests
-#my $splitlocation = Bio::Location::Split->new();
-#my $f = Bio::Location::Simple->new(-start  => 13,
-#                                  -end    => 30,
-#                                  -strand => 1);
-#$splitlocation->add_sub_Location($f);
-#is($f->start, 13, 'Bio::Location::Split tests');
-#is($f->min_start, 13);
-#is($f->max_start,13);
+__END__
 
-#$f = Bio::Location::Simple->new(-start  =>30,
-#                               -end    =>90,
-#                               -strand =>1);
-#$splitlocation->add_sub_Location($f);
-#
-#$f = Bio::Location::Simple->new(-start  =>18,
-#                               -end    =>22,
-#                               -strand =>1);
-#$splitlocation->add_sub_Location($f);
-#
-#$f = Bio::Location::Simple->new(-start  =>19,
-#                               -end    =>20,
-#                               -strand =>1);
-#
-#$splitlocation->add_sub_Location($f);
-#
-#$f = Bio::Location::Fuzzy->new(-start  =>"<50",
-#                              -end    =>61,
-#                              -strand =>1);
-#is($f->start, 50);
-#ok(! defined $f->min_start);
-#is($f->max_start, 50);
-#
-#is(scalar($splitlocation->each_Location()), 4);
-#
-#$splitlocation->add_sub_Location($f);
-#
-#is($splitlocation->max_end, 90);
-#is($splitlocation->min_start, 13);
-#is($splitlocation->end, 90);
-#is($splitlocation->start, 13);
-#is($splitlocation->sub_Location(),5);
+# fuzzy location tests
+my $fuzzy = Bio::Location::Fuzzy->new('-start'  =>'<10',
+                                     '-end'    => 20,
+                                     -strand   =>1, 
+                                     -seq_id   =>'my2');
 
-#is($fuzzy->to_FTstring(), '<10..20');
-#$fuzzy->strand(-1);
-#is($fuzzy->to_FTstring(), 'complement(<10..20)');
-#is($simple->to_FTstring(), '10..20');
-#$simple->strand(-1);
-#is($simple->to_FTstring(), 'complement(10..20)');
-#is( $splitlocation->to_FTstring(), 
-#    'join(13..30,30..90,18..22,19..20,<50..61)');
+is($fuzzy->strand, 1, 'Bio::Location::Fuzzy tests');
+is($fuzzy->start, 10);
+is($fuzzy->end,20);
+ok(!defined $fuzzy->min_start);
+is($fuzzy->max_start, 10);
+is($fuzzy->min_end, 20);
+is($fuzzy->max_end, 20);
+is($fuzzy->location_type, 'EXACT');
+is($fuzzy->start_pos_type, 'BEFORE');
+is($fuzzy->end_pos_type, 'EXACT');
+is($fuzzy->seq_id, 'my2');
+is($fuzzy->seq_id('my3'), 'my3');
+
+($loc) = $fuzzy->each_Location();
+ok($loc);
+is("$loc", "$fuzzy");
+
+# split location tests
+my $splitlocation = Bio::Location::Split->new();
+my $f = Bio::Location::Simple->new(-start  => 13,
+                                  -end    => 30,
+                                  -strand => 1);
+$splitlocation->add_sub_Location($f);
+is($f->start, 13, 'Bio::Location::Split tests');
+is($f->min_start, 13);
+is($f->max_start,13);
+
+
+$f = Bio::Location::Simple->new(-start  =>30,
+                               -end    =>90,
+                               -strand =>1);
+$splitlocation->add_sub_Location($f);
+
+$f = Bio::Location::Simple->new(-start  =>18,
+                               -end    =>22,
+                               -strand =>1);
+$splitlocation->add_sub_Location($f);
+
+$f = Bio::Location::Simple->new(-start  =>19,
+                               -end    =>20,
+                               -strand =>1);
+
+$splitlocation->add_sub_Location($f);
+
+$f = Bio::Location::Fuzzy->new(-start  =>"<50",
+                              -end    =>61,
+                              -strand =>1);
+is($f->start, 50);
+ok(! defined $f->min_start);
+is($f->max_start, 50);
+
+is(scalar($splitlocation->each_Location()), 4);
+
+$splitlocation->add_sub_Location($f);
+
+is($splitlocation->max_end, 90);
+is($splitlocation->min_start, 13);
+is($splitlocation->end, 90);
+is($splitlocation->start, 13);
+is($splitlocation->sub_Location(),5);
+
+
+is($fuzzy->to_FTstring(), '<10..20');
+$fuzzy->strand(-1);
+is($fuzzy->to_FTstring(), 'complement(<10..20)');
+is($simple->to_FTstring(), '10..20');
+$simple->strand(-1);
+is($simple->to_FTstring(), 'complement(10..20)');
+is( $splitlocation->to_FTstring(), 
+    'join(13..30,30..90,18..22,19..20,<50..61)');
 
 # test for bug #1074
-#$f = Bio::Location::Simple->new(-start  => 5,
-#                               -end    => 12,
-#                               -strand => -1);
-#$splitlocation->add_sub_Location($f);
-#is( $splitlocation->to_FTstring(), 
-#    'join(13..30,30..90,18..22,19..20,<50..61,complement(5..12))',
-#        'Bugfix 1074');
-#$splitlocation->strand(-1);
-#is( $splitlocation->to_FTstring(), 
-#    'complement(join(13..30,30..90,18..22,19..20,<50..61,5..12))');
+$f = Bio::Location::Simple->new(-start  => 5,
+                               -end    => 12,
+                               -strand => -1);
+$splitlocation->add_sub_Location($f);
+is( $splitlocation->to_FTstring(), 
+    'join(13..30,30..90,18..22,19..20,<50..61,complement(5..12))',
+        'Bugfix 1074');
+$splitlocation->strand(-1);
+is( $splitlocation->to_FTstring(), 
+    'complement(join(13..30,30..90,18..22,19..20,<50..61,5..12))');
 
-#$f = Bio::Location::Fuzzy->new(-start => '45.60',
-#                              -end   => '75^80');
-#
-#is($f->to_FTstring(), '(45.60)..(75^80)');
-#$f->start('20>');
-#is($f->to_FTstring(), '>20..(75^80)');
+$f = Bio::Location::Fuzzy->new(-start => '45.60',
+                              -end   => '75^80');
+
+is($f->to_FTstring(), '(45.60)..(75^80)');
+$f->start('20>');
+is($f->to_FTstring(), '>20..(75^80)');
 
 # test that even when end < start that length is always positive
 
-$f = Biome::Segment::Simple->new(
-                               -strict  => -1,
+$f = Bio::Location::Simple->new(-verbose => -1,
                                -start   => 100, 
                                -end     => 20, 
                                -strand  => 1);
@@ -285,67 +271,107 @@ is($f->length, 81, 'Positive length');
 is($f->strand,-1);
 
 # test that can call seq_id() on a split location;
-#$splitlocation = Bio::Location::Split->new(-seq_id => 'mysplit1');
-#is($splitlocation->seq_id,'mysplit1', 'seq_id() on Bio::Location::Split');
-#is($splitlocation->seq_id('mysplit2'),'mysplit2');
+$splitlocation = Bio::Location::Split->new(-seq_id => 'mysplit1');
+is($splitlocation->seq_id,'mysplit1', 'seq_id() on Bio::Location::Split');
+is($splitlocation->seq_id('mysplit2'),'mysplit2');
 
-# Test Biome::Segment::Simple
 
-ok($exact = Biome::Segment::Simple->new(-start    => 10, 
+# Test Bio::Location::Exact
+
+ok(my $exact = Bio::Location::Simple->new(-start    => 10, 
                                          -end      => 20,
                                          -strand   => 1, 
                                          -seq_id   => 'my1'));
-does_ok($exact, 'Biome::Role::Rangeable');
+isa_ok($exact, 'Bio::LocationI');
+isa_ok($exact, 'Bio::RangeI');
 
-is( $exact->start, 10, 'Biome::Segment::Simple EXACT');
+is( $exact->start, 10, 'Bio::Location::Simple EXACT');
 is( $exact->end, 20);
 is( $exact->seq_id, 'my1');
 is( $exact->length, 11);
-is( $exact->segment_type, 'EXACT');
+is( $exact->location_type, 'EXACT');
 
-ok ($exact = Biome::Segment::Simple->new(-start         => 10, 
+ok ($exact = Bio::Location::Simple->new(-start         => 10, 
                                       -end           => 11,
-                                      -segment_type => 'IN-BETWEEN',
+                                      -location_type => 'IN-BETWEEN',
                                       -strand        => 1, 
                                       -seq_id        => 'my2'));
 
-is($exact->start, 10, 'Biome::Segment::Simple BETWEEN');
+is($exact->start, 10, 'Bio::Location::Simple IN-BETWEEN');
 is($exact->end, 11);
 is($exact->seq_id, 'my2');
 is($exact->length, 0);
-is($exact->segment_type, 'IN-BETWEEN');
+is($exact->location_type, 'IN-BETWEEN');
 
-# 'fuzzy' segments are combined with simple ones in Biome
+eval {
+    $exact = Bio::Location::Simple->new(-start         => 10, 
+                                       -end           => 12,
+                                       -location_type => 'IN-BETWEEN');
+};
+ok( $@, 'Testing error handling' );
 
-my $error = qr/length of segment with IN-BETWEEN position type cannot be larger than 1/;
+# testing error when assigning 10^11 simple location into fuzzy
+eval {
+    ok $fuzzy = Bio::Location::Fuzzy->new(-start         => 10, 
+                                         -end           => 11,
+                                         -location_type => '^',
+                                         -strand        => 1, 
+                                         -seq_id        => 'my2');
+};
+ok( $@ );
 
-# testing error when assigning 10^12 simple location into fuzzy
-throws_ok {
-    $fuzzy = Biome::Segment::Simple->new(
-                                        -start         => 10, 
-                                        -end           => 12,
-                                        -segment_type  => '^',
-                                        -strand        => 1, 
-                                        -seq_id        => 'my2');
-} $error, 'Exception:IN-BETWEEN locations should be contiguous';
-
-$fuzzy = Biome::Segment::Simple->new(-segment_type => '^',
+$fuzzy = Bio::Location::Fuzzy->new(-location_type => '^',
                                   -strand        => 1, 
                                   -seq_id        => 'my2');
 
 $fuzzy->start(10);
-throws_ok { $fuzzy->end(12) } $error, 'Exception:IN-BETWEEN locations should be contiguous';
+eval { $fuzzy->end(11) };
+ok($@);
 
-$fuzzy = Biome::Segment::Simple->new(-segment_type => '^',
+$fuzzy = Bio::Location::Fuzzy->new(-location_type => '^',
                                   -strand        => 1, 
                                   -seq_id        =>'my2');
 
-$fuzzy->end(12);
-throws_ok { $fuzzy->start(10); } $error, 'Exception:IN-BETWEEN locations should be contiguous';
+$fuzzy->end(11);
+eval {
+    $fuzzy->start(10);
+};
+ok($@);
 
-####### No coordinate policies #######
+# testing coodinate policy modules
 
-done_testing;
+use_ok('Bio::Location::WidestCoordPolicy');
+use_ok('Bio::Location::NarrowestCoordPolicy');
+use_ok('Bio::Location::AvWithinCoordPolicy');
 
-__END__
+$f = Bio::Location::Fuzzy->new(-start => '40.60',
+                              -end   => '80.100');
+is $f->start, 40, 'Default coodinate policy';
+is $f->end, 100;
+is $f->length, 61;
+is $f->to_FTstring, '(40.60)..(80.100)';
+isa_ok($f->coordinate_policy, 'Bio::Location::WidestCoordPolicy');
 
+# this gives an odd location string; is it legal?
+$f->coordinate_policy(Bio::Location::NarrowestCoordPolicy->new());
+is $f->start, 60, 'Narrowest coodinate policy';
+is $f->end, 80;
+is $f->length, 21;
+is $f->to_FTstring, '(60.60)..(80.80)';
+isa_ok($f->coordinate_policy, 'Bio::Location::NarrowestCoordPolicy');
+
+# this gives an odd location string
+$f->coordinate_policy(Bio::Location::AvWithinCoordPolicy->new());
+is $f->start, 50, 'Average coodinate policy';
+is $f->end, 90;
+is $f->length, 41;
+is $f->to_FTstring, '(50.60)..(80.90)';
+isa_ok($f->coordinate_policy, 'Bio::Location::AvWithinCoordPolicy');
+
+# to complete the circle
+$f->coordinate_policy(Bio::Location::WidestCoordPolicy->new());
+is $f->start, 40, 'Widest coodinate policy';
+is $f->end, 100;
+is $f->length, 61;
+is $f->to_FTstring, '(40.60)..(80.100)';
+isa_ok($f->coordinate_policy, 'Bio::Location::WidestCoordPolicy');

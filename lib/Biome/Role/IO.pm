@@ -2,7 +2,7 @@ package Biome::Role::IO;
 
 use Biome::Role;
 
-use Moose::Util::TypeConstraints;
+use MooseX::Types::IO;
 
 # attributes
 has file    => (
@@ -21,49 +21,11 @@ has file    => (
 
 has fh      => (
     is      => 'ro',
-    isa     => 'FileHandle',
+    isa     => IO,
     writer  => '_set_fh',
     clearer => '_clear_fh',
     init_arg => undef,
 );
-
-#has 'close_file'    => (
-#    isa         => 'Bool',
-#    is          => 'rw',
-#    default     => 1
-#);
-
-#has 'flush' => (
-#    isa         => 'Bool',
-#    is          => 'rw',
-#	default		=> 0
-#);
-
-# LWP-related tasks to be pushed into a separate role...
-#has 'url' => (
-#    isa         => 'Str',
-#    is          => 'rw',
-#);
-
-# cluster LWP-related stuff
-#has 'lwp_params' => (
-#    isa         => 'HashRef[Any]',
-#    is          => 'rw',
-#    default     => sub {{}}
-#);
-#
-#has 'lwp_retries' => (
-#    isa         => 'Int',
-#    is          => 'rw',
-#	default		=> 5
-#);
-
-# cluster tempfile stuff
-#has 'unlink_tempfiles' => (
-#    isa         => 'Bool',
-#    is          => 'rw',
-#    default     => 1
-#);
 
 # factor these out into a loaded module map
 
@@ -72,68 +34,22 @@ has fh      => (
 #    isa         => 'Bool',
 #    lazy        => 1,
 #    default     => sub {
-#        Class::MOP::load_class('LWP::UserAgent');
-#        Class::MOP::is_class_loaded('LWP::UserAgent') ? 1 : 0;
+#        eval {Class::MOP::load_class('LWP::UserAgent')};
+#        $@ ? 1 : 0;
+#    }
+#);
+#
+#has 'EOL_LOADED' => (
+#    is          => 'ro',
+#    isa         => 'Bool',
+#    lazy        => 1,
+#    default     => sub {
+#        eval {Class::MOP::load_class('PerlIO::eol')};
+#        $@ ? 1 : 0;
 #    }
 #);
 
 # the three below modules are in core so should always return true
-
-#has 'FILEPATH_LOADED' => (
-#    is          => 'ro',
-#    isa         => 'Bool',
-#    lazy        => 1,
-#    default     => sub {
-#    	Class::MOP::load_class('File::Path');
-#        Class::MOP::is_class_loaded('File::Path') ? 1 : 0;
-#    }
-#);
-
-#has 'FILETEMP_LOADED' => (
-#    is          => 'ro',
-#    isa         => 'Bool',
-#    lazy        => 1,
-#    default     => sub {
-#        Class::MOP::load_class('File::Temp');
-#        Class::MOP::is_class_loaded('File::Temp') ? 1 : 0;
-#    }
-#);
-
-has 'FILESPEC_LOADED' => (
-    is          => 'ro',
-    isa         => 'Bool',
-    lazy        => 1,
-    default     => sub {
-        Class::MOP::load_class('File::Spec');
-        Class::MOP::is_class_loaded('File::Spec') ? 1 : 0;
-    }
-);
-
-#has 'TEMPDIR' => (
-#    is          => 'ro',
-#    isa         => 'Str',
-#    lazy        => 1,
-#    default     => sub {
-#        my $self = shift;
-#        if ($self->FILESPEC_LOADED) {
-#            return File::Spec->tmpdir()
-#        } else {
-#            $self->throw("File::Temp not loaded, required for tempfile creations");
-#        }
-#    }
-#);
-
-#has 'TEMPFILE_COUNTER'   => (
-#    traits      => ['Counter'],
-#    is          => 'ro',
-#    isa         => 'Num',
-#    default     => 0,
-#    handles     => {
-#        inc_counter => 'inc_tempfile',
-#        dec_counter => 'dec_tempfile',
-#        reset_counter => 'reset_tempfiles'
-#    }
-#);
 
 has 'ROOTDIR' => (
     is          => 'ro',
@@ -141,117 +57,13 @@ has 'ROOTDIR' => (
     lazy        => 1,
     default     => sub {
         my $self = shift;
-        if ($self->FILESPEC_LOADED) {
+        if ($self->FILESPEC_LOADED) {   # use Root's module cache to check
             return File::Spec->tmpdir()
         } else {
             $self->throw("File::Temp not loaded, required for tempfile creations");
         }
     }
 );
-
-sub _initialize_io {
-    my($self) = @_;
-    
-    # move to DEMOLISH
-    #$self->_register_for_cleanup(\&_io_cleanup);
-
-    my ($input, $file, $fh);
-
-    # URL
-    #if (my $url = $self->url) {
-    #    if($self->LWP_LOADED){ #use LWP::UserAgent
-    #        require LWP::UserAgent;
-    #        my $ua = LWP::UserAgent->new(%{$self->lwp_params});
-    #        my $http_result;
-    #        my($handle,$tempfile) = $self->tempfile();
-    #        CORE::close($handle);
-    #        my $retries = $self->retries;
-    #        for (my $try = 1 ; $try <= $retries ; $try++) {
-    #            $http_result = $ua->get($url, ':content_file' => $tempfile);
-    #            $self->warn("[$try/$retries] tried to fetch $url, but server threw " . $http_result->code . ".  retrying...") if !$http_result->is_success;
-    #            last if $http_result->is_success;
-    #        }
-    #        $self->throw("failed to fetch $url, server threw " . $http_result->code) if !$http_result->is_success;
-    #
-    #        $input = $tempfile;
-    #        $file  = $tempfile;
-    #    } else {
-    #        $self->throw("LWP::UserAgent not found; is it installed?");
-    #    }
-    #}
-
-    #delete $self->{'_readbuffer'};
-    #delete $self->{'_filehandle'};
-    #$self->noclose( $noclose) if defined $noclose;
-    # determine whether the input is a file(name) or a stream
-#    if ($input) {
-#        if(ref(\$input) eq "SCALAR") {
-#            # we assume that a scalar is a filename
-#            if($file && ($file ne $input)) {
-#                $self->throw("input file given twice: $file and $input disagree");
-#            }
-#            $file = $input;
-#        } elsif(ref($input) &&
-#            ((ref($input) eq "GLOB") || $input->isa('IO::Handle'))) {
-#            # input is a stream
-#            $fh = $input;
-#        } else {
-#            # let's be strict for now
-#            $self->throw("unable to determine type of input $input: ".
-#                 "not string and not GLOB");
-#        }
-#    }
-#    if(defined($file) && defined($fh)) {
-#        $self->throw("Providing both a file and a filehandle for reading - only one please!");
-#    }
-#
-#    if(defined($file) && ($file ne '')) {
-#	$fh = Symbol::gensym();
-#	open ($fh,$file) ||
-#	    $self->throw("Could not open $file: $!");
-#	$self->file($file);
-#    }
-#    if ( defined($fh) && !(ref($fh) && ((ref($fh) eq "GLOB") || $fh->isa('IO::Handle') || $fh->isa('IO::String')))  ) {
-#        $self->throw("file handle $fh doesn't appear to be a handle");
-#    }
-#    $self->_fh($fh) if $fh; # if not provided, defaults to STDIN and STDOUT
-#
-#    #$self->_flush_on_write(defined $flush ? $flush : 1);
-#
-#    return 1;
-}
-
-# Possible attributes
-
-#sub mode {
-#    my ($obj, @arg) = @_;
-#	my %param = @arg;
-#    return $obj->{'_mode'} if defined $obj->{'_mode'} and !$param{-force};
-#    
-#    # Previous system of:
-#    #  my $iotest = new IO::Handle;
-#    #  $iotest->fdopen( dup(fileno($fh)) , 'r' );
-#    #  if ($iotest->error == 0) { ... }
-#    # didn't actually seem to work under any platform, since there would no
-#    # no error if the filehandle had been opened writable only. Couldn't be
-#    # hacked around when dealing with unseekable (piped) filehandles.
-#    #
-#    # Just try and do a simple readline, turning io warnings off, instead:
-#    
-#    my $fh = $obj->_fh || return '?';
-#    
-#    no warnings "io"; # we expect a warning if this is writable only
-#    my $line = <$fh>;
-#    if (defined $line) {
-#        $obj->_pushback($line);
-#        $obj->{'_mode'} = 'r';
-#    }
-#    else {
-#        $obj->{'_mode'} = 'w';
-#    }
-#    
-#    return $obj->{'_mode'};
-#}
 
 # READ
 

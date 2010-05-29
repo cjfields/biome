@@ -1,84 +1,74 @@
-package Biome::Role::Segment::SegmentContainer;
+package Biome::Role::DBAdaptor;
 
 use Biome::Role;
-use Biome::Segment::Simple;
 
-# this is a role mainly for consistency with BioPerl's locations.
+use DBI;
 
-has     'segments'  => (
-    is          => 'rw',
-    isa         => 'ArrayRef[Biome::Segment::Simple]',
-    handles     => {
-        add_subSegment      => 'push',
-        subSegments         => 'elements',
-        remove_subSegments  => 'clear',
-        get_subSegment      => 'get',
-        num_subSegments     => 'count',
-    }
-);
-
-has     'split_type'    => (
+has 'db' => (
     isa         => 'Str',
-    is          => 'rw',
+    is          => 'ro',
+    required    => 1
 );
 
-has     'maps_to_single'    => (
+has 'adaptor' => (
+    isa         => 'Str',
+    is          => 'ro',
+    required    => 1
+);
+
+has 'init' => (
     isa         => 'Bool',
-    is          => 'rw'
+    is          => 'ro',
 );
 
-has     'guide_strand'      => (
+has 'write' => (
+    isa         => 'Bool',
+    is          => 'ro',
+);
+
+has 'user' =>  (
+    isa         => 'Str',
+    is          => 'ro'
+);
+
+has 'pass' =>  (
+    isa         => 'Str',
+    is          => 'ro'
+);
+
+has 'dbh' => (
+    isa         => 'DBI::db',
     is          => 'rw',
-    isa         => 'Int',
-    lazy        => 1,
-    default     => 0,
 );
 
-sub start {
-    my ($self, $start) = @_;
-    if ($start) {
-        $self->warn("This is a container of Segments; manipulate each simple segment start() individually");
-    }
-    shift->get_Segment(1)->start()
-}
+# should override this...
+has 'tables' => (
+    isa         => 'HashRef[Str]',
+    is          => 'ro',
+    required    => 1
+);
 
-sub end {
-    my ($self, $end) = @_;
-    if ($end) {
-        $self->warn("This is a container of Segments; manipulate each simple segment end() individually");
-    }
-    shift->get_Segment(-1)->end()
-}
-
-sub strand {
-    my ($self, $str) = @_;
-    if ($str) {
-        $self->warn("This is a container of Segments; manipulate each simple segment strand() individually");
-    }
-    my ($strand, $lstrand);
-    foreach my $loc ($self->sub_Segment()) {
-        # we give up upon any location that's remote or doesn't have
-        # the strand specified, or has a differing one set than 
-        # previously seen.
-        # calling strand() is potentially expensive if the subloc is also
-        # a split location, so we cache it
-        $lstrand = $loc->strand();
-        if((! $lstrand) ||
-           ($strand && ($strand != $lstrand)) ||
-           $loc->is_remote()) {
-            $strand = undef;
-            last;
-        } elsif(! $strand) {
-            $strand = $lstrand;
-        }
-    }
-    return $strand;
-}
-
-sub flip_strand {
+# default connect procedure, override if needed
+sub connect {
     my $self = shift;
-    foreach my $loc ($self->subSegment()) {
-        $loc->flip_strand;    
+    my ($adaptor, $u, $p, $db) = ($self->adaptor, $self->user, $self->pass, $self->db);
+    my $dbh = DBI->connect("DBI:$adaptor:dbname=$db",$u ||'', $p||'') || die DBI->errstr;
+    $self->dbh($dbh);
+    if ($self->init) {
+        $self->initialize_db;
+    }
+    1;
+}
+
+# default init procedure, override if needed
+sub initialize_db {
+    my $self = shift;
+    my $dbh = $self->dbh;
+    my $table_map = $self->tables;
+    while (my ($key,$sql) = each %$table_map) {
+        print "Creating table $key\n";
+        $dbh->do("DROP TABLE IF EXISTS $key");
+        $dbh->do($sql) || die "Couldn't create table $key\n".$dbh->errstr;
     }
 }
 
@@ -90,15 +80,15 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Segment::Split - <One-line description of module's purpose>
+Biome::Role::DBAdaptor - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::Segment::Split version Biome::Role.
+This documentation refers to Biome::Role::DBAdaptor version Biome::Role.
 
 =head1 SYNOPSIS
 
-   with 'Biome::Role::Segment::Split';
+   with 'Biome::Role::DBAdaptor';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,
@@ -258,11 +248,11 @@ welcome.
 
 =head1 AUTHOR
 
-Chris Fields  (cjfields at bioperl dot org)
+Chris Fields  C<< <cjfields at bioperl dot org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) 2010 Chris Fields (cjfields at bioperl dot org). All rights reserved.
 
 followed by whatever licence you wish to release it under.
 For Perl code that is often just:

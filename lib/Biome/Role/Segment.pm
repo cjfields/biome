@@ -19,7 +19,12 @@ has 'start_pos_type'    => (
     coerce          => 1,
     trigger         => sub {
         my ($self, $v) = @_;
+        return unless $self->end && $self->start;
         $self->throw("Start position can't have type $v") if $v eq 'AFTER';
+        if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
+                         "cannot be larger than 1");
+        }
     }
 );
 
@@ -31,8 +36,21 @@ has 'end_pos_type'      => (
     coerce          => 1,
     trigger         => sub {
         my ($self, $v) = @_;
+        return unless $self->end && $self->start;
         $self->throw("End position can't have type $v") if $v eq 'BEFORE';
+        if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
+                         " cannot be larger than 1");
+        }
     }
+);
+
+# this is for 'fuzzy' locations like WITHIN, BEFORE, AFTER
+has [qw(start_offset end_offset)]  => (
+    isa             => 'Int',
+    is              => 'rw',
+    lazy            => 1,
+    default         => 0
 );
 
 ## TODO: Should this be a delegated method dependent on the presence of a
@@ -45,25 +63,52 @@ has is_remote => (
     default => 0
 );
 
-sub length {
-    my $self = shift;
+around length => sub {
+    my ($orig, $self) = @_;
     given ($self->segment_type) {
         when ([qw(EXACT WITHIN)]) {
-            my ($st, $end) = ($self->start, $self->end);
-            return ($st == 0 && $end == 0) ? 0 : abs($end - $st + 1);
+            return $self->$orig
         }
         default {
             return 0
         }
     }
-}
+};
+
+has 'start' => (
+    isa         => 'Int',
+    is          => 'rw',
+    trigger     => sub {
+        my ($self, $start) = @_;
+        my $end = $self->end;
+        return unless $start && $end;
+        if ($self->start_pos_type eq 'IN-BETWEEN' &&
+            (abs($end - $start) != 1 )) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
+                         "cannot be larger than 1; got ".abs($end - $start));
+    }
+});
+
+has 'end' => (
+    isa         => 'Int',
+    is          => 'rw',
+    trigger     => sub {
+        my ($self, $end) = @_;
+        my $start = $self->start;
+        return unless $start && $end;
+        if ($self->end_pos_type eq 'IN-BETWEEN' &&
+            (abs($end - $start) != 1) ) {
+            $self->throw("length of segment with IN-BETWEEN position type ".
+                         "cannot be larger than 1; got ".abs($end - $start));
+    }
+});
+
+my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
 sub is_fuzzy {
     my $self = shift;
-    if ($self->start_pos_type ne 'EXACT' && $self->end_pos_type ne 'EXACT') {
-        return 0;
-    }
-    return 1;
+    (exists $IS_FUZZY{$self->start_pos_type} ||
+        exists $IS_FUZZY{$self->end_pos_type}) ? 1 : 0;
 }
 
 sub valid_Segment {
@@ -86,6 +131,9 @@ sub to_FTstring {
             }
             when ('WITHIN') {
                 $position{$pos} .= $self->$min.'.'.$self->$max;
+            }
+            when ('BETWEEN') {
+                $position{$pos} .= $self->$min.'^'.$self->$max;
             }
             when ('BEFORE') {
                 $position{$pos} .= '<'.$self->$pos;
@@ -155,7 +203,7 @@ sub segment_type {
     # to the proper methods
     return $ps if ($ps eq $pe);  # WITHIN BETWEEN
     if ($ps eq 'BEFORE' || $pe eq 'AFTER') {
-        return 'EXACT';
+        return 'EXACT';  # this doesn't make sense to me, shouldn't it be 'UNCERTAIN'?
     }
     return 'UNCERTAIN';
 }

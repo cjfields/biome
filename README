@@ -1,6 +1,6 @@
 This is an experimental implementation of BioPerl classes in Moose.  It may
 (or may not) be used for a future BioPerl 2.0.  Hic sunt dracones!
-
+ 
 Note: The name of the distribution may change at some point in the near future. As
 (rightfully) pointed out by Robert Buels, Bio::Moose is not the best name as we
 don't name distributions on how they are implemented, but on what they do.

@@ -240,7 +240,7 @@ sub subtract {
 # should be genericized for nonstranded Ranges.  I'm not sure about
 # modifying the object in place...
 
-sub offset_stranded {
+sub offset_stranded { 
     my ($self, $offset_fiveprime, $offset_threeprime) = @_;
     my ($offset_start, $offset_end) = $self->strand() eq -1 ?
         (- $offset_threeprime, - $offset_fiveprime) :

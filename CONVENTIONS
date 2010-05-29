@@ -2,27 +2,37 @@
 
 =head2 Last updated July 29, 2009
 
-This is a short style guide for Biome. In general, consult Perl Best Practices.
+This is a short style guide for Biome. In general, consult Perl Best Practices:
+
+http://refcards.com/docs/vromansj/perl-best-practices/refguide.pdf
+
+or Moose Best Practices:
+
+http://search.cpan.org/perldoc?Moose::Manual::BestPractices
 
 =head1 Perl version
 
-At the moment we are using a minimum perl 5.10.0 and Modern::Perl; perl 5.10.1
-is highly recommended.  We also recommend all warnings and strictures, and
+At the moment we are requiring a minimum of perl 5.10.0 and Modern::Perl; perl
+5.10.1 is highly recommended. We also recommend all warnings and strictures, and
 fully expect that features present in 5.10.1 will be used (smart matching, state
 variables, given/when, defined-or, etc).
 
+We will likely migrate to a perl 5.12.0 minimal requirement prior to release to
+take advantage of several key features for that release, including pluggable
+keywords, module version syntax, better switch statements and smart matching,
+parallel tests, default 'use strict', and so on. 
+
 =head1 Moose and MooseX
 
-We are currently requiring at least Moose 0.89, but it is safest to use the
-latest release. As for MooseX modules, we are using:
+We are currently requiring at least Moose 1.01, but it is safest to use the
+latest release. As for MooseX modules, some of what we are using:
 
-    MooseX::AttributeHelpers
     MooseX::Types
     MooseX::ClassAttributes
     MooseX::Role::Parameterized
     MooseX::Aliases
     
-Others may be added along the way. MooseX::AttributeHelpers is to be moved into
+Others may be added along the way. MooseX::AttributeHelpers has been moved into
 the Moose core, therefore at that point we will remove that module as a
 dependency and bump the required Moose core version.
 
@@ -42,6 +52,11 @@ If it is demonstrated that usage of either module isn't detrimental to overall
 performance (a major concern with this project), then we may revisit this at a
 later time.
 
+An additional concern (though we allow it for now) is the use of MooseX::Types.
+We are allowing it for the time being, but if it is decided that there is a
+significant performance hit for it's use, we may revert to using simple core Moose
+types.
+
 =head1 Documentation
 
 The best source for an overall picture of how to document code is the
@@ -58,9 +73,9 @@ The best source for an overall picture of how to document code is the
 =head1 Attributes
 
 Attributes should be typed where possible (with 'isa' or 'does'). Subtypes
-should go into Biome/Types.pm, should use MooseX::Types, and should be exported.
-We may switch back to simple Moose-based types if they improve performance
-substantially.
+should go into Biome::Types, for now using MooseX::Types (but see caveat above),
+and should be exported.  If Biome::Types becomes too large we may split them up
+further based on namespace and use (Location, Alphabet, etc)
 
 =head1 Roles
 
@@ -78,10 +93,12 @@ with 'Bio::Role::Annotate';
 This is a bit different than the suggested Moose naming convention for naming
 roles (using 'able' with names, such as Bio::Role::Annotatable). As this hews
 closely with the interfaces within BioPerl (Bio::AnnotatableI), we are open to
-changing this. It is expected that we will settle on a standard convention very
-soon, by the first CPAN release.
+changing this. We will settle on a standard convention soon.
 
 =head1 Classes
+
+As mentioned above, we are flattening much of the class hierarchy using roles
+where applicable.
 
 =head1 Inheritance
 
