@@ -70,9 +70,9 @@ for my $s (@spans) {
     }
 }
 
-does_ok($ranges[0],'Biome::Role::Rangeable', 'Range role');
+does_ok($ranges[0],'Biome::Role::Range', 'Range role');
 isa_ok($ranges[0],'Biome::Range', 'Biome::Range class');
-ok(!$ranges[0]->isa('Biome::Role::Rangeable'), 'Role consumed by class');
+ok(!$ranges[0]->isa('Biome::Role::Range'), 'Role consumed by class');
 is($ranges[0]->start, 1);
 is($ranges[0]->end, 100);
 is($ranges[0]->strand, 1);

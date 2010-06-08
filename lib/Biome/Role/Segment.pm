@@ -3,7 +3,7 @@ package Biome::Role::Segment;
 use 5.010;
 use Biome::Role;
 
-with 'Biome::Role::Rangeable';
+with 'Biome::Role::Range';
 use Biome::Types qw(LocationType LocationSymbol);
 
 has 'seq_id' => (
@@ -82,6 +82,7 @@ has 'start' => (
         my ($self, $start) = @_;
         my $end = $self->end;
         return unless $start && $end;
+        # could put start<->end reversal here...
         if ($self->start_pos_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1 )) {
             $self->throw("length of segment with IN-BETWEEN position type ".
@@ -96,6 +97,7 @@ has 'end' => (
         my ($self, $end) = @_;
         my $start = $self->start;
         return unless $start && $end;
+        # could put start<->end reversal here...
         if ($self->end_pos_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1) ) {
             $self->throw("length of segment with IN-BETWEEN position type ".
@@ -115,7 +117,7 @@ sub valid_Segment {
     defined($_[0]->start) && defined($_[0]->end) ? 1 : 0;
 }
 
-sub to_FTstring {
+sub to_string {
     my ($self) = @_;
     if( $self->start == $self->end ) {
         return $self->start;

@@ -13,7 +13,7 @@ BEGIN {
 
 =head1 Segments
 
-Segments are Bio::Role::Rangeable consumers that allow for more fuzzily defined
+Segments are Bio::Role::Range consumers that allow for more fuzzily defined
 start/end points, but are also more lightweight in nature than BioPerl's
 Locations.
 
@@ -29,7 +29,7 @@ my $simple = Biome::Segment::Simple->new(
     -seq_id => 'my1');
 isa_ok($simple, 'Biome::Segment::Simple');
 does_ok($simple, 'Biome::Role::Segment',  'does Segment');
-does_ok($simple, 'Biome::Role::Rangeable',  'has Rangeable');
+does_ok($simple, 'Biome::Role::Range',  'has Range');
 
 is($simple->start, 10, 'has a start location');
 is($simple->end, 20,  'has an end location');
@@ -42,7 +42,7 @@ ok(!$simple->is_fuzzy);
 
 is ($simple->pos_string('start'), '10', 'start pos_string');
 is ($simple->pos_string('end'), '20', 'end pos_string');
-is ($simple->to_FTstring, '10..20', 'full FT string');
+is ($simple->to_string, '10..20', 'full FT string');
 
 #my ($loc) = $simple->all_Segments();
 #ok($loc);
@@ -60,7 +60,7 @@ is($f->strand,-1,  'Negative strand' );
 
 is ($f->pos_string('start'), '20', 'start pos_string');
 is ($f->pos_string('end'), '100', 'end pos_string');
-is ($f->to_FTstring, 'complement(20..100)','full FT string');
+is ($f->to_string, 'complement(20..100)','full FT string');
 
 my $exact = Biome::Segment::Simple->new(
                     -start         => 10,
@@ -78,7 +78,7 @@ ok(!$exact->is_fuzzy);
 
 is ($exact->pos_string('start'), '10', 'start pos_string');
 is ($exact->pos_string('end'), '11', 'end pos_string');
-is ($exact->to_FTstring, '10^11','full FT string');
+is ($exact->to_string, '10^11','full FT string');
 
 # check coercions with segment_type and strand
 $exact = Biome::Segment::Simple->new(
@@ -99,7 +99,7 @@ is($exact->end_pos_type, 'IN-BETWEEN');
 
 is($exact->pos_string('start'), '10', 'start pos_string');
 is($exact->pos_string('end'), '11', 'end pos_string');
-is($exact->to_FTstring, '10^11', 'full FT string');
+is($exact->to_string, '10^11', 'full FT string');
 
 $exact = Biome::Segment::Simple->new(
                     -start          => 10, 
@@ -124,7 +124,7 @@ ok($exact->is_fuzzy);
 
 is($exact->pos_string('start'), '<10', 'start pos_string');
 is($exact->pos_string('end'), '20>', 'end pos_string');
-is($exact->to_FTstring, '<10..20>', 'full FT string');
+is($exact->to_string, '<10..20>', 'full FT string');
 
 # check coercions with start/end_pos_type, and length determination
 $exact = Biome::Segment::Simple->new(
@@ -145,7 +145,7 @@ is($exact->end_pos_type, 'EXACT');
 
 is($exact->pos_string('start'), '<10', 'start pos_string');
 is($exact->pos_string('end'), '20', 'end pos_string');
-is($exact->to_FTstring, '<10..20', 'full FT string');
+is($exact->to_string, '<10..20', 'full FT string');
 
 # check exception handling
 throws_ok { $exact = $exact = Biome::Segment::Simple->new(
@@ -245,13 +245,13 @@ These will gradually be converted over and used as a test base
 #is($splitlocation->start, 13);
 #is($splitlocation->sub_Location(),5);
 
-#is($fuzzy->to_FTstring(), '<10..20');
+#is($fuzzy->to_string(), '<10..20');
 #$fuzzy->strand(-1);
-#is($fuzzy->to_FTstring(), 'complement(<10..20)');
-#is($simple->to_FTstring(), '10..20');
+#is($fuzzy->to_string(), 'complement(<10..20)');
+#is($simple->to_string(), '10..20');
 #$simple->strand(-1);
-#is($simple->to_FTstring(), 'complement(10..20)');
-#is( $splitlocation->to_FTstring(), 
+#is($simple->to_string(), 'complement(10..20)');
+#is( $splitlocation->to_string(), 
 #    'join(13..30,30..90,18..22,19..20,<50..61)');
 
 # test for bug #1074
@@ -259,19 +259,19 @@ These will gradually be converted over and used as a test base
 #                               -end    => 12,
 #                               -strand => -1);
 #$splitlocation->add_sub_Location($f);
-#is( $splitlocation->to_FTstring(), 
+#is( $splitlocation->to_string(), 
 #    'join(13..30,30..90,18..22,19..20,<50..61,complement(5..12))',
 #        'Bugfix 1074');
 #$splitlocation->strand(-1);
-#is( $splitlocation->to_FTstring(), 
+#is( $splitlocation->to_string(), 
 #    'complement(join(13..30,30..90,18..22,19..20,<50..61,5..12))');
 
 #$f = Bio::Location::Fuzzy->new(-start => '45.60',
 #                              -end   => '75^80');
 #
-#is($f->to_FTstring(), '(45.60)..(75^80)');
+#is($f->to_string(), '(45.60)..(75^80)');
 #$f->start('20>');
-#is($f->to_FTstring(), '>20..(75^80)');
+#is($f->to_string(), '>20..(75^80)');
 
 # test that even when end < start that length is always positive
 
@@ -295,7 +295,7 @@ ok($exact = Biome::Segment::Simple->new(-start    => 10,
                                          -end      => 20,
                                          -strand   => 1, 
                                          -seq_id   => 'my1'));
-does_ok($exact, 'Biome::Role::Rangeable');
+does_ok($exact, 'Biome::Role::Range');
 
 is( $exact->start, 10, 'Biome::Segment::Simple EXACT');
 is( $exact->end, 20);

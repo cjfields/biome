@@ -2,10 +2,14 @@ package Biome::Range;
 
 use Biome;
 
-with 'Biome::Role::Rangeable';
+with 'Biome::Role::Range';
 
-sub length {
-    return $_[0]->end - $_[0]->start + 1;
+sub to_string {
+    my ($self) = @_;
+    return sprintf("(%s, %s) strand=%s",
+                   $self->start,
+                   $self->end,
+                   $self->strand);
 }
 
 no Biome;

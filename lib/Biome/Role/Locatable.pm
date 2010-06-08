@@ -7,9 +7,9 @@ use Biome::Segment::Simple;
 
 # this allows anything that does Biome::Role::Rangeable to work here
 has 'location'  => (
-    does        => 'Biome::Role::Rangeable',
+    does        => 'Biome::Role::Range',
     is          => 'rw',
-    handles     => [qw(start end strand length)],
+    handles     => [qw(start end strand length overlaps contains)],
     lazy        => 1,
     default     => sub {Biome::Segment::Simple->new()}
 );
