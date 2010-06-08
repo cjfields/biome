@@ -1,8 +1,11 @@
-package Biome::Root::Error;
+package Biome::Meta::Error;
 
 use Moose;
 
-extends qw(Moose::Error::Default);
+# stringification overload
+use overload ('""' => \&to_string);
+
+extends qw(Moose::Object Moose::Error::Default);
 
 has message    => ( isa => "Str",                           is => "ro" );
 has attr       => ( isa => "Moose::Meta::Attribute",        is => "ro" );
@@ -12,6 +15,12 @@ has data       => ( is  => "ro" );
 has line       => ( isa => "Int",                           is => "ro" );
 has file       => ( isa => "Str",                           is => "ro" );
 has last_error => ( isa => "Any",                           is => "ro" );
+
+sub to_string {
+    my ($self) = @_;
+    my $class = ref($self) || $self;
+    $self->message();
+}
 
 no Moose;
 

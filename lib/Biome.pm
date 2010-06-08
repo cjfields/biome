@@ -8,7 +8,7 @@ use Moose ();
 use Moose::Exporter;
 
 use Biome::Meta::Class;
-use Biome::Root::Error;
+use Biome::Meta::Error;
 
 Moose::Exporter->setup_import_methods(also => 'Moose');
 
@@ -19,8 +19,10 @@ sub init_meta {
         base_class  => 'Biome::Root',
         metaclass   => 'Biome::Meta::Class',
         );
-    $moose->error_class('Biome::Root::Error');
+    $moose->error_class('Biome::Meta::Error');
     $moose;
 }
+
+# additional sugar here, make sure to add to set_import_methods as needed
 
 1;
