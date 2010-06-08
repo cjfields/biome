@@ -46,6 +46,12 @@ has 'score'         => (
     is          => 'rw',
 );
 
+has 'type'        => (
+    isa         => 'Str',  # should be changed to a class when applicable
+    is          => 'rw',
+    predicate   => 'has_type'
+);
+
 no Biome::Role;
 
 1;
