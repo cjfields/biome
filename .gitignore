@@ -14,3 +14,4 @@ pod2htm*.tmp
 .emacs.*
 blib*
 *.bak
+MYMETA.yml
