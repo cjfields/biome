@@ -30,7 +30,7 @@ use Biome::Annotation::Target;
             'annotate'      => "Biome::Role::Annotate",
             'identify'      => "Biome::Role::Identifiable",
             'describe'      => "Biome::Role::Describable",
-            'range'         => "Biome::Role::Rangeable",
+            'range'         => "Biome::Role::Range",
             }
             }
         );
