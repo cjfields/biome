@@ -1,9 +1,13 @@
 package Biome::Root;
+
 use Moose;
-use Modern::Perl;
-use Module::Load::Conditional;
 
 extends 'Moose::Object';
+
+#__PACKAGE__->meta->error_class('Biome::Root::Error');
+
+use Modern::Perl;
+use Module::Load::Conditional;
 
 # run BEGIN block to check for exception class, default to light output?
 # or should that go in Biome?
