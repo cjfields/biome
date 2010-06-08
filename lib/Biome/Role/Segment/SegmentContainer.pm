@@ -17,7 +17,7 @@ has     'segments'  => (
     }
 );
 
-has     'split_type'    => (
+has     'container_type'    => (
     isa         => 'Str',
     is          => 'rw',
 );
