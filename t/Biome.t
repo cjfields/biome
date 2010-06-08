@@ -40,9 +40,9 @@ for my $att (qw(test1 -test1)) {
 	
 	isa_ok($i->meta, 'Biome::Meta::Class');
 	# We should hook in Bio::Root::Exceptions here
-	throws_ok {$i->strict('Foo')} qr/Validation failed for 'Int' failed/,
+	throws_ok {$i->strict('Foo')} qr/Validation failed for 'Int'/,
 		'verbose() requires an Int value';
-	throws_ok {$i->verbose('Foo')} qr/Validation failed for 'Bool' failed/,
+	throws_ok {$i->verbose('Foo')} qr/Validation failed for 'Bool'/,
 		'debug() requires a Bool value (0 or 1)';
 	
 	is($i->strict, 0, 'default strictness');
@@ -50,6 +50,6 @@ for my $att (qw(test1 -test1)) {
 	
 	# explicit warn/throw
 	
-	throws_ok {$i->throw('Foo!')} 'Biome::Root::Error', 'throw()';
+	throws_ok {$i->throw('Foo!')} 'Biome::Meta::Error', 'throw()';
 }
 
