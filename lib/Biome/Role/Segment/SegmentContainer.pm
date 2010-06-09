@@ -2,24 +2,31 @@ package Biome::Role::Segment::SegmentContainer;
 
 use Biome::Role;
 use Biome::Segment::Simple;
+use List::Util qw(reduce);
+use Biome::Types qw(SplitLocationType);
 
 # this is a role mainly for consistency with BioPerl's locations.
 
 has     'segments'  => (
     is          => 'rw',
     isa         => 'ArrayRef[Biome::Segment::Simple]',
+    traits      => ['Array'],
     handles     => {
-        add_subSegment      => 'push',
-        subSegments         => 'elements',
-        remove_subSegments  => 'clear',
-        get_subSegment      => 'get',
-        num_subSegments     => 'count',
-    }
+        add_sub_Segment      => 'push',
+        sub_Segments         => 'elements',
+        remove_sub_Segments  => 'clear',
+        get_sub_Segment      => 'get',
+        num_sub_Segments     => 'count',
+    },
+    lazy        => 1,
+    default     => sub { [] }
 );
 
 has     'container_type'    => (
-    isa         => 'Str',
+    isa         => SplitLocationType,
     is          => 'rw',
+    lazy        => 1,
+    default     => 'JOIN'
 );
 
 has     'maps_to_single'    => (
@@ -27,19 +34,22 @@ has     'maps_to_single'    => (
     is          => 'rw'
 );
 
-has     'guide_strand'      => (
-    is          => 'rw',
-    isa         => 'Int',
-    lazy        => 1,
-    default     => 0,
-);
+#has     'guide_strand'      => (
+#    is          => 'rw',
+#    isa         => 'Int',
+#    lazy        => 1,
+#    default     => 0,
+#);
 
 sub start {
     my ($self, $start) = @_;
     if ($start) {
         $self->warn("This is a container of Segments; manipulate each simple segment start() individually");
     }
-    shift->get_Segment(1)->start()
+    my $loc = reduce { $a < $b ? $a : $b}
+        map {$_->start} 
+        $self->sub_Segments;
+    $loc;
 }
 
 sub end {
@@ -47,16 +57,20 @@ sub end {
     if ($end) {
         $self->warn("This is a container of Segments; manipulate each simple segment end() individually");
     }
-    shift->get_Segment(-1)->end()
+    my $loc = reduce { $a > $b ? $a : $b}
+        map {$_->end} 
+        $self->sub_Segments;
+    $loc;
 }
 
 sub strand {
     my ($self, $str) = @_;
     if ($str) {
-        $self->warn("This is a container of Segments; manipulate each simple segment strand() individually");
+        $self->warn("This is a container of Segments; manipulate each ".
+                    "simple segment strand() individually");
     }
     my ($strand, $lstrand);
-    foreach my $loc ($self->sub_Segment()) {
+    foreach my $loc ($self->sub_Segments()) {
         # we give up upon any location that's remote or doesn't have
         # the strand specified, or has a differing one set than 
         # previously seen.
@@ -79,6 +93,15 @@ sub flip_strand {
     my $self = shift;
     foreach my $loc ($self->subSegment()) {
         $loc->flip_strand;    
+    }
+}
+
+sub to_string {
+    my $self = shift;
+    # JOIN assumes specific order, ORDER does not, BOND
+    my $type = $self->container_type;
+    for my $seg ($self->sub_Segments) {
+        
     }
 }
 

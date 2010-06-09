@@ -128,7 +128,7 @@ subtype StartPosition,  as Int;
 
 subtype EndPosition,  as Int;
 
-coerce StartPosition,  
+coerce StartPosition,
 	from Location, 
 	 	via {
 			my $pos = $_->min_start();

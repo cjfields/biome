@@ -107,6 +107,40 @@ has 'end' => (
 
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
+# these just delegate to start, end, using the indicated offsets
+
+sub max_start {
+    my ($self, $newstart) = @_;
+    if ($newstart) {
+        # reset start based on a specific behavior?
+    }
+    $self->start;
+}
+
+sub min_start {
+    my ($self, $newstart) = @_;
+    if ($newstart) {
+        # reset start based on a specific behavior?
+    }
+    $self->start;    
+}
+
+sub max_end {
+    my ($self, $newend) = @_;
+    if ($newend) {
+        # reset start based on a specific behavior?
+    }
+    $self->end;    
+}
+
+sub min_end {
+    my ($self, $newend) = @_;
+    if ($newend) {
+        # reset start based on a specific behavior?
+    }
+    $self->end;    
+}
+
 sub is_fuzzy {
     my $self = shift;
     (exists $IS_FUZZY{$self->start_pos_type} ||
@@ -208,6 +242,16 @@ sub segment_type {
         return 'EXACT';  # this doesn't make sense to me, shouldn't it be 'UNCERTAIN'?
     }
     return 'UNCERTAIN';
+}
+
+sub from_string {
+    my ($self, $string) = @_;
+    return unless $string;
+    if ($string =~ /^([\?<])(\d+)(?:([.^]{1,2})(\d+)([\?<]))?$/xmso) {
+        my ($start_pos, $start, $range_type, $end, $end_pos) = ($1, $2, $3, $4, $5);
+    } else {
+        $self->throw("Can't parse location string: $string");
+    }
 }
 
 sub flip_strand {
