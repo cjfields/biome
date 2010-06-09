@@ -4,11 +4,11 @@ use warnings;
 my $EXCEPTION_CLASS;
 
 BEGIN {
-    use lib '.';
+    use lib qw(. t/lib);
     use Test::More;
     use Test::Moose;
     use Test::Exception;
-    eval { require Exception::Class; 1 };
+    eval { require MyExceptions; 1 };
     if ($@) {
         $EXCEPTION_CLASS = 0;
     } else {
@@ -96,8 +96,6 @@ SKIP: {
         
         use Biome;
         use lib 't/lib';
-        
-        use MyExceptions;
         
         sub unimplemented {
             shift->throw(
