@@ -16,11 +16,7 @@ has line       => ( isa => "Int",                           is => "ro" );
 has file       => ( isa => "Str",                           is => "ro" );
 has last_error => ( isa => "Any",                           is => "ro" );
 
-sub to_string {
-    my ($self) = @_;
-    my $class = ref($self) || $self;
-    $self->message();
-}
+sub to_string { shift->message }
 
 no Moose;
 

@@ -20,11 +20,9 @@ sub throw_error {
 
 sub raise_error {
     my ( $self, @args ) = @_;
-    if (ref $args[0] &&
-        ($args[0]->isa('Exception::Class::Base') || # includes Biome::Root::Error
+    if (($args[0]->isa('Exception::Class::Base') || 
         $args[0]->isa('Error::Base'))) {
-        my $class = shift @args;
-        $class->throw(@args);
+        $args[0]->throw(@args);
     } else {
         # this defaults to Moose::Error::Default
         die @args;
@@ -40,28 +38,39 @@ sub create_error {
         $text = shift @args;
     }
     
-    my %args = (metaclass => $self, last_error => $@, @args );
-    $text ||= $args{message} || 'Something wrong!';
+    my %args = (@args );
     
-    my $class = ref $self ? $self->error_class : "Moose::Error::Default";
-
-    my $std = $self->stack_trace_dump();
-    my $title = "------------- EXCEPTION $class -------------";
-    my $footer = ('-' x CORE::length($title))."\n";
-    my $msg = "\n$title\n". "MSG: $text\n". $std. $footer."\n";
-
-    $args{message} = $msg;
+    $text ||= $args{message} || "Something's wrong!";
     
+    my $class = $args{class} || $self->error_class;
+    
+    # we add stack trace and extra stuff only for core Biome ex. class for the
+    # time being
+    
+    if ($class->isa('Biome::Meta::Error')) {
+        @args{qw(metaclass last_error)} = ($self, $@);
+        my $std = $self->stack_trace_dump();
+        my $title = "------------- EXCEPTION $class -------------";
+        my $footer = ('-' x CORE::length($title))."\n";
+        my $msg = "\n$title\n". "MSG: $text\n". $std. $footer."\n";
+    
+        $args{message} = $msg;
+    }
     $args{depth} += $error_level;
-
+    
     Class::MOP::load_class($class);
-
     require Carp::Heavy;
     
-    $class->new(
-        Carp::caller_info($args{depth}),
-        %args
-    );
+    # Exception::Class dies unless you pass specific params, so white-list them
+    my $exception = $class->isa('Exception::Class::Base') ? 
+        $class->new(
+            @args{qw(message)}
+        ) :
+        $class->new(
+            Carp::caller_info($args{depth}),
+            %args
+        ) ;        
+        
 }
 
 sub stack_trace_dump{

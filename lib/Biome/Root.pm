@@ -86,17 +86,12 @@ sub throw {
     # grunt work there so it also BP-izes the other errors that'll pop up, such
     # as type check errors, etc.
     
-    my ($text, $class, $value) = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
-    $text ||= $args[0] if @args == 1;
+    my %args;
     
-    # set the error class if passed
-    if (defined $class) {
-        $self->meta->error_class($class)
-    } 
+    @args{qw(message class value)} = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
+    $args{message} ||= $args[0] if @args == 1;
     
-    # the following should work for any error class set in the meta class,
-    # including the text-only Moose fallback using Carp
-    $self->meta->throw_error(message => $text, value => $value);
+    $self->meta->throw_error(%args);
 }
 
 sub deprecated{
