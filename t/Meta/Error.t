@@ -90,7 +90,7 @@ is_deeply( $e->{error}->data, [ $foo, 4 ], "captured args" );
 like( $e->{error}->last_error, qr/Blah/, "last error preserved" );
 
 SKIP: {
-    skip('Exception::Class not found, skipping', 7) unless $EXCEPTION_CLASS;
+    skip('Exception::Class not found, skipping', 10) unless $EXCEPTION_CLASS;
     {
         package Foo_EC;
         
