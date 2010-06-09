@@ -22,7 +22,6 @@ my $build = Module::Build->new(
                             'Moose'                         => '0.90',
                             # tentative list of MooseX modules, for comments
                             # see CONVENTIONS
-                            'Exception::Class'              => 0,  
                             'MooseX::Singleton'             => 0,
                             
                             # use sparingly (instances where this is used may be
