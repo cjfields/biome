@@ -5,10 +5,11 @@ use Biome::Role;
 
 with 'Biome::Role::Range';
 use Biome::Types qw(LocationType LocationSymbol);
+use Data::Dumper;
 
 has 'seq_id' => (
-	is => 'rw', 
-	isa => 'Str', 
+        is => 'rw', 
+        isa => 'Str', 
 );
 
 has 'start_pos_type'    => (
@@ -17,6 +18,7 @@ has 'start_pos_type'    => (
     lazy            => 1,
     default         => 'EXACT',
     coerce          => 1,
+    predicate       => 'has_start_pos_type',
     trigger         => sub {
         my ($self, $v) = @_;
         return unless $self->end && $self->start;
@@ -34,6 +36,7 @@ has 'end_pos_type'      => (
     lazy            => 1,
     default         => 'EXACT',
     coerce          => 1,
+    predicate       => 'has_end_pos_type',
     trigger         => sub {
         my ($self, $v) = @_;
         return unless $self->end && $self->start;
@@ -104,6 +107,16 @@ has 'end' => (
                          "cannot be larger than 1; got ".abs($end - $start));
     }
 });
+
+has 'location_string' => (
+    isa         => 'Str',
+    is          => 'ro',
+    lazy        => 1,
+    default     => sub {
+        shift->to_string();
+    },
+    trigger     => \&from_string
+);
 
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
@@ -249,22 +262,46 @@ my @STRING_ORDER = qw(start loc_type end);
 sub from_string {
     my ($self, $string) = @_;
     return unless $string;
+    if ($string =~ /(?:join|order|bond)/) {
+        $self->throw("Passing a split segment type: $string");
+    }
+    my %atts;
+    if ($string =~ /^complement\(([^\)]+)\)$/) {
+        $atts{strand} = -1;
+        $string = $1;
+    } else {
+        $atts{strand} = 1; # though, this assumes nucleotide sequence...
+    }
     my @loc_data = split(/(\.{2}|\^|\:)/, $string);
+    
+    # SeqID
     if (@loc_data == 5) {
-        $self->seq_id(shift @loc_data);
-        shift @loc_data;
+        $atts{seq_id} = shift @loc_data;
+        shift @loc_data; # get rid of ':'
     }
     for my $i (0..$#loc_data) {
         my $order = $STRING_ORDER[$i];
         my $str = $loc_data[$i];
         if ($order eq 'start' || $order eq 'end') {
             $str =~ s{[\[\]\(\)]+}{}g;
-            print STDERR "$str\n";
-            
+            if ($str =~ /^([<>\?])?(\d+)?$/) {
+                $atts{"${order}_pos_type"} = $1;
+                $atts{$order} = $2;                
+            } elsif ($str =~ /^(\d+)\.(\d+)$/) {
+                $atts{"${order}_pos_type"} = '.';
+                $atts{$order} = $1;
+                $atts{"${order}_offset"} = $2 - $1;
+            } else {
+                $self->throw("Can't parse location string: $str");
+            }
         } else {
-            $self->start_pos_type($str);
-            $self->end_pos_type($str);
+            for (qw(start_pos_type end_pos_type)) {
+                $atts{$_} = $str if !exists $atts{$_};
+            }
         }
+    }
+    for my $m (sort keys %atts) {
+        $self->$m($atts{$m}) if defined $atts{$m};
     }
 }
 

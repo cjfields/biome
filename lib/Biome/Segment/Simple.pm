@@ -9,16 +9,6 @@ with 'Biome::Role::Segment';
 sub BUILD {
     my ($self, $params) = @_;
     
-    # correct for reversed location coordinates
-    # (this should prob. be an exception upon instance creation, but we try to
-    # DTRT for now)
-    
-    if ($params->{location_string}) {
-        $self->throw("Arg!!!!") if keys(%$params) > 1;
-        $self->from_string($params->{location_string});
-        return;
-    }
-    
     if ($params->{start} && $params->{end} && ($params->{end} < $params->{start})) {
         $self->warn('End is greater than start; flipping strands');
         $self->end($params->{start});
