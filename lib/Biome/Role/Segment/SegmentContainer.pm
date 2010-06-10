@@ -3,7 +3,7 @@ package Biome::Role::Segment::SegmentContainer;
 use Biome::Role;
 use Biome::Segment::Simple;
 use List::Util qw(reduce);
-use Biome::Types qw(SplitLocationType);
+use Biome::Types qw(Split_Segment_Type);
 
 # this is a role mainly for consistency with BioPerl's locations.
 
@@ -23,7 +23,7 @@ has     'segments'  => (
 );
 
 has     'container_type'    => (
-    isa         => SplitLocationType,
+    isa         => Split_Segment_Type,
     is          => 'rw',
     lazy        => 1,
     default     => 'JOIN'
@@ -100,9 +100,12 @@ sub to_string {
     my $self = shift;
     # JOIN assumes specific order, ORDER does not, BOND
     my $type = $self->container_type;
-    for my $seg ($self->sub_Segments) {
-        
+    my @segs = $self->sub_Segments;
+    my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
+    if ($self->strand < 0) {
+        $str = "complement($str)";
     }
+    $str;
 }
 
 no Biome::Role;

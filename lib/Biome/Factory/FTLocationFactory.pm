@@ -22,7 +22,7 @@ our $SPLIT_CLASS = 'Biome::Segment::Split';
 
 sub BUILD {
     my ($self) = @_;
-    $self->load_modules($SIMPLE_CLASS, $SPLIT_CLASS);
+    $self->load_modules($SIMPLE_CLASS,$SPLIT_CLASS);
 }
 
 has coordinate_policy   => (
@@ -53,11 +53,9 @@ sub from_string {
 
         my ($beg, $mid, $end) = ($1, $2, $3);
         
-        #print STDERR sprintf("BEG:%s\tMID:%s\tEND:%s\n", $beg, $mid, $end);
-        
         my @sublocs = (split(q(,),$beg), $mid, split(q(,),$end));
         
-        #my @loc_objs;
+        my @loc_objs;
         my $loc_obj;
         
         SUBLOCS:
@@ -73,55 +71,53 @@ sub from_string {
                 if (($oparg eq 'join' || $oparg eq 'order' || $oparg eq 'bond' )
                      && $sub !~ m{(?:join|order|bond)}) {
                     my @splitlocs = split(q(,), $sub);
-                    #$loc_obj = Bio::Location::Split->new(-verbose => 1,
-                    #                                     -splittype => $oparg);
+                    $loc_obj = $SPLIT_CLASS->new(-verbose => 1,
+                                                -container_type => $oparg);
                     while (my $splitloc = shift @splitlocs) {
-                        #next unless $splitloc;
-                        #my $sobj;
+                        next unless $splitloc;
+                        my $sobj;
                         if ($splitloc =~ m{\(($LOCREG)\)}) {
                             my $comploc = $1;
-                            $self->_parse_location($comploc);
-                            #$sobj = $self->_parse_location($comploc);
-                            #$sobj->strand(-1);
+                            $sobj = $self->_parse_location($comploc);
+                            $sobj->strand(-1);
                         } else {
-                            $self->_parse_location($splitloc);
-                            #$sobj = $self->_parse_location($splitloc);
+                            $sobj = $self->_parse_location($splitloc);
                         }
-                        #$loc_obj->add_sub_Location($sobj);
+                        $loc_obj->add_sub_Segment($sobj);
                     }
                 } else {
                     $loc_obj = $self->from_string($sub, $oparg);
-                    #$self->from_string($sub, $oparg);
+                    $self->from_string($sub, $oparg);
                     # reinsure the operator is set correctly for this level
                     # unless it is complement
-                    #$loc_obj->splittype($oparg) unless $oparg eq 'complement';
+                    $loc_obj->segment_type($oparg) unless $oparg eq 'complement';
                 }
             }
             # no operator, simple or fuzzy 
             else {
-                #$loc_obj = $self->from_string($subloc,1);
+                $loc_obj = $self->from_string($subloc,1);
                 $self->from_string($subloc,1);
             }
-            #$loc_obj->strand(-1) if ($op && $op eq 'complement');
-            #push @loc_objs, $loc_obj;
+            $loc_obj->strand(-1) if ($op && $op eq 'complement');
+            push @loc_objs, $loc_obj;
         }
-        #my $ct = @loc_objs;
-        #if ($op && !($op eq 'join' || $op eq 'order' || $op eq 'bond')
-        #        && $ct > 1 ) {
-        #    $self->throw("Bad operator $op: had multiple locations ".
-        #                 scalar(@loc_objs).", should be SplitLocationI");
-        #}
-        #if ($ct > 1) {
-        #    #$loc = Bio::Location::Split->new();
-        #    #$loc->add_sub_Location(shift @loc_objs) while (@loc_objs);
-        #    return $loc;
-        #} else {
-        #    $loc = shift @loc_objs;
-        #    return $loc;
-        #}
+        my $ct = @loc_objs;
+        if ($op && !($op eq 'join' || $op eq 'order' || $op eq 'bond')
+                && $ct > 1 ) {
+            $self->throw("Bad operator $op: had multiple locations ".
+                         scalar(@loc_objs).", should be SplitLocationI");
+        }
+        if ($ct > 1) {
+            $loc = $SPLIT_CLASS->new();
+            $loc->add_sub_Segment(shift @loc_objs) while (@loc_objs);
+            return $loc;
+        } else {
+            $loc = shift @loc_objs;
+            return $loc;
+        }
     } else { # simple location(s)
         $loc = $self->_parse_location($locstr);
-        #$loc->strand(-1) if ($op && $op eq 'complement');
+        $loc->strand(-1) if ($op && $op eq 'complement');
     }
     return $loc;
 }
@@ -129,7 +125,6 @@ sub from_string {
 sub _parse_location {
     my ($self, $locstr) = @_;
     my ($loc, $seqid);
-    
     return $SIMPLE_CLASS->new(location_string => $locstr);
 }
 

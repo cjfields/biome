@@ -14,8 +14,12 @@ use MooseX::Types -declare => [qw(
 							   SequenceStrandSymbol
 							   SequenceAlphabet
                                
-                               LocationSymbol
-                               LocationType
+                               Segment_Pos_Symbol
+                               Segment_Pos_Type
+                               Segment_Symbol
+                               Segment_Type
+                               Split_Segment_Type
+                               
                                SplitLocationType
                                FuzzyPosition
                                
@@ -57,16 +61,20 @@ subtype SequenceAlphabet,
 	where { /^(?:dna|rna|protein)$/xism }, # do we want more?
 	message { "Strand must be 'dna', 'rna', or 'protein'"};
 
-my %VALID_LOCATION_SYMBOL = (
+my %VALID_SEGMENT_SYMBOL = (
+    '..'         => 'EXACT',
+    '^'          => 'IN-BETWEEN',
+);
+
+my %VALID_SEGMENT_POS_SYMBOL = (
     '..'         => 'EXACT',
     '<'          => 'BEFORE',
     '>'          => 'AFTER',
     '.'          => 'WITHIN',
-    '^'          => 'IN-BETWEEN',
     '?'          => 'UNCERTAIN'
 );
 
-my %SYMBOL_MAP = (
+my %SYMBOL_TYPE = (
     'EXACT'     => '..',
     'BEFORE'    => '<',
     'AFTER'     => '>',
@@ -75,41 +83,69 @@ my %SYMBOL_MAP = (
     'UNCERTAIN' => '?'
 );
 
-my %VALID_LOCATION_TYPE = map {$_ => 1}
-    qw(EXACT BEFORE AFTER WITHIN IN-BETWEEN UNCERTAIN);
+my %TYPE_SYMBOL = map {$SYMBOL_TYPE{$_} => $_} keys %SYMBOL_TYPE;
+
+my %VALID_SEGMENT_TYPE = map {$_ => 1}
+    qw(EXACT IN-BETWEEN);
+
+my %VALID_SEGMENT_POS_TYPE = map {$_ => 1}
+    qw(EXACT BEFORE AFTER WITHIN UNCERTAIN);
 
 # TODO: some of these could probably be redef. as enums, but it makes coercion
 # easier, needs checking
 
-subtype LocationSymbol,
+subtype Segment_Symbol,
     as Str,
-    where {exists $VALID_LOCATION_SYMBOL{$_}},
-    message {"Unknown Location symbol $_"};
+    where {exists $VALID_SEGMENT_SYMBOL{$_}},
+    message {"Unknown Segment symbol $_"};
+
+subtype Segment_Type,
+    as Str,
+    where {exists $VALID_SEGMENT_TYPE{$_}},
+    message {"Unknown Segment type $_"};
+
+subtype Segment_Pos_Symbol,
+    as Str,
+    where {exists $VALID_SEGMENT_POS_SYMBOL{$_}},
+    message {"Unknown Segment positional symbol $_"};
     
-subtype LocationType,
+subtype Segment_Pos_Type,
     as Str,
-    where {exists $VALID_LOCATION_TYPE{$_}},
-    message {"Unknown Location type $_"};
+    where {exists $VALID_SEGMENT_POS_TYPE{$_}},
+    message {"Unknown Segment positional type $_"};
 
-coerce LocationType,
-    from LocationSymbol,
-    via {$VALID_LOCATION_SYMBOL{$_}};
+coerce Segment_Pos_Type,
+    from Segment_Pos_Symbol,
+    via {$TYPE_SYMBOL{$_}};
+    
+coerce Segment_Pos_Symbol,
+    from Segment_Pos_Type,
+    via {$SYMBOL_TYPE{$_}};
 
-coerce LocationSymbol,
-    from LocationType,
-    via {$SYMBOL_MAP{$_}};
+coerce Segment_Symbol,
+    from Segment_Type,
+    via {$SYMBOL_TYPE{$_}};
+
+coerce Segment_Type,
+    from Segment_Symbol,
+    via {$TYPE_SYMBOL{$_}};
+    
+my %VALID_SPLIT_TYPE = map {$_ => 1}
+    qw(JOIN ORDER BOND);
+    
+subtype Split_Segment_Type,
+    as Str,
+    where {exists $VALID_SPLIT_TYPE{uc $_}},
+    message {"Unknown Split Location type $_"};
 
 subtype FuzzyPosition,
     as Str,
     where { /^[\?<]?\d+(?:[\.\^]\d+)?/ },
     message {"Not a fuzzy position type : $_"};
-
-my %VALID_SPLIT_LOCATION_TYPE = map {$_ => 1}
-    qw(JOIN ORDER BOND);
     
 subtype SplitLocationType,
     as Str,
-    where {exists $VALID_SPLIT_LOCATION_TYPE{$_}},
+    where {exists $VALID_SPLIT_TYPE{$_}},
     message {"Unknown Split Location type $_"};
 
 enum PositionType, (qw(INCLUSIVE EXCLUSIVE AVERAGE));

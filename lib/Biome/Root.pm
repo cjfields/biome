@@ -7,7 +7,6 @@ extends 'Moose::Object';
 #__PACKAGE__->meta->error_class('Biome::Root::Error');
 
 use Modern::Perl;
-use Module::Load::Conditional;
 
 # run BEGIN block to check for exception class, default to light output?
 # or should that go in Biome?
@@ -183,15 +182,13 @@ sub clone {
 
 # Module::Load::Conditional caches already loaded modules
 sub load_modules {
-    my ($self, $name) = @_;
-    (ref $name eq 'HASH') ?
-        Module::Load::Conditional::can_load(modules => $name) :
-        Module::Load::Conditional::can_load(modules => {$name => undef}) ;
+    my ($self) = shift;
+    Class::MOP::load_class($_) for @_;
 }
 
 sub load_module {
     my ($self, $name) = @_;
-    Module::Load::Conditional::can_load(modules => $name);
+    Class::MOP::load_class($name);
 }
 
 no Moose;

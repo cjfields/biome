@@ -4,16 +4,17 @@ use 5.010;
 use Biome::Role;
 
 with 'Biome::Role::Range';
-use Biome::Types qw(LocationType LocationSymbol);
+use Biome::Types qw(Segment_Type Segment_Symbol
+    Segment_Pos_Type Segment_Pos_Symbol);
 use Data::Dumper;
 
 has 'seq_id' => (
         is => 'rw', 
-        isa => 'Str', 
+        isa => 'Str',
 );
 
 has 'start_pos_type'    => (
-    isa             => LocationType,
+    isa             => Segment_Pos_Type,
     is              => 'rw',
     lazy            => 1,
     default         => 'EXACT',
@@ -31,7 +32,7 @@ has 'start_pos_type'    => (
 );
 
 has 'end_pos_type'      => (
-    isa             => LocationType,
+    isa             => Segment_Pos_Type,
     is              => 'rw',
     lazy            => 1,
     default         => 'EXACT',
@@ -81,6 +82,7 @@ around length => sub {
 has 'start' => (
     isa         => 'Int',
     is          => 'rw',
+    default     => 0,
     trigger     => sub {
         my ($self, $start) = @_;
         my $end = $self->end;
@@ -96,6 +98,7 @@ has 'start' => (
 has 'end' => (
     isa         => 'Int',
     is          => 'rw',
+    default     => 0,
     trigger     => sub {
         my ($self, $end) = @_;
         my $start = $self->start;
@@ -113,9 +116,17 @@ has 'location_string' => (
     is          => 'ro',
     lazy        => 1,
     default     => sub {
-        shift->to_string();
+        shift->to_string() || '';
     },
     trigger     => \&from_string
+);
+
+has 'segment_type'  => (
+    isa         => Segment_Type,
+    is          => 'rw',
+    lazy        => 1,
+    default     => 'EXACT',
+    coerce      => 1
 );
 
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
@@ -124,26 +135,17 @@ my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
 sub max_start {
     my ($self, $newstart) = @_;
-    if ($newstart) {
-        # reset start based on a specific behavior?
-    }
-    $self->start;
+    $self->start + $self->start_offset || 0;
 }
 
 sub min_start {
     my ($self, $newstart) = @_;
-    if ($newstart) {
-        # reset start based on a specific behavior?
-    }
-    $self->start;    
+    $self->start;
 }
 
 sub max_end {
     my ($self, $newend) = @_;
-    if ($newend) {
-        # reset start based on a specific behavior?
-    }
-    $self->end;    
+    $self->end + + $self->end_offset || 0;
 }
 
 sub min_end {
@@ -151,7 +153,7 @@ sub min_end {
     if ($newend) {
         # reset start based on a specific behavior?
     }
-    $self->end;    
+    $self->end;
 }
 
 sub is_fuzzy {
@@ -166,42 +168,42 @@ sub valid_Segment {
 
 sub to_string {
     my ($self) = @_;
-    if( $self->start == $self->end ) {
-        return $self->start;
-    }
     
-    my %position;
+    my %data = map {$_ => $self->$_} qw(
+        start end
+        min_start max_start
+        min_end max_end
+        start_offset end_offset
+        start_pos_type end_pos_type
+        seq_id
+        segment_type);
     
     for my $pos (qw(start end)) {
-        my ($pm, $min, $max) = ("${pos}_pos_type", "min_$pos", "max_$pos");
-        given ($self->$pm) {
-            when ('EXACT') {
-                $position{$pos} .= $self->$pos;
-            }
+        my $pos_str = $data{$pos} || '';
+        if ($pos eq 'end' && $data{start} == $data{end}) {
+            $pos_str = '';
+        }
+        given ($data{"${pos}_pos_type"}) {
             when ('WITHIN') {
-                $position{$pos} .= $self->$min.'.'.$self->$max;
-            }
-            when ('BETWEEN') {
-                $position{$pos} .= $self->$min.'^'.$self->$max;
+                $pos_str = '('.$data{"min_$pos"}.'.'.$data{"max_$pos"}.')';
             }
             when ('BEFORE') {
-                $position{$pos} .= '<'.$self->$pos;
+                $pos_str = '<'.$pos_str;
             }
             when ('AFTER') {
-                $position{$pos} .= $self->$pos.'>';
+                $pos_str = '>'.$pos_str;
             }
             when ('UNCERTAIN') {
-                $position{$pos} .= '?'.$self->$pos;
-            }
-            default {
-                $position{$pos} .= $self->$pos;
+                $pos_str = '?'.$pos_str;
             }
         }
+        $data{"${pos}_string"} = $pos_str;
     }
     
-    my $str = $position{start}.
-            to_LocationSymbol($self->segment_type).
-            $position{end};
+    my $str = $data{start_string}. ($data{end_string} ? 
+            to_Segment_Symbol($data{segment_type}).
+            $data{end_string} : '');
+    $str = "$data{seq_id}:$str" if $data{seq_id};
      
     if ($self->strand == -1) {
         $str = sprintf("complement(%s)",$str)
@@ -209,54 +211,7 @@ sub to_string {
     $str;
 }
 
-sub pos_string {
-    my ($self, $pos) = @_;
-    $pos ||= '';
-    if (!defined $pos || ($pos ne 'start' && $pos ne 'end')) {
-        $self->throw("Must specify a position type: got [$pos]");
-    }
-    my ($pm, $min, $max) = ("${pos}_pos_type", "min_$pos", "max_$pos");
-    given ($self->$pm) {
-        when ('EXACT') {
-            return $self->$pos;
-        }
-        when ('WITHIN') {
-            return $self->$min.'.'.$self->$max;
-        }
-        when ('BEFORE') {
-            return '<'.$self->$pos;
-        }
-        when ('AFTER') {
-            return $self->$pos.'>';
-        }
-        when ('UNCERTAIN') {
-            return '?'.$self->$pos;
-        }
-        default {
-            return $self->$pos;
-        }
-    }
-}
-
-sub segment_type {
-    my ($self, $val) = @_;
-    if ($val) {
-        $self->start_pos_type($val);
-        $self->end_pos_type($val);
-        return $val;
-    }
-    my ($ps, $pe) = ($self->start_pos_type, $self->end_pos_type);
-    
-    # this is currently derived off the start/end_pos_type and is not a separate
-    # attribute (e.g. not settable), though it will likely change to delegate
-    # to the proper methods
-    return $ps if ($ps eq $pe);  # WITHIN BETWEEN
-    if ($ps eq 'BEFORE' || $pe eq 'AFTER') {
-        return 'EXACT';  # this doesn't make sense to me, shouldn't it be 'UNCERTAIN'?
-    }
-    return 'UNCERTAIN';
-}
-
+{
 my @STRING_ORDER = qw(start loc_type end);
 
 sub from_string {
@@ -285,8 +240,8 @@ sub from_string {
         if ($order eq 'start' || $order eq 'end') {
             $str =~ s{[\[\]\(\)]+}{}g;
             if ($str =~ /^([<>\?])?(\d+)?$/) {
-                $atts{"${order}_pos_type"} = $1;
-                $atts{$order} = $2;                
+                $atts{"${order}_pos_type"} = $1 if $1;
+                $atts{$order} = $2;
             } elsif ($str =~ /^(\d+)\.(\d+)$/) {
                 $atts{"${order}_pos_type"} = '.';
                 $atts{$order} = $1;
@@ -295,14 +250,17 @@ sub from_string {
                 $self->throw("Can't parse location string: $str");
             }
         } else {
-            for (qw(start_pos_type end_pos_type)) {
-                $atts{$_} = $str if !exists $atts{$_};
-            }
+            $atts{segment_type} = $str;
         }
     }
+    $atts{end} ||= $atts{start};
     for my $m (sort keys %atts) {
-        $self->$m($atts{$m}) if defined $atts{$m};
+        if (defined $atts{$m}){
+            $self->$m($atts{$m}) 
+        }
     }
+}
+
 }
 
 sub flip_strand {
