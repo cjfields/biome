@@ -100,8 +100,8 @@ my $locfac = Biome::Factory::FTLocationFactory->new(-verbose => 1);
 # sorting is to keep the order constant from one run to the next
 foreach my $locstr (keys %testcases) {
     #print STDERR "$locstr\n";
-	my $loc = $locfac->from_string($locstr);
     print STDERR "\n";
+	my $loc = $locfac->from_string($locstr);
 	#if($locstr eq "join(AY016290.1:108..185,AY016291.1:1546..1599)") {
 	#	$loc->seq_id("AY016295.1");
 	#}

@@ -244,13 +244,27 @@ sub segment_type {
     return 'UNCERTAIN';
 }
 
+my @STRING_ORDER = qw(start loc_type end);
+
 sub from_string {
     my ($self, $string) = @_;
     return unless $string;
-    if ($string =~ /^([\?<])(\d+)(?:([.^]{1,2})(\d+)([\?<]))?$/xmso) {
-        my ($start_pos, $start, $range_type, $end, $end_pos) = ($1, $2, $3, $4, $5);
-    } else {
-        $self->throw("Can't parse location string: $string");
+    my @loc_data = split(/(\.{2}|\^|\:)/, $string);
+    if (@loc_data == 5) {
+        $self->seq_id(shift @loc_data);
+        shift @loc_data;
+    }
+    for my $i (0..$#loc_data) {
+        my $order = $STRING_ORDER[$i];
+        my $str = $loc_data[$i];
+        if ($order eq 'start' || $order eq 'end') {
+            $str =~ s{[\[\]\(\)]+}{}g;
+            print STDERR "$str\n";
+            
+        } else {
+            $self->start_pos_type($str);
+            $self->end_pos_type($str);
+        }
     }
 }
 

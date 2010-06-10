@@ -15,6 +15,16 @@ $LOCREG = qr{
             )*
             }xmso;     
 
+# make global for now, allow for abstraction later
+our $SIMPLE_CLASS = 'Biome::Segment::Simple';
+
+our $SPLIT_CLASS = 'Biome::Segment::Split';
+
+sub BUILD {
+    my ($self) = @_;
+    $self->load_modules($SIMPLE_CLASS, $SPLIT_CLASS);
+}
+
 has coordinate_policy   => (
     is          => 'ro',
     does        => 'Biome::Location::Role::CoordinatePolicy',
@@ -43,7 +53,7 @@ sub from_string {
 
         my ($beg, $mid, $end) = ($1, $2, $3);
         
-        print STDERR sprintf("BEG:%s\tMID:%s\tEND:%s\n", $beg, $mid, $end);
+        #print STDERR sprintf("BEG:%s\tMID:%s\tEND:%s\n", $beg, $mid, $end);
         
         my @sublocs = (split(q(,),$beg), $mid, split(q(,),$end));
         
@@ -53,7 +63,7 @@ sub from_string {
         SUBLOCS:
         while (@sublocs) {
             my $subloc = shift @sublocs;
-            next if !$subloc;
+            #next if !$subloc;
             my $oparg = ($subloc eq 'join'   || $subloc eq 'bond' ||
                          $subloc eq 'order'  || $subloc eq 'complement') ? $subloc : undef;
             # has operator, requires further work (recurse)
@@ -117,11 +127,19 @@ sub from_string {
     return $loc;
 }
 
+
+{
+    my @order = qw(start join end);
+    
 sub _parse_location {
     my ($self, $locstr) = @_;
     my ($loc, $seqid);
-    $self->debug( "Location parse, processing $locstr\n");
+    
+    return $SIMPLE_CLASS->new(location_string => $locstr);
+    
+    #$self->debug( "$locstr\n");
     # 'remote' location?
+    
     #if($locstr =~ m{^(\S+):(.*)$}o) {
     #    # yes; memorize remote ID and strip from location string
     #    $seqid = $1;
@@ -189,6 +207,7 @@ sub _parse_location {
 
     # done (hopefully)
     #return $loc;
+}
 }
 
 no Biome;
