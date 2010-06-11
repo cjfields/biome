@@ -40,9 +40,7 @@ ok($simple->valid_Segment);
 is($simple->segment_type, 'EXACT',  'has a default segment type');
 ok(!$simple->is_fuzzy);
 
-is ($simple->pos_string('start'), '10', 'start pos_string');
-is ($simple->pos_string('end'), '20', 'end pos_string');
-is ($simple->to_string, '10..20', 'full FT string');
+is ($simple->to_string, 'my1:10..20', 'full FT string');
 
 #my ($loc) = $simple->all_Segments();
 #ok($loc);
@@ -58,8 +56,6 @@ my $f = Biome::Segment::Simple->new(
 is($f->length, 81, 'Positive length');
 is($f->strand,-1,  'Negative strand' );
 
-is ($f->pos_string('start'), '20', 'start pos_string');
-is ($f->pos_string('end'), '100', 'end pos_string');
 is ($f->to_string, 'complement(20..100)','full FT string');
 
 my $exact = Biome::Segment::Simple->new(
@@ -76,29 +72,24 @@ is($exact->length, 0);
 is($exact->segment_type, 'IN-BETWEEN');
 ok(!$exact->is_fuzzy);
 
-is ($exact->pos_string('start'), '10', 'start pos_string');
-is ($exact->pos_string('end'), '11', 'end pos_string');
-is ($exact->to_string, '10^11','full FT string');
+is ($exact->to_string, 'my2:10^11','full FT string');
 
 # check coercions with segment_type and strand
 $exact = Biome::Segment::Simple->new(
                     -start         => 10, 
                     -end           => 11,
                     -segment_type  => '^',
-                    -strand        => '+', 
-                    -seq_id        => 'my2');
+                    -strand        => '+');
 
 is($exact->start, 10, 'Bio::Segment::Simple IN-BETWEEN');
 is($exact->end, 11);
 is($exact->strand, 1, 'strand coerced');
-is($exact->seq_id, 'my2');
+is($exact->seq_id, undef);
 is($exact->length, 0);
 is($exact->segment_type, 'IN-BETWEEN');
-is($exact->start_pos_type, 'IN-BETWEEN');
-is($exact->end_pos_type, 'IN-BETWEEN');
+is($exact->start_pos_type, 'EXACT');
+is($exact->end_pos_type, 'EXACT');
 
-is($exact->pos_string('start'), '10', 'start pos_string');
-is($exact->pos_string('end'), '11', 'end pos_string');
 is($exact->to_string, '10^11', 'full FT string');
 
 $exact = Biome::Segment::Simple->new(
@@ -106,13 +97,12 @@ $exact = Biome::Segment::Simple->new(
                     -end            => 20,
                     -start_pos_type => '<',
                     -end_pos_type   => '>', # this should default to 'EXACT'
-                    -strand         => '+', 
-                    -seq_id         => 'my2');
+                    -strand         => '+');
 
 is($exact->start, 10);
 is($exact->end, 20);
 is($exact->strand, 1, 'strand coerced');
-is($exact->seq_id, 'my2');
+is($exact->seq_id, undef);
 is($exact->length, 11);
 
 # this doesn't seem correct, shouldn't it be 'FUZZY' or 'UNCERTAIN'?
@@ -122,29 +112,24 @@ is($exact->start_pos_type, 'BEFORE');
 is($exact->end_pos_type, 'AFTER');
 ok($exact->is_fuzzy);
 
-is($exact->pos_string('start'), '<10', 'start pos_string');
-is($exact->pos_string('end'), '20>', 'end pos_string');
-is($exact->to_string, '<10..20>', 'full FT string');
+is($exact->to_string, '<10..>20', 'full FT string');
 
 # check coercions with start/end_pos_type, and length determination
 $exact = Biome::Segment::Simple->new(
                     -start          => 10, 
                     -end            => 20,
                     -start_pos_type => '<',
-                    -strand         => '+', 
-                    -seq_id         => 'my2');
+                    -strand         => '+');
 
 is($exact->start, 10);
 is($exact->end, 20);
 is($exact->strand, 1, 'strand coerced');
-is($exact->seq_id, 'my2');
+is($exact->seq_id, undef);
 is($exact->length, 11);
 is($exact->segment_type, 'EXACT');
 is($exact->start_pos_type, 'BEFORE');
 is($exact->end_pos_type, 'EXACT');
 
-is($exact->pos_string('start'), '<10', 'start pos_string');
-is($exact->pos_string('end'), '20', 'end pos_string');
 is($exact->to_string, '<10..20', 'full FT string');
 
 # check exception handling
