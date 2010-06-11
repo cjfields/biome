@@ -107,7 +107,7 @@ my %testcases = (
         
     # not passing yet, getting redundant commas, probably from recursive joins
     'join(1000..2000,join(3000..4000,join(5000..6000,7000..8000)),9000..10000)'
-        => [-1, $split_impl,1000,1000,'JOIN', 10000, 10000, 'JOIN', 'JOIN', 3, 1],
+        => [0, $split_impl,1000,1000,'JOIN', 10000, 10000, 'JOIN', 'JOIN', 3, 1],
     
     'order(S67862.1:72..75,join(S67863.1:1..788,1..19))'
         => [0, $split_impl, 72, 72, 'ORDER', 75, 75, 'ORDER', 'ORDER', 2, undef],
@@ -121,11 +121,6 @@ foreach my $locstr (keys %testcases) {
     my $loc = $locfac->from_string($locstr);
     if (!$replace) {
         is($loc->to_string, $locstr, "compare round-trip on $locstr")
-    } elsif ($replace  =~ /^-1$/) {
-        TODO: {
-            local $TODO = "Not passing yet";
-            is($loc->to_string, $locstr, "compare conversion of $locstr to $replace");
-        }
     } else {
         # these are ones we want converted.  They both have 
         is($loc->to_string, $replace, "compare conversion of $locstr to $replace");
