@@ -88,7 +88,7 @@ has 'start' => (
         my $end = $self->end;
         return unless $start && $end;
         # could put start<->end reversal here...
-        if ($self->start_pos_type eq 'IN-BETWEEN' &&
+        if ($self->segment_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1 )) {
             $self->throw("length of segment with IN-BETWEEN position type ".
                          "cannot be larger than 1; got ".abs($end - $start));
@@ -104,7 +104,7 @@ has 'end' => (
         my $start = $self->start;
         return unless $start && $end;
         # could put start<->end reversal here...
-        if ($self->end_pos_type eq 'IN-BETWEEN' &&
+        if ($self->segment_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1) ) {
             $self->throw("length of segment with IN-BETWEEN position type ".
                          "cannot be larger than 1; got ".abs($end - $start));
