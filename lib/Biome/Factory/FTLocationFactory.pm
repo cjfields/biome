@@ -68,37 +68,44 @@ sub from_string {
             if ($oparg) {
                 my $sub = shift @sublocs;
                 # simple split operators (no recursive calls needed)
-                if (($oparg eq 'join' || $oparg eq 'order' || $oparg eq 'bond' )
-                     && $sub !~ m{(?:join|order|bond)}) {
+                if ($sub !~ m{(?:join|order|bond)}) {
                     my @splitlocs = split(q(,), $sub);
-                    $loc_obj = $SPLIT_CLASS->new(-verbose => 1,
-                                                -container_type => $oparg);
-                    while (my $splitloc = shift @splitlocs) {
-                        next unless $splitloc;
-                        my $sobj;
-                        if ($splitloc =~ m{\(($LOCREG)\)}) {
-                            my $comploc = $1;
-                            $sobj = $self->_parse_location($comploc);
-                            $sobj->strand(-1);
-                        } else {
-                            $sobj = $self->_parse_location($splitloc);
+                    if (@splitlocs == 1) {
+                        # this should be a complement only
+                        $self->throw("getting nested l") unless $oparg eq 'complement';
+                        $loc_obj = $SIMPLE_CLASS->new(location_string => "complement($splitlocs[0])");
+                    } else {
+                        $loc_obj = $SPLIT_CLASS->new(-verbose => 1,
+                                                    -container_type => $oparg);
+                        while (my $splitloc = shift @splitlocs) {
+                            next unless $splitloc;
+                            my $sobj;
+                            if ($splitloc =~ m{\(($LOCREG)\)}) {
+                                my $comploc = $1;
+                                $sobj = $SIMPLE_CLASS->new(location_string => $comploc);
+                                $sobj->strand(-1);
+                            } else {
+                                $sobj = $SIMPLE_CLASS->new(location_string => $splitloc);
+                            }
+                            $loc_obj->add_sub_Segment($sobj);
                         }
-                        $loc_obj->add_sub_Segment($sobj);
                     }
                 } else {
+                    #$self->warn("Nesting operators is not supported yet")
+                    #    unless $oparg eq 'complement';
                     $loc_obj = $self->from_string($sub, $oparg);
-                    $self->from_string($sub, $oparg);
-                    # reinsure the operator is set correctly for this level
-                    # unless it is complement
-                    $loc_obj->segment_type($oparg) unless $oparg eq 'complement';
+                    if ($oparg eq 'complement') {
+                        $loc_obj->guide_strand(-1)
+                    } else {
+                        $loc_obj->segment_type($oparg) ;
+                    }
                 }
             }
             # no operator, simple or fuzzy 
             else {
                 $loc_obj = $self->from_string($subloc,1);
-                $self->from_string($subloc,1);
             }
-            $loc_obj->strand(-1) if ($op && $op eq 'complement');
+            #$loc_obj->strand(-1) if ($op && $op eq 'complement');
             push @loc_objs, $loc_obj;
         }
         my $ct = @loc_objs;
@@ -116,16 +123,10 @@ sub from_string {
             return $loc;
         }
     } else { # simple location(s)
-        $loc = $self->_parse_location($locstr);
+        $loc = $SIMPLE_CLASS->new(location_string => $locstr);
         $loc->strand(-1) if ($op && $op eq 'complement');
     }
     return $loc;
-}
-
-sub _parse_location {
-    my ($self, $locstr) = @_;
-    my ($loc, $seqid);
-    return $SIMPLE_CLASS->new(location_string => $locstr);
 }
 
 no Biome;

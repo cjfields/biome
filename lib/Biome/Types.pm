@@ -9,10 +9,10 @@
 package Biome::Types;
 
 use MooseX::Types -declare => [qw(
-							   SequenceStrand
-							   SequenceStrandInt
-							   SequenceStrandSymbol
-							   SequenceAlphabet
+							   Sequence_Strand
+							   Sequence_Strand_Int
+							   Sequence_Strand_Symbol
+							   Sequence_Alphabet
                                
                                Segment_Pos_Symbol
                                Segment_Pos_Type
@@ -35,12 +35,12 @@ use MooseX::Types -declare => [qw(
 
 use MooseX::Types::Moose qw(Int Str Object Any);
 
-subtype SequenceStrand,
+subtype Sequence_Strand,
 	as Int,
 	where {$_ >= -1 && $_ <= 1},
 	message { "Strand can be -1, 0, or 1, not $_"};
 
-subtype SequenceStrandSymbol,
+subtype Sequence_Strand_Symbol,
 	as Str,
 	where { /^(?:[\+\-\.])$/},
 	message { "Strand symbol can be one of [-.+], not $_"};
@@ -52,11 +52,11 @@ my %STRAND_SYMBOL = (
     '-'     => -1
 );
 
-coerce SequenceStrand,
-    from SequenceStrandSymbol,
+coerce Sequence_Strand,
+    from Sequence_Strand_Symbol,
     via {$STRAND_SYMBOL{$_}};
 
-subtype SequenceAlphabet,
+subtype Sequence_Alphabet,
 	as Str,
 	where { /^(?:dna|rna|protein)$/xism }, # do we want more?
 	message { "Strand must be 'dna', 'rna', or 'protein'"};

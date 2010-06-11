@@ -78,25 +78,35 @@ my %testcases = (
         108, 108, "EXACT", 185, 185, "EXACT", "EXACT", 2, undef],
     "join(12..78,134..202)" => [0, $split_impl,
         12, 12, "EXACT", 202, 202, "EXACT", "EXACT", 2, 1],
+    "complement(join(2691..4571,4918..5163))" => [0, $split_impl,
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "EXACT", 2, -1],
     "complement(join(4918..5163,2691..4571))" => [0, $split_impl,
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "EXACT", 2, -1],
+    "join(complement(4918..5163),complement(2691..4571))" => [
+        'complement(join(2691..4571,4918..5163))', $split_impl,
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "EXACT", 2, -1],
+    "join(complement(2691..4571),complement(4918..5163))" => [
+        'complement(join(4918..5163,2691..4571))', $split_impl,
         2691, 2691, "EXACT", 5163, 5163, "EXACT", "EXACT", 2, -1],
     "complement(34..(122.126))" => [0, $fuzzy_impl,
         34, 34, "EXACT", 122, 126, "WITHIN", "EXACT", 1, -1],
     
-    # complex
+    # complex, technically not legal FT types but we handle and resolve these as needed
     
-    #'join(11025..11049,join(complement(239890..240081),complement(241499..241580),complement(251354..251412),complement(315036..315294)))'
-    #    => [1, ],
-    #'join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))'
-    #    => [1, ],
-    #'join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))'
-    #    => [1, ],
-    #'join(20464..20694,21548..22763,join(complement(231520..231669),complement(232596..232990),complement(314652..314672)))'
-    #    => [1, ],
+    'join(11025..11049,join(complement(239890..240081),complement(241499..241580),complement(251354..251412),complement(315036..315294)))'
+        => ['join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))',
+            ],
+    'join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))'
+        => [0, ],
+    'join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))'
+        => [0, ],
+    'join(20464..20694,21548..22763,join(complement(231520..231669),complement(232596..232990),complement(314652..314672)))'
+        => ['join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))',
+            ],
     #'join(1000..2000,join(3000..4000,join(5000..6000,7000..8000)),9000..10000)'
-    #    => [1, ],
-    #'order(S67862.1:72..75,join(S67863.1:1..788,1..19))'
-    #    => [1, ],
+    #    => [0, ],
+    'order(S67862.1:72..75,join(S67863.1:1..788,1..19))'
+        => [0, ],
           );
 
 my $locfac = Biome::Factory::FTLocationFactory->new(-verbose => 1);

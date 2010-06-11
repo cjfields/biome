@@ -3,13 +3,13 @@ package Biome::Role::Segment::SegmentContainer;
 use Biome::Role;
 use Biome::Segment::Simple;
 use List::Util qw(reduce);
-use Biome::Types qw(Split_Segment_Type);
+use Biome::Types qw(Split_Segment_Type Sequence_Strand);
 
 # this is a role mainly for consistency with BioPerl's locations.
 
 has     'segments'  => (
     is          => 'rw',
-    isa         => 'ArrayRef[Biome::Segment::Simple]',
+    isa         => 'ArrayRef[Any]',
     traits      => ['Array'],
     handles     => {
         add_sub_Segment      => 'push',
@@ -22,7 +22,7 @@ has     'segments'  => (
     default     => sub { [] }
 );
 
-has     'container_type'    => (
+has     'segment_type'    => (
     isa         => Split_Segment_Type,
     is          => 'rw',
     lazy        => 1,
@@ -34,12 +34,19 @@ has     'maps_to_single'    => (
     is          => 'rw'
 );
 
-#has     'guide_strand'      => (
-#    is          => 'rw',
-#    isa         => 'Int',
-#    lazy        => 1,
-#    default     => 0,
-#);
+has     'guide_strand'      => (
+    isa         => Sequence_Strand,
+    is          => 'rw',
+    lazy        => 1,
+    default     => 1,
+);
+
+has     'resolve_Segments'      => (
+    isa         => 'Bool',
+    is          => 'rw',
+    lazy        => 1,
+    default     => 1,
+);
 
 sub start {
     my ($self, $start) = @_;
@@ -70,6 +77,8 @@ sub strand {
                     "simple segment strand() individually");
     }
     my ($strand, $lstrand);
+    
+    # this could use reduce()
     foreach my $loc ($self->sub_Segments()) {
         # we give up upon any location that's remote or doesn't have
         # the strand specified, or has a differing one set than 
@@ -80,7 +89,7 @@ sub strand {
         if((! $lstrand) ||
            ($strand && ($strand != $lstrand)) ||
            $loc->is_remote()) {
-            $strand = undef;
+            $strand = 0;
             last;
         } elsif(! $strand) {
             $strand = $lstrand;
@@ -89,20 +98,29 @@ sub strand {
     return $strand;
 }
 
+# noop
+sub is_remote {}
+
 sub flip_strand {
     my $self = shift;
-    foreach my $loc ($self->subSegment()) {
-        $loc->flip_strand;    
-    }
+    my @segs = @{$self->segments()};
+    @segs = map {$_->flip_strand(); $_} reverse @segs;
+    $self->segments(\@segs);
 }
 
 sub to_string {
     my $self = shift;
     # JOIN assumes specific order, ORDER does not, BOND
-    my $type = $self->container_type;
+    my $type = $self->segment_type;
+    if ($self->resolve_Segments) {
+        if ($self->strand < 0) {
+            $self->flip_strand();
+            $self->guide_strand(-1);
+        }
+    }
     my @segs = $self->sub_Segments;
     my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
-    if ($self->strand < 0) {
+    if ($self->guide_strand < 0) {
         $str = "complement($str)";
     }
     $str;

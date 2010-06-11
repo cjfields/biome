@@ -1,12 +1,12 @@
 package Biome::Role::Range;
 
 use Biome::Role;
-use Biome::Types qw(SequenceStrand);
+use Biome::Types qw(Sequence_Strand);
 
 requires 'to_string';
 
 has strand  => (
-    isa     => SequenceStrand,
+    isa     => Sequence_Strand,
     is      => 'rw',
     default => 0,
     coerce  => 1
