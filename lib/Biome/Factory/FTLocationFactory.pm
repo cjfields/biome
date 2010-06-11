@@ -53,7 +53,7 @@ sub from_string {
 
         my ($beg, $mid, $end) = ($1, $2, $3);
         
-        my @sublocs = (split(q(,),$beg), $mid, split(q(,),$end));
+        my @sublocs = grep {$_} (split(q(,),$beg), $mid, split(q(,),$end));
         
         my @loc_objs;
         my $loc_obj;
@@ -61,7 +61,6 @@ sub from_string {
         SUBLOCS:
         while (@sublocs) {
             my $subloc = shift @sublocs;
-            #next if !$subloc;
             my $oparg = ($subloc eq 'join'   || $subloc eq 'bond' ||
                          $subloc eq 'order'  || $subloc eq 'complement') ? $subloc : undef;
             # has operator, requires further work (recurse)
@@ -76,7 +75,7 @@ sub from_string {
                         $loc_obj = $SIMPLE_CLASS->new(location_string => "complement($splitlocs[0])");
                     } else {
                         $loc_obj = $SPLIT_CLASS->new(-verbose => 1,
-                                                    -container_type => $oparg);
+                                                    -segment_type => uc $oparg);
                         while (my $splitloc = shift @splitlocs) {
                             next unless $splitloc;
                             my $sobj;
@@ -95,9 +94,9 @@ sub from_string {
                     #    unless $oparg eq 'complement';
                     $loc_obj = $self->from_string($sub, $oparg);
                     if ($oparg eq 'complement') {
-                        $loc_obj->guide_strand(-1)
+                        $loc_obj->strand(-1)
                     } else {
-                        $loc_obj->segment_type($oparg) ;
+                        $loc_obj->segment_type(uc $oparg) ;
                     }
                 }
             }

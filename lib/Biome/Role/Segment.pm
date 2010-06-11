@@ -9,8 +9,9 @@ use Biome::Types qw(Segment_Type Segment_Symbol
 use Data::Dumper;
 
 has 'seq_id' => (
-        is => 'rw', 
-        isa => 'Str',
+    is              => 'rw', 
+    isa             => 'Str',
+    predicate       => 'is_remote'
 );
 
 has 'start_pos_type'    => (
@@ -60,12 +61,6 @@ has [qw(start_offset end_offset)]  => (
 ## TODO: Should this be a delegated method dependent on the presence of a
 ## sequence ID? Not sure it belongs in Segment, probably should be relegated to
 ## the purview of a Feature.
-
-has is_remote => (
-    isa     => 'Bool',
-    is      => 'rw',
-    default => 0
-);
 
 around length => sub {
     my ($orig, $self) = @_;
@@ -134,26 +129,30 @@ my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 # these just delegate to start, end, using the indicated offsets
 
 sub max_start {
-    my ($self, $newstart) = @_;
-    $self->start + $self->start_offset || 0;
+    my ($self) = @_;
+    my $start = $self->start;
+    return unless $start;
+    ($start + $self->start_offset);
 }
 
 sub min_start {
-    my ($self, $newstart) = @_;
-    $self->start;
+    my ($self) = @_;
+    my $start = $self->start;
+    return if !$start || ($self->start_pos_type eq 'BEFORE');
+    $start;
 }
 
 sub max_end {
-    my ($self, $newend) = @_;
-    $self->end + + $self->end_offset || 0;
+    my ($self) = @_;
+    my $end = $self->end;
+    return if !$end || ($self->end_pos_type eq 'AFTER');
+    return ($end + $self->end_offset);
 }
 
 sub min_end {
-    my ($self, $newend) = @_;
-    if ($newend) {
-        # reset start based on a specific behavior?
-    }
-    $self->end;
+    my ($self) = @_;
+    my $end = $self->end;
+    return unless $end;
 }
 
 sub is_fuzzy {
@@ -169,14 +168,17 @@ sub valid_Segment {
 sub to_string {
     my ($self) = @_;
     
-    my %data = map {$_ => $self->$_} qw(
+    my %data;
+    for (qw(
         start end
         min_start max_start
         min_end max_end
         start_offset end_offset
         start_pos_type end_pos_type
         seq_id
-        segment_type);
+        segment_type)) {
+        $data{$_} = $self->$_;
+    }
     
     for my $pos (qw(start end)) {
         my $pos_str = $data{$pos} || '';
@@ -204,7 +206,7 @@ sub to_string {
             to_Segment_Symbol($data{segment_type}).
             $data{end_string} : '');
     $str = "$data{seq_id}:$str" if $data{seq_id};
-     
+    $str = "($str)" if $data{segment_type} eq 'WITHIN';
     if ($self->strand == -1) {
         $str = sprintf("complement(%s)",$str)
     }
@@ -253,7 +255,14 @@ sub from_string {
             $atts{segment_type} = $str;
         }
     }
-    $atts{end} ||= $atts{start};
+    if ($atts{start_pos_type} && $atts{start_pos_type} eq '.' &&
+        (!$atts{end} && !$atts{end_pos_type})
+        ) {
+        $atts{end} = $atts{start} + $atts{start_offset};
+        delete @atts{qw(start_offset start_pos_type end_pos_type)};
+        $atts{segment_type} = '.';
+    }
+    $atts{end} ||= $atts{start} unless $atts{end_pos_type};
     for my $m (sort keys %atts) {
         if (defined $atts{$m}){
             $self->$m($atts{$m}) 
@@ -267,6 +276,8 @@ sub flip_strand {
     my $self= shift;
     $self->strand($self->strand * -1);
 }
+
+sub sub_Segments { }
 
 no Biome::Role;
 

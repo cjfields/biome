@@ -2,7 +2,9 @@ package Biome::Role::Segment::SegmentContainer;
 
 use Biome::Role;
 use Biome::Segment::Simple;
+use MooseX::Types::Moose qw(Maybe);
 use List::Util qw(reduce);
+use List::MoreUtils qw(any);
 use Biome::Types qw(Split_Segment_Type Sequence_Strand);
 
 # this is a role mainly for consistency with BioPerl's locations.
@@ -34,11 +36,15 @@ has     'maps_to_single'    => (
     is          => 'rw'
 );
 
-has     'guide_strand'      => (
-    isa         => Sequence_Strand,
+has     'strand'      => (
+    isa         => Maybe[Sequence_Strand],
     is          => 'rw',
     lazy        => 1,
-    default     => 1,
+    predicate   => 'has_strand',
+    default     => sub {
+        my $self = shift;
+        return $self->sub_Segment_strand;
+        },
 );
 
 has     'resolve_Segments'      => (
@@ -48,48 +54,86 @@ has     'resolve_Segments'      => (
     default     => 1,
 );
 
-sub start {
-    my ($self, $start) = @_;
-    if ($start) {
-        $self->warn("This is a container of Segments; manipulate each simple segment start() individually");
+has     'is_remote'             => (
+    isa         => 'Bool',
+    is          => 'rw',
+    lazy        => 1,
+    default     => sub {
+        my $self = shift;
+        for my $seg ($self->sub_Segments) {
+            return 1 if $seg->is_remote;
+        }
+        0;
     }
-    my $loc = reduce { $a < $b ? $a : $b}
-        map {$_->start} 
-        $self->sub_Segments;
-    $loc;
+);
+
+sub start {
+    my $self = shift;
+    return $self->get_sub_Segment(0)->start if $self->is_remote;
+    return $self->_reduce('start');
 }
 
 sub end {
-    my ($self, $end) = @_;
-    if ($end) {
-        $self->warn("This is a container of Segments; manipulate each simple segment end() individually");
+    my $self = shift;
+    return $self->get_sub_Segment(0)->end if $self->is_remote;
+    return $self->_reduce('end');
+}
+
+sub min_start {
+    my $self = shift;
+    return $self->get_sub_Segment(0)->min_start if $self->is_remote;
+    return $self->_reduce('min_start');
+}
+
+sub max_start {
+    my $self = shift;
+    return $self->get_sub_Segment(0)->max_start if $self->is_remote;
+    return $self->_reduce('max_start');
+}
+
+sub min_end {
+    my $self = shift;
+    return $self->get_sub_Segment(0)->min_end if $self->is_remote;
+    return $self->_reduce('min_end');
+}
+
+sub max_end {
+    my $self = shift;
+    return $self->get_sub_Segment(0)->max_end if $self->is_remote;
+    return $self->_reduce('max_end');
+}
+
+# helper, just grabs the indicated value for the contained segments
+sub _reduce {
+    my ($self, $caller) = @_;
+    my $loc;
+    if ($caller =~ /start$/) {
+        $loc = reduce {
+            $a < $b ? $a : $b
+            }
+        map {$_->$caller}
+        @{$self->segments};
+    } else {
+        $loc = reduce {
+            $a > $b ? $a : $b
+            }
+        map {$_->$caller}
+        @{$self->segments};
     }
-    my $loc = reduce { $a > $b ? $a : $b}
-        map {$_->end} 
-        $self->sub_Segments;
     $loc;
 }
 
-sub strand {
-    my ($self, $str) = @_;
-    if ($str) {
-        $self->warn("This is a container of Segments; manipulate each ".
-                    "simple segment strand() individually");
-    }
+sub sub_Segment_strand {
+    my ($self) = @_;
     my ($strand, $lstrand);
     
     # this could use reduce()
     foreach my $loc ($self->sub_Segments()) {
-        # we give up upon any location that's remote or doesn't have
-        # the strand specified, or has a differing one set than 
-        # previously seen.
-        # calling strand() is potentially expensive if the subloc is also
-        # a split location, so we cache it
         $lstrand = $loc->strand();
         if((! $lstrand) ||
            ($strand && ($strand != $lstrand)) ||
            $loc->is_remote()) {
-            $strand = 0;
+            $strand = undef;
             last;
         } elsif(! $strand) {
             $strand = $lstrand;
@@ -97,9 +141,6 @@ sub strand {
     }
     return $strand;
 }
-
-# noop
-sub is_remote {}
 
 sub flip_strand {
     my $self = shift;
@@ -113,14 +154,15 @@ sub to_string {
     # JOIN assumes specific order, ORDER does not, BOND
     my $type = $self->segment_type;
     if ($self->resolve_Segments) {
-        if ($self->strand < 0) {
+        my $substrand = $self->sub_Segment_strand;
+        if ($substrand && $substrand < 0) {
             $self->flip_strand();
-            $self->guide_strand(-1);
+            $self->strand(-1);
         }
     }
     my @segs = $self->sub_Segments;
     my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
-    if ($self->guide_strand < 0) {
+    if ($self->strand && $self->strand < 0) {
         $str = "complement($str)";
     }
     $str;

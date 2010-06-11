@@ -62,6 +62,7 @@ subtype Sequence_Alphabet,
 	message { "Strand must be 'dna', 'rna', or 'protein'"};
 
 my %VALID_SEGMENT_SYMBOL = (
+    '.'          => 'WITHIN',
     '..'         => 'EXACT',
     '^'          => 'IN-BETWEEN',
 );
@@ -85,8 +86,9 @@ my %SYMBOL_TYPE = (
 
 my %TYPE_SYMBOL = map {$SYMBOL_TYPE{$_} => $_} keys %SYMBOL_TYPE;
 
+# WITHIN here is very rare but does occur, ex (122.144)
 my %VALID_SEGMENT_TYPE = map {$_ => 1}
-    qw(EXACT IN-BETWEEN);
+    qw(EXACT IN-BETWEEN WITHIN);
 
 my %VALID_SEGMENT_POS_TYPE = map {$_ => 1}
     qw(EXACT BEFORE AFTER WITHIN UNCERTAIN);
