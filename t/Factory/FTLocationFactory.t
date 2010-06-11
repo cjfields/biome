@@ -37,7 +37,7 @@ my %testcases = (
          122, 133, "WITHIN", 204, 221, "WITHIN", "EXACT", 1, 1],
     "123^124" => [0, $simple_impl,
          123, 123, "EXACT", 124, 124, "EXACT", "IN-BETWEEN", 1, 1],
-    "145^177" => [0, $fuzzy_impl,
+    "145^146" => [0, $fuzzy_impl,
          145, 145, "EXACT", 177, 177, "EXACT", "IN-BETWEEN", 1, 1],
     "J00194:100..202" => [0, $simple_impl,
          100, 100, "EXACT", 202, 202, "EXACT", "EXACT", 1, 1],
