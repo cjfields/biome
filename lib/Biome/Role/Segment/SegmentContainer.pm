@@ -3,7 +3,7 @@ package Biome::Role::Segment::SegmentContainer;
 use Biome::Role;
 use Biome::Segment::Simple;
 use MooseX::Types::Moose qw(Maybe);
-use List::Util qw(reduce);
+use List::Util qw(min max reduce);
 use List::MoreUtils qw(any);
 use Biome::Types qw(Split_Segment_Type Sequence_Strand);
 
@@ -103,22 +103,28 @@ sub max_end {
     return $self->_reduce('max_end');
 }
 
+sub start_pos_type {
+    my $self = shift;
+    my $type = reduce {$a eq $b ? $a : undef}
+        map {$_->start_pos_type} $self->sub_Segments;
+    return $type;
+}
+
+sub end_pos_type {
+    my $self = shift;
+    my $type = reduce {$a eq $b ? $a : undef} 
+        map {$_->end_pos_type} $self->sub_Segments;
+    return $type;
+}
+
 # helper, just grabs the indicated value for the contained segments
 sub _reduce {
     my ($self, $caller) = @_;
     my $loc;
     if ($caller =~ /start$/) {
-        $loc = reduce {
-            $a < $b ? $a : $b
-            }
-        map {$_->$caller}
-        @{$self->segments};
+        $loc = min map {my $v = $_->$caller} @{$self->segments};
     } else {
-        $loc = reduce {
-            $a > $b ? $a : $b
-            }
-        map {$_->$caller}
-        @{$self->segments};
+        $loc = max map {my $v = $_->$caller} @{$self->segments};
     }
     $loc;
 }

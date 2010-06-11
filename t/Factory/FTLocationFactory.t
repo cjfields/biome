@@ -76,19 +76,21 @@ my %testcases = (
     # SPLITS
     
     "join(AY016290.1:108..185,AY016291.1:1546..1599)"=> [0, $split_impl,
-        108, 108, "JOIN", 185, 185, "JOIN", "JOIN", 2, undef],
+        108, 108, "EXACT", 185, 185, "EXACT", "JOIN", 2, undef],
     "join(12..78,134..202)" => [0, $split_impl,
-        12, 12, "JOIN", 202, 202, "JOIN", "JOIN", 2, 1],
+        12, 12, "EXACT", 202, 202, "EXACT", "JOIN", 2, 1],
+    "join(<12..78,134..202)" => [0, $split_impl,
+        undef, 12, undef, 202, 202, "EXACT", "JOIN", 2, 1],
     "complement(join(2691..4571,4918..5163))" => [0, $split_impl,
-        2691, 2691, "JOIN", 5163, 5163, "JOIN", "JOIN", 2, -1],
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1],
     "complement(join(4918..5163,2691..4571))" => [0, $split_impl,
-        2691, 2691, "JOIN", 5163, 5163, "JOIN", "JOIN", 2, -1],
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1],
     "join(complement(4918..5163),complement(2691..4571))" => [
         'complement(join(2691..4571,4918..5163))', $split_impl,
-        2691, 2691, "JOIN", 5163, 5163, "JOIN", "JOIN", 2, -1],
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1],
     "join(complement(2691..4571),complement(4918..5163))" => [
         'complement(join(4918..5163,2691..4571))', $split_impl,
-        2691, 2691, "JOIN", 5163, 5163, "JOIN", "JOIN", 2, -1],
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1],
     "complement(34..(122.126))" => [0, $simple_impl,
         34, 34, "EXACT", 122, 126, "WITHIN", "EXACT", 0, -1],
     
@@ -96,21 +98,21 @@ my %testcases = (
     
     'join(11025..11049,join(complement(239890..240081),complement(241499..241580),complement(251354..251412),complement(315036..315294)))'
         => ['join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))',
-            $split_impl,11025,11025, 'JOIN', 315294, 315294, 'JOIN', 'JOIN', 2, undef],
+            $split_impl,11025,11025, 'EXACT', 315294, 315294, 'EXACT', 'JOIN', 2, undef],
     'join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))'
-        => [0, $split_impl,11025,11025, 'JOIN', 315294, 315294, 'JOIN', 'JOIN', 2, undef],
+        => [0, $split_impl,11025,11025, 'EXACT', 315294, 315294, 'EXACT', 'JOIN', 2, undef],
     'join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))'
-        => [0, $split_impl,20464,20464, 'JOIN', 314672, 314672, 'JOIN', 'JOIN', 3, undef],
+        => [0, $split_impl,20464,20464, 'EXACT', 314672, 314672, 'EXACT', 'JOIN', 3, undef],
     'join(20464..20694,21548..22763,join(complement(231520..231669),complement(232596..232990),complement(314652..314672)))'
         => ['join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))',$split_impl,
-            20464,20464, 'JOIN', 314672, 314672, 'JOIN', 'JOIN', 3, undef],
+            20464,20464, 'EXACT', 314672, 314672, 'EXACT', 'JOIN', 3, undef],
         
     # not passing yet, getting redundant commas, probably from recursive joins
     'join(1000..2000,join(3000..4000,join(5000..6000,7000..8000)),9000..10000)'
-        => [0, $split_impl,1000,1000,'JOIN', 10000, 10000, 'JOIN', 'JOIN', 3, 1],
+        => [0, $split_impl,1000,1000,'EXACT', 10000, 10000, 'EXACT', 'JOIN', 3, 1],
     
     'order(S67862.1:72..75,join(S67863.1:1..788,1..19))'
-        => [0, $split_impl, 72, 72, 'ORDER', 75, 75, 'ORDER', 'ORDER', 2, undef],
+        => [0, $split_impl, 72, 72, 'EXACT', 75, 75, 'EXACT', 'ORDER', 2, undef],
           );
 
 my $locfac = Biome::Factory::FTLocationFactory->new(-verbose => 1);
@@ -129,10 +131,10 @@ foreach my $locstr (keys %testcases) {
     isa_ok($loc, $rest[0]);
     is($loc->min_start(), $rest[1], "min_start: $locstr");
     is($loc->max_start(), $rest[2], "max_start: $locstr");
-    #is($loc->start_pos_type(), $rest[3], "start_pos_type: $locstr");
+    is($loc->start_pos_type(), $rest[3], "start_pos_type: $locstr");
     is($loc->min_end(), $rest[4], "min_end: $locstr");
     is($loc->max_end(), $rest[5], "max_end: $locstr");
-    #is($loc->end_pos_type(), $rest[6], "end_pos_type: $locstr");
+    is($loc->end_pos_type(), $rest[6], "end_pos_type: $locstr");
     is($loc->segment_type(), $rest[7], "segment_type: $locstr");
     my @locs = $loc->sub_Segments();
     is(@locs, $rest[8], "sub_Segments: $locstr");
