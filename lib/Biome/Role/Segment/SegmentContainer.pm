@@ -3,20 +3,21 @@ package Biome::Role::Segment::SegmentContainer;
 use Biome::Role;
 use Biome::Segment::Simple;
 use MooseX::Types::Moose qw(Maybe);
-use List::Util qw(min max reduce);
-use List::MoreUtils qw(any);
+use List::Util qw(reduce);
 use Biome::Types qw(Split_Segment_Type Sequence_Strand);
 
 # this is a role mainly for consistency with BioPerl's locations.
 
 has     'segments'  => (
     is          => 'rw',
-    isa         => 'ArrayRef[Any]',
+    isa         => 'ArrayRef[Biome::Role::Range|Biome::Role::Segment::SegmentContainer]',
     traits      => ['Array'],
     handles     => {
         add_sub_Segment      => 'push',
         sub_Segments         => 'elements',
         remove_sub_Segments  => 'clear',
+        _reduce_segs         => 'reduce',
+        _sort_segs           => 'sort',
         get_sub_Segment      => 'get',
         num_sub_Segments     => 'count',
     },
@@ -120,13 +121,12 @@ sub end_pos_type {
 # helper, just grabs the indicated value for the contained segments
 sub _reduce {
     my ($self, $caller) = @_;
-    my $loc;
-    if ($caller =~ /start$/) {
-        $loc = min map {my $v = $_->$caller} @{$self->segments};
-    } else {
-        $loc = max map {my $v = $_->$caller} @{$self->segments};
-    }
-    $loc;
+    my @segs = sort {
+        $a->$caller <=> $b->$caller
+                     }
+    grep {$_->$caller} $self->sub_Segments;
+    return unless @segs == $self->num_sub_Segments;
+    $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
 }
 
 sub sub_Segment_strand {
