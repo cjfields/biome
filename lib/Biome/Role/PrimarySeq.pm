@@ -1,7 +1,7 @@
 package Biome::Role::PrimarySeq;
 
 use Biome::Role;
-use Biome::Types qw(SequenceAlphabet);
+use Biome::Types qw(Sequence_Alphabet);
 
 use Biome::Tools::CodonTable;
 
@@ -15,7 +15,7 @@ has raw_seq => (
 # make a subtype or coerce input into a subtype?
 has alphabet => (
    is    => 'rw',
-   isa   => SequenceAlphabet,
+   isa   => Sequence_Alphabet,
 );
 
 has is_circular => (
