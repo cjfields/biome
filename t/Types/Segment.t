@@ -12,7 +12,7 @@ BEGIN {
 {
     package Foo;
     use Biome;
-    use Biome::Types qw(Segment_Pos_Type Segment_Type);
+    use Biome::Type::Segment qw(Segment_Pos_Type Segment_Type);
     has pos_type      => (
         isa     => Segment_Pos_Type,
         is      => 'rw',

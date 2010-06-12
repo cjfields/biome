@@ -12,7 +12,7 @@ BEGIN {
 {
     package Foo;
     use Biome;
-    use Biome::Types qw(Sequence_Strand);
+    use Biome::Type::Sequence qw(Sequence_Strand);
     has strand      => (
         isa     => Sequence_Strand,
         is      => 'rw',

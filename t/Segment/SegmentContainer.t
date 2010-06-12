@@ -45,65 +45,54 @@ $f = Biome::Segment::Simple->new(
 is($f->start, 50);
 is($f->to_string(), '<50..61');
 
-TODO: {
-    local $TODO = 'Not implemented for fuzzy locations yet';
-    ok(0);
-    #ok(! defined $f->min_start);
-    #is($f->max_start, 50);
-}
+ok(! defined $f->min_start);
+is($f->max_start, 50);
 
 is($container->num_sub_Segments(), 4);
 
-#is($container->max_end, 90);
-#is($container->min_start, 13);
+is($container->max_end, 90);
+is($container->min_start, 13);
 is($container->start, 13);
 is($container->end, 90);
 
 $container->add_sub_Segment($f);
 is($container->num_sub_Segments(), 5);
 
-done_testing();
+my $simple = Biome::Segment::Simple->new(location_string => '10..20');
 
-__END__
+my $fuzzy = Biome::Segment::Simple->new( location_string  => '<10..20');
 
 $fuzzy->strand(-1);
-is($fuzzy->to_FTstring(), 'complement(<10..20)');
-is($simple->to_FTstring(), '10..20');
+is($fuzzy->to_string(), 'complement(<10..20)');
+
+
+is($simple->to_string(), '10..20');
 $simple->strand(-1);
-is($simple->to_FTstring(), 'complement(10..20)');
-is( $splitlocation->to_FTstring(), 
+is($simple->to_string(), 'complement(10..20)');
+is( $container->to_string(), 
     'join(13..30,30..90,18..22,19..20,<50..61)');
 
 # test for bug #1074
-$f = Bio::Location::Simple->new(-start  => 5,
+$f = Biome::Segment::Simple->new(-start  => 5,
 			       -end    => 12,
 			       -strand => -1);
-$splitlocation->add_sub_Location($f);
-is( $splitlocation->to_FTstring(), 
+$container->add_sub_Segment($f);
+is( $container->to_string(), 
     'join(13..30,30..90,18..22,19..20,<50..61,complement(5..12))',
 	'Bugfix 1074');
-$splitlocation->strand(-1);
-is( $splitlocation->to_FTstring(), 
+$container->strand(-1);
+
+TODO: {
+    local $TODO = "Check this test, may not be correct with this implementation";
+    is( $container->to_string(), 
     'complement(join(13..30,30..90,18..22,19..20,<50..61,5..12))');
-
-$f = Bio::Location::Fuzzy->new(-start => '45.60',
-			      -end   => '75^80');
-
-is($f->to_FTstring(), '(45.60)..(75^80)');
-$f->start('20>');
-is($f->to_FTstring(), '>20..(75^80)');
-
-# test that even when end < start that length is always positive
-
-$f = Bio::Location::Simple->new(-verbose => -1,
-			       -start   => 100, 
-			       -end     => 20, 
-			       -strand  => 1);
-
-is($f->length, 81, 'Positive length');
-is($f->strand,-1);
+}
 
 # test that can call seq_id() on a split location;
-$splitlocation = Bio::Location::Split->new(-seq_id => 'mysplit1');
-is($splitlocation->seq_id,'mysplit1', 'seq_id() on Bio::Location::Split');
-is($splitlocation->seq_id('mysplit2'),'mysplit2');
+$container = Biome::Segment::Split->new(seq_id => 'mysplit1');
+is($container->seq_id,'mysplit1', 'seq_id() on Bio::Segment::Split');
+is($container->seq_id('mysplit2'),'mysplit2');
+
+done_testing();
+
+__END__
