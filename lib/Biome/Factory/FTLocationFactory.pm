@@ -25,19 +25,9 @@ sub BUILD {
     $self->load_modules($SIMPLE_CLASS,$SPLIT_CLASS);
 }
 
-has coordinate_policy   => (
-    is          => 'ro',
-    does        => 'Biome::Location::Role::CoordinatePolicy',
-    #required    => 1,
-);
-
 sub from_string {
     my ($self,$locstr,$op) = @_;
     my $loc;
-    
-    #$self->debug("$locstr\n");
-    
-    # $op for operator (error handling)
     
     # run on first pass only
     # Note : These location types are now deprecated in GenBank (Oct. 2006)

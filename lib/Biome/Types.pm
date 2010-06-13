@@ -33,7 +33,7 @@ use MooseX::Types -declare => [qw(
                                Location
 							   )];
 
-use MooseX::Types::Moose qw(Int Str Object Any);
+use MooseX::Types::Moose qw(Int Str Object CodeRef Any);
 
 subtype Sequence_Strand,
 	as Int,

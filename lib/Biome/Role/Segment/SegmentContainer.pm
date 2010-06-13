@@ -1,16 +1,12 @@
 package Biome::Role::Segment::SegmentContainer;
 
 use Biome::Role;
-use Biome::Segment::Simple;
-use MooseX::Types::Moose qw(Maybe);
-use List::Util qw(reduce);
-use Biome::Types qw(Split_Segment_Type Sequence_Strand);
-
-# this is a role mainly for consistency with BioPerl's locations.
+use Biome::Type::Segment qw(Split_Segment_Type);
+use Biome::Type::Sequence qw(Sequence_Strand);
 
 has     'segments'  => (
     is          => 'rw',
-    isa         => 'ArrayRef[Biome::Role::Range|Biome::Role::Segment::SegmentContainer]',
+    isa         => 'ArrayRef[Biome::Role::Range]',
     traits      => ['Array'],
     handles     => {
         add_sub_Segment      => 'push',
@@ -37,97 +33,12 @@ has     'maps_to_single'    => (
     is          => 'rw'
 );
 
-has     'strand'      => (
-    isa         => Maybe[Sequence_Strand],
-    is          => 'rw',
-    lazy        => 1,
-    predicate   => 'has_strand',
-    default     => sub {
-        my $self = shift;
-        return $self->sub_Segment_strand;
-        },
-);
-
 has     'resolve_Segments'      => (
     isa         => 'Bool',
     is          => 'rw',
     lazy        => 1,
     default     => 1,
 );
-
-has     'is_remote'             => (
-    isa         => 'Bool',
-    is          => 'rw',
-    lazy        => 1,
-    default     => sub {
-        my $self = shift;
-        for my $seg ($self->sub_Segments) {
-            return 1 if $seg->is_remote;
-        }
-        0;
-    }
-);
-
-sub start {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->start if $self->is_remote;
-    return $self->_reduce('start');
-}
-
-sub end {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->end if $self->is_remote;
-    return $self->_reduce('end');
-}
-
-sub min_start {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->min_start if $self->is_remote;
-    return $self->_reduce('min_start');
-}
-
-sub max_start {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->max_start if $self->is_remote;
-    return $self->_reduce('max_start');
-}
-
-sub min_end {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->min_end if $self->is_remote;
-    return $self->_reduce('min_end');
-}
-
-sub max_end {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->max_end if $self->is_remote;
-    return $self->_reduce('max_end');
-}
-
-sub start_pos_type {
-    my $self = shift;
-    my $type = reduce {$a eq $b ? $a : undef}
-        map {$_->start_pos_type} $self->sub_Segments;
-    return $type;
-}
-
-sub end_pos_type {
-    my $self = shift;
-    my $type = reduce {$a eq $b ? $a : undef} 
-        map {$_->end_pos_type} $self->sub_Segments;
-    return $type;
-}
-
-# helper, just grabs the indicated value for the contained segments
-sub _reduce {
-    my ($self, $caller) = @_;
-    my @segs = sort {
-        $a->$caller <=> $b->$caller
-                     }
-    grep {$_->$caller} $self->sub_Segments;
-    return unless @segs == $self->num_sub_Segments;
-    $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
-}
 
 sub sub_Segment_strand {
     my ($self) = @_;
@@ -146,32 +57,6 @@ sub sub_Segment_strand {
         }
     }
     return $strand;
-}
-
-sub flip_strand {
-    my $self = shift;
-    my @segs = @{$self->segments()};
-    @segs = map {$_->flip_strand(); $_} reverse @segs;
-    $self->segments(\@segs);
-}
-
-sub to_string {
-    my $self = shift;
-    # JOIN assumes specific order, ORDER does not, BOND
-    my $type = $self->segment_type;
-    if ($self->resolve_Segments) {
-        my $substrand = $self->sub_Segment_strand;
-        if ($substrand && $substrand < 0) {
-            $self->flip_strand();
-            $self->strand(-1);
-        }
-    }
-    my @segs = $self->sub_Segments;
-    my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
-    if ($self->strand && $self->strand < 0) {
-        $str = "complement($str)";
-    }
-    $str;
 }
 
 no Biome::Role;

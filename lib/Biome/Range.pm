@@ -2,6 +2,29 @@ package Biome::Range;
 
 use Biome;
 
+use Biome::Types qw(Sequence_Strand);
+
+has strand  => (
+    isa     => Sequence_Strand,
+    is      => 'rw',
+    default => 0,
+    coerce  => 1
+);
+
+has start   => (
+    is      => 'rw',
+    isa     => 'Int',
+);
+
+has end     => (
+    is      => 'rw',
+    isa     => 'Int'
+);
+
+sub length {
+    $_[0]->end - $_[0]->start + 1;
+}
+
 with 'Biome::Role::Range';
 
 sub to_string {
