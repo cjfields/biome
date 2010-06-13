@@ -27,7 +27,6 @@ requires qw(
     sub_Segments
 );
 
-# don't think remote seq_ids make sense with Splits, but there we have it...
 has 'seq_id' => (
     is              => 'rw', 
     isa             => 'Str',
