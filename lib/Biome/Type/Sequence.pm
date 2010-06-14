@@ -13,14 +13,20 @@ use MooseX::Types -declare => [qw(
 							   Sequence_Strand_Int
 							   Sequence_Strand_Symbol
 							   Sequence_Alphabet
+							   Sequence_Phase
 							   )];
 
-use MooseX::Types::Moose qw(Int Str Object CodeRef Any);
+use MooseX::Types::Moose qw(Int Str Object CodeRef Any Maybe);
 
 subtype Sequence_Strand,
 	as Int,
 	where {$_ >= -1 && $_ <= 1},
 	message { "Strand can be -1, 0, or 1, not $_"};
+    
+subtype Sequence_Phase,
+	as Maybe[Int],
+	where  { $_ >= 0 && $_ <= 2},
+	message { "Phase can be 0, 1, 2, or undefined" };
 
 subtype Sequence_Strand_Symbol,
 	as Str,

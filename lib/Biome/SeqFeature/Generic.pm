@@ -1,6 +1,7 @@
 package Biome::SeqFeature::Generic;
 
 use Biome;
+use Biome::Segment::Simple;
 
 sub BUILD {
     my ($self, $params) = @_;
@@ -11,6 +12,11 @@ sub BUILD {
 }
 
 with 'Biome::Role::Locatable';
+
+sub _build_location {
+    return Biome::Segment::Simple->new();
+}
+
 with 'Biome::Role::SeqFeature';
 
 no Biome;
