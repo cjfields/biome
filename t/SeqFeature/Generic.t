@@ -5,7 +5,7 @@ use strict;
 
 BEGIN { 
     use lib '.';
-    use Test::More tests => 24;
+    use Test::More;
     use Test::Moose;
     use Test::Exception;
 	use_ok('Biome::SeqFeature::Generic');
@@ -37,7 +37,6 @@ is $feat->start, 40, 'start of feature location';
 is $feat->end, 80, 'end of feature location';
 is $feat->strand, 1, 'strand of feature location';
 is $feat->length, 41, 'length of feature location';
-isa_ok $feat->location, 'Biome::Segment::Simple';
 does_ok $feat->location, 'Biome::Role::Range';
 
 # Taggable
@@ -68,3 +67,5 @@ my $sub = $feat->primary_seq;
 isa_ok($sub, 'Biome::PrimarySeq');
 is $sub->raw_seq, 'gccggccgtggcgtagagcgcgaggacggcgaccggcgtgg';
 is $feat->length, $sub->length, 'lengths match';
+
+done_testing();

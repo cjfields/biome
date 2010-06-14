@@ -13,7 +13,8 @@ my $simple = Biome::Segment::Simple->new(
     -start  => 10,
     -end    => 20,
     -strand => 1,
-    -seq_id => 'my1');
+    -seq_id => 'my1',
+    -is_remote => 1);
 isa_ok($simple, 'Biome::Segment::Simple');
 does_ok($simple, 'Biome::Role::Segment',  'does Segment');
 does_ok($simple, 'Biome::Role::Range',  'has Range');
@@ -55,7 +56,7 @@ is($exact->length, 0);
 is($exact->segment_type, 'IN-BETWEEN');
 ok(!$exact->is_fuzzy);
 
-is ($exact->to_string, 'my2:10^11','full FT string');
+is ($exact->to_string, '10^11','full FT string');
 
 # check coercions with segment_type and strand
 $exact = Biome::Segment::Simple->new(

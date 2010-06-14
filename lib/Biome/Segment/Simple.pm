@@ -117,13 +117,15 @@ has 'segment_type'  => (
     coerce      => 1
 );
 
+has 'is_remote' => (
+    is              => 'rw', 
+    isa             => 'Bool',
+    default         => 0
+);
+
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
 # these just delegate to start, end, using the indicated offsets
-
-sub is_remote {
-    defined($_[0]->seq_id) ? 1 : 0;
-}
 
 sub max_start {
     my ($self) = @_;
@@ -172,6 +174,7 @@ sub to_string {
         min_end max_end
         start_offset end_offset
         start_pos_type end_pos_type
+        is_remote
         seq_id
         segment_type)) {
         $data{$_} = $self->$_;
@@ -202,7 +205,7 @@ sub to_string {
     my $str = $data{start_string}. ($data{end_string} ? 
             to_Segment_Symbol($data{segment_type}).
             $data{end_string} : '');
-    $str = "$data{seq_id}:$str" if $data{seq_id};
+    $str = "$data{seq_id}:$str" if $data{seq_id} && $data{is_remote};
     $str = "($str)" if $data{segment_type} eq 'WITHIN';
     if ($self->strand == -1) {
         $str = sprintf("complement(%s)",$str)
@@ -231,6 +234,7 @@ sub from_string {
     # SeqID
     if (@loc_data == 5) {
         $atts{seq_id} = shift @loc_data;
+        $atts{is_remote} = 1;
         shift @loc_data; # get rid of ':'
     }
     for my $i (0..$#loc_data) {

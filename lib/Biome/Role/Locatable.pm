@@ -2,16 +2,12 @@ package Biome::Role::Locatable;
 
 use Biome::Role;
 
-# default to a generic Range for now
-use Biome::Segment::Simple;
-
 # this allows anything that does Biome::Role::Rangeable to work here
 has 'location'  => (
     does        => 'Biome::Role::Range',
     is          => 'rw',
-    handles     => [qw(start end strand length overlaps contains)],
-    lazy        => 1,
-    default     => sub {Biome::Segment::Simple->new()}
+    handles     => 'Biome::Role::Range',
+    lazy_build  => 1
 );
 
 no Biome::Role;

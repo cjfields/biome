@@ -1,61 +1,13 @@
-package Biome::Role::SeqFeature;
+package Biome::Role::Scorable;
 
 use Biome::Role;
-use Biome::Type::Sequence qw(Sequence_Phase);
 
-=head1
+# simply holds the score attribute for now, may hold mappable scores at some
+# point
 
-A SeqFeature has these Roles:
-
-1) Locatable (and delegates to the Location).
-2) is Identifiable and Describable
-3) contains tag-value pairs (Taggable)
-4) is linked to, or contains, a PrimarySeq (PrimarySeqContainer)
-
-And possibly: 
-
-5) may contain annotations (Annotatable)
-
-=cut
-
-with qw(Biome::Role::Taggable
-        Biome::Role::Describable
-        Biome::Role::Identifiable
-        Biome::Role::Scorable
-        Biome::Role::PrimarySeqContainer
-        Biome::Role::SeqFeature::Collection);
-
-# minimal required methods to define location of SeqFeature on a Seq string.
-# Note that this doesn't have to come from the location (eg these could be
-# defined in the implementation or consumed from a Role, and these could inform
-# the location instead of vice versa).
-
-# implemented in Biome::Role::Segment, part of Biome::Role::Locatable
-requires qw(
-    start
-    end
-    strand
-    length
-    overlaps
-    contains
-    intersection
-    union
-);
-
-has 'seq_id'    => (
-    isa         => 'Str',
-    is          => 'rw'
-);
-
-has 'phase'         => (
-    isa         => Sequence_Phase,
-    is          => 'rw',
-);
-
-has 'type'         => (
-    isa         => 'Str',     # change this to Ontology Term class of some sort?
-    is          => 'rw',
-    predicate   => 'has_type'
+has score   => (
+    isa     => 'Num',
+    is      => 'rw'
 );
 
 no Biome::Role;
@@ -64,24 +16,29 @@ no Biome::Role;
 
 __END__
 
+
 =head1 NAME
 
-Biome::Role::SeqFeature - Role that describes basic methods/attributes
-for describing a Feature on a sequence.
+Biome::Role::Scorable - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::SeqFeature version 0.01.
+This documentation refers to Biome::Role::Scorable version Biome::Role.
 
 =head1 SYNOPSIS
 
-   use Biome::Role::SeqFeature;
-   
+   with 'Biome::Role::Scorable';
+   # Brief but working code example(s) here showing the most common usage(s)
+
+   # This section will be as far as many users bother reading,
+
+   # so make it as educational and exemplary as possible.
+
 =head1 DESCRIPTION
 
-This is an abstract Role that contains the basic methods/attributes for
-describing a sequence feature.  Most of the methods described here may be 
-defined in other roles.  
+<TODO>
+A full description of the module and its features.
+May include numerous subsections (i.e., =head2, =head3, etc.).
 
 =head1 SUBROUTINES/METHODS
 
@@ -230,11 +187,11 @@ welcome.
 
 =head1 AUTHOR
 
-Chris Fields  (cjfields at bioperl dot org)
+Chris Fields  C<< <cjfields at bioperl dot org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) 2010 Chris Fields (cjfields at bioperl dot org). All rights reserved.
 
 followed by whatever licence you wish to release it under.
 For Perl code that is often just:

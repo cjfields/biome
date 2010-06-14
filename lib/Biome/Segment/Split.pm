@@ -43,19 +43,13 @@ sub end {
     return $self->_reduce('end');
 }
 
-# this is cached for speed
-has     'is_remote'             => (
-    isa         => 'Bool',
-    is          => 'rw',
-    lazy        => 1,
-    default     => sub {
-        my $self = shift;
-        for my $seg ($self->sub_Segments) {
-            return 1 if $seg->is_remote;
-        }
-        0;
+sub is_remote {
+    my $self = shift;
+    for my $seg ($self->sub_Segments) {
+        return 1 if $seg->is_remote;
     }
-);
+    0;
+}
 
 sub min_start {
     my $self = shift;
@@ -150,6 +144,7 @@ sub to_string {
     $str;
 }
 
+# could do all string parsing here instead of FTLocationFactory...
 sub from_string {
     shift->throw_not_implemented;
 }
