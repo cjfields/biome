@@ -3,8 +3,8 @@ package Biome::Role::Segment;
 use 5.010;
 use Biome::Role;
 
-use Biome::Types qw(Segment_Type Segment_Symbol
-    Segment_Pos_Type Segment_Pos_Symbol Sequence_Strand);
+use Biome::Type::Segment qw(Segment_Type Segment_Symbol Segment_Pos_Type);
+use Biome::Type::Sequence qw(Sequence_Strand);
 
 with 'Biome::Role::Range';
     

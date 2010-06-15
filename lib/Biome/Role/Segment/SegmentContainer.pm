@@ -4,7 +4,7 @@ use Biome::Role;
 use Biome::Type::Segment qw(Split_Segment_Type);
 use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 
-with 'Biome::Role::Range';
+with 'Biome::Role::Segment';
 
 has     'segments'  => (
     is          => 'rw',
@@ -41,6 +41,7 @@ has     'resolve_Segments'      => (
     lazy        => 1,
     default     => 1,
 );
+
 
 sub sub_Segment_strand {
     my ($self) = @_;
