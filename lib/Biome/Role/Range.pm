@@ -2,7 +2,26 @@ package Biome::Role::Range;
 
 use Biome::Role;
 
-requires qw(start end strand length);
+use Biome::Type::Sequence qw(Sequence_Strand);
+
+requires 'to_string', 'length';
+
+has strand  => (
+    isa     => Sequence_Strand,
+    is      => 'rw',
+    default => 0,
+    coerce  => 1
+);
+
+has start   => (
+    is      => 'rw',
+    isa     => 'Int',
+);
+
+has end     => (
+    is      => 'rw',
+    isa     => 'Int'
+);
 
 # returns true if strands are equal and non-zero
 our %VALID_STRAND_TESTS = (
