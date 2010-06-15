@@ -5,27 +5,260 @@ use namespace::clean -except => 'meta';
 
 requires qw(
     seq_id
-    
     start
     end
     strand
     length
     
-    overlaps
-    contains
-    equals
-    
-    intersection
-    union
-    subtract
-    overlap_extent
-    
     flip_strand
     
-    to_string
     from_string
     to_string
 );
+
+# returns true if strands are equal and non-zero
+our %VALID_STRAND_TESTS = (
+    'strong' => 1,
+    'weak'   => 1,
+    'ignore' => 1
+    );
+
+sub _strong {
+    my ($s1, $s2) = ($_[0]->strand, $_[1]->strand);
+    ($s1 != 0 && $s1 == $s2) ? 1 : 0
+}
+
+sub _weak {
+    my ($s1, $s2) = ($_[0]->strand, $_[1]->strand);
+    ($s1 == 0 || $s2 == 0 || $s1 == $s2) ? 1 : 0;
+}
+
+sub _ignore { 1 }
+
+# works out what test to use for the strictness and returns true/false
+# e.g. $r1->_testStrand($r2, 'strong')
+sub _testStrand() {
+    my ($r1, $r2, $comp) = @_;
+    return 1 unless $comp;
+    $r1->throw("$comp is not a supported strand test") unless exists $VALID_STRAND_TESTS{lc $comp};
+    my $test = '_'.lc $comp;
+    return $r1->$test($r2);
+}
+
+sub overlaps {
+    my ($self, $other, $so) = @_;
+    $self->_eval_ranges($other);
+    ($self->_testStrand($other, $so)
+        && !(($self->start() > $other->end() || $self->end() < $other->start())))
+    ? 1 : 0;
+}
+
+sub contains {
+    my ($self, $other, $so) = @_;
+    $self->_eval_ranges($other);
+    ($self->_testStrand($other, $so)
+        && $other->start() >= $self->start() && $other->end() <= $self->end())
+    ? 1 : 0;
+}
+
+sub equals {
+    my ($self, $other, $so) = @_;
+    $self->_eval_ranges($other);
+    ($self->_testStrand($other, $so)
+        && $self->start() == $other->start() && $self->end() == $other->end())
+    ? 1 : 0;
+}
+
+# Original interface for this is a bit odd (accepts array or array ref with
+# strand test). API also differs from union()
+# Original code did not include appear to include self for some reason.
+
+sub intersection {
+    my ($self, $given, $so) = @_;
+    $self->throw("Missing arg: you need to pass in another Range") unless $given;
+    $so ||= 'ignore';
+    my @ranges;
+    ref($given) eq 'ARRAY' ? push( @ranges, @{$given}) : push(@ranges, $given);
+
+    $self->_eval_ranges(@ranges);
+    my $intersect;
+    while (@ranges > 0) {
+        unless ($intersect) {
+            $intersect = $self;
+        }
+
+        my $compare = shift(@ranges);
+        
+        last if !defined $compare;
+        
+        if (!$compare->_testStrand($intersect, $so)) {
+            return
+        }
+
+        my @starts = sort {$a <=> $b} ($intersect->start(), $compare->start());
+        my @ends   = sort {$a <=> $b} ($intersect->end(), $compare->end());
+
+        my $start = pop @starts; # larger of the 2 starts
+        my $end = shift @ends;   # smaller of the 2 ends
+
+        my $intersect_strand;    # strand for the intersection
+        if (defined($intersect->strand) && defined($compare->strand) && $intersect->strand == $compare->strand) {
+            $intersect_strand = $compare->strand;
+        }
+        else {
+            $intersect_strand = 0;
+        }
+
+        if ($start > $end) {
+            return;
+        } else {
+            $intersect = (blessed $self)->new(-start  => $start,
+                                    -end    => $end,
+                                    -strand => $intersect_strand);
+        }
+    }
+    return $intersect;     
+}
+
+sub union {
+    my ($self, $given, $so) = @_;
+    
+    # strand test doesn't matter here 
+    
+    $self->_eval_ranges(@$given);
+    
+    my @start = sort {$a <=> $b} map { $_->start() } ($self, @$given);
+    my @end   = sort {$a <=> $b} map { $_->end()   } ($self, @$given);
+
+    my $start = shift @start;
+    while( !defined $start ) {
+        $start = shift @start;
+    }
+
+    my $end = pop @end;
+
+    my $union_strand = $self->strand;  # Strand for the union range object.
+
+    for my $r (@$given) {
+        if(!defined $r->strand || $union_strand ne $r->strand) {
+            $union_strand = 0;
+            last;
+        }
+    }
+    return unless $start || $end;
+    return (blessed $self)->new('-start' => $start,
+                      '-end' => $end,
+                      '-strand' => $union_strand
+                      );
+}
+
+### Other methods
+
+# should this return lengths or Range implementors?
+# currently, returns integers, but I think Ranges would be more informative...
+
+sub overlap_extent{
+	my ($a,$b) = @_;
+
+	$a->_eval_ranges($b);
+
+	if( ! $a->overlaps($b) ) {
+	    return ($a->clone,0,$b->clone);
+	}
+
+	my ($au,$bu) = (0, 0);
+	if( $a->start < $b->start ) {
+		$au = $b->start - $a->start;
+	} else {
+		$bu = $a->start - $b->start;
+	}
+
+	if( $a->end > $b->end ) {
+		$au += $a->end - $b->end;
+	} else {
+		$bu += $b->end - $a->end;
+	}
+
+	my $intersect = $a->intersection($b);
+	if( ! $intersect ) {
+	    $a->warn("no intersection\n");
+	    return ($au, 0, $bu);
+	} else {
+	    my $ie = $intersect->end;
+	    my $is = $intersect->start;
+	    return ($au,$ie-$is+1,$bu);
+	}
+}
+
+sub subtract {
+    my ($self, $range, $so) = @_;
+
+    return $self unless $self->_testStrand($range, $so);
+
+    $self->_eval_ranges($range);
+
+    if (!$self->overlaps($range)) {
+        return $self;  # no Range; maybe this should be Range?
+    }
+
+    # Subtracts everything (empty Range of length = 0 and strand = 0 
+    if ($self->equals($range) || $range->contains($self)) {
+        return (blessed $self)->new(-start => 0, -end => 0, -strand => 0);
+    }
+
+    my $int = $self->intersection($range, $so);
+    my ($start, $end, $strand) = ($int->start, $int->end, $int->strand);
+    
+    #Subtract intersection from $self
+    my @outranges = ();
+    if ($self->start < $start) {
+        push(@outranges, 
+		 (blessed $self)->new(
+                '-start'=> $self->start,
+			    '-end'=>$start - 1,
+			    '-strand'=>$self->strand,
+			   ));
+    }
+    if ($self->end > $end) {
+        push(@outranges, 
+		 (blessed $self)->new('-start'=>$end + 1,
+			    '-end'=>$self->end,
+			    '-strand'=>$self->strand,
+			   ));   
+    }
+    return @outranges;
+}
+
+# should be genericized for nonstranded Ranges.  I'm not sure about
+# modifying the object in place...
+
+sub offset_stranded { 
+    my ($self, $offset_fiveprime, $offset_threeprime) = @_;
+    my ($offset_start, $offset_end) = $self->strand() eq -1 ?
+        (- $offset_threeprime, - $offset_fiveprime) :
+        ($offset_fiveprime, $offset_threeprime);
+    $self->start($self->start + $offset_start);
+    $self->end($self->end + $offset_end);
+    return $self;
+}
+
+############## PRIVATE ##############
+
+# called as instance method only; does slow things down a bit...
+sub _eval_ranges {
+    my ($self, @ranges) = @_;
+    #$self->throw("start is undefined in calling instance") if !defined $self->start;
+    #$self->throw("end is undefined in calling instance") if !defined $self->end;    
+    for my $obj ($self, @ranges) {
+        $self->throw("Not an object") unless ref($obj);
+        $self->throw("start is undefined in instance ".$obj->to_string) if !defined $obj->start;
+        $self->throw("end is undefined in instance ".$obj->to_string) if !defined $obj->end;
+        $self->throw('Rangeable equality or set methods not '.
+                     'implemented yet for fuzzy locations') if
+            $self->does('Bio::Range::Segment') && $self->is_fuzzy;
+    }
+}
+
 
 1;
 

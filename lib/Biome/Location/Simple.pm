@@ -1,12 +1,13 @@
 # Let the code begin...
 
-package Biome::Segment::Simple;
+package Biome::Location::Simple;
 
 use 5.010;
 use Biome;
+use namespace::clean -except => 'meta';
 
-# implementation that covers abstract role
-with 'Biome::Role::Segment';
+with 'Biome::Role::Location::Simple';
+with 'Biome::Role::Does_Location';
 
 sub BUILD {
     my ($self, $params) = @_;
@@ -24,10 +25,8 @@ sub BUILD {
         $self->strand($self->strand * -1);
     }
     
-    $params->{segment_type} && $self->segment_type($params->{segment_type});
+    $params->{location_type} && $self->location_type($params->{location_type});
 }
-
-no Biome;
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,7 +1,9 @@
-package Biome::Role::Does_Segment;
+package Biome::Role::Does_Location;
 
 use Biome::Role;
 use namespace::clean -except => 'meta';
+
+with 'Biome::Role::Does_Range';
 
 requires qw(
     start_pos_type
@@ -16,6 +18,8 @@ requires qw(
     
     is_remote
     is_fuzzy
+    
+    valid_Location
 );
 
 1;

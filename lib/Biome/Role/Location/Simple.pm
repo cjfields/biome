@@ -1,4 +1,4 @@
-package Biome::Role::Segment;
+package Biome::Role::Location::Simple;
 
 use 5.010;
 use Biome::Role;
@@ -6,8 +6,8 @@ use namespace::clean -except => 'meta';
 
 use Biome::Type::Sequence qw(Sequence_Strand);
 
-use Biome::Type::Segment qw(Segment_Type Segment_Symbol
-    Segment_Pos_Type Segment_Pos_Symbol);
+use Biome::Type::Location qw(Location_Type Location_Symbol
+    Location_Pos_Type Location_Pos_Symbol);
 
 has 'strand'  => (
     isa     => Sequence_Strand,
@@ -25,9 +25,9 @@ has 'start' => (
         my $end = $self->end;
         return unless $start && $end;
         # could put start<->end reversal here...
-        if ($self->segment_type eq 'IN-BETWEEN' &&
+        if ($self->location_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1 )) {
-            $self->throw("length of segment with IN-BETWEEN position type ".
+            $self->throw("length of location with IN-BETWEEN position type ".
                          "cannot be larger than 1; got ".abs($end - $start));
     }
 });
@@ -41,16 +41,21 @@ has 'end' => (
         my $start = $self->start;
         return unless $start && $end;
         # could put start<->end reversal here...
-        if ($self->segment_type eq 'IN-BETWEEN' &&
+        if ($self->location_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1) ) {
-            $self->throw("length of segment with IN-BETWEEN position type ".
+            $self->throw("length of location with IN-BETWEEN position type ".
                          "cannot be larger than 1; got ".abs($end - $start));
     }
 });
 
+has seq_id   => (
+    is      => 'rw',
+    isa     => 'Str'
+);
+
 sub length {
     my ($self) = @_;
-    given ($self->segment_type) {
+    given ($self->location_type) {
         when ([qw(EXACT WITHIN)]) {
             return $self->end - $self->start + 1;
         }
@@ -60,15 +65,10 @@ sub length {
     }
 }
 
-sub sub_Segments { }
-
-has 'seq_id' => (
-    is              => 'rw', 
-    isa             => 'Str',
-);
+sub sub_Locations { }
 
 has 'start_pos_type'    => (
-    isa             => Segment_Pos_Type,
+    isa             => Location_Pos_Type,
     is              => 'rw',
     lazy            => 1,
     default         => 'EXACT',
@@ -79,14 +79,14 @@ has 'start_pos_type'    => (
         return unless $self->end && $self->start;
         $self->throw("Start position can't have type $v") if $v eq 'AFTER';
         if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
-            $self->throw("length of segment with IN-BETWEEN position type ".
+            $self->throw("length of location with IN-BETWEEN position type ".
                          "cannot be larger than 1");
         }
     }
 );
 
 has 'end_pos_type'      => (
-    isa             => Segment_Pos_Type,
+    isa             => Location_Pos_Type,
     is              => 'rw',
     lazy            => 1,
     default         => 'EXACT',
@@ -97,7 +97,7 @@ has 'end_pos_type'      => (
         return unless $self->end && $self->start;
         $self->throw("End position can't have type $v") if $v eq 'BEFORE';
         if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
-            $self->throw("length of segment with IN-BETWEEN position type ".
+            $self->throw("length of location with IN-BETWEEN position type ".
                          " cannot be larger than 1");
         }
     }
@@ -111,8 +111,8 @@ has [qw(start_offset end_offset)]  => (
     default         => 0
 );
 
-has 'segment_type'  => (
-    isa         => Segment_Type,
+has 'location_type'  => (
+    isa         => Location_Type,
     is          => 'rw',
     lazy        => 1,
     default     => 'EXACT',
@@ -162,7 +162,7 @@ sub is_fuzzy {
         exists $IS_FUZZY{$self->end_pos_type}) ? 1 : 0;
 }
 
-sub valid_Segment {
+sub valid_Location {
     defined($_[0]->start) && defined($_[0]->end) ? 1 : 0;
 }
 
@@ -178,7 +178,7 @@ sub to_string {
         start_pos_type end_pos_type
         is_remote
         seq_id
-        segment_type)) {
+        location_type)) {
         $data{$_} = $self->$_;
     }
     
@@ -205,10 +205,10 @@ sub to_string {
     }
     
     my $str = $data{start_string}. ($data{end_string} ? 
-            to_Segment_Symbol($data{segment_type}).
+            to_Location_Symbol($data{location_type}).
             $data{end_string} : '');
     $str = "$data{seq_id}:$str" if $data{seq_id} && $data{is_remote};
-    $str = "($str)" if $data{segment_type} eq 'WITHIN';
+    $str = "($str)" if $data{location_type} eq 'WITHIN';
     if ($self->strand == -1) {
         $str = sprintf("complement(%s)",$str)
     }
@@ -222,7 +222,7 @@ sub from_string {
     my ($self, $string) = @_;
     return unless $string;
     if ($string =~ /(?:join|order|bond)/) {
-        $self->throw("Passing a split segment type: $string");
+        $self->throw("Passing a split location type: $string");
     }
     my %atts;
     if ($string =~ /^complement\(([^\)]+)\)$/) {
@@ -255,7 +255,7 @@ sub from_string {
                 $self->throw("Can't parse location string: $str");
             }
         } else {
-            $atts{segment_type} = $str;
+            $atts{location_type} = $str;
         }
     }
     if ($atts{start_pos_type} && $atts{start_pos_type} eq '.' &&
@@ -263,7 +263,7 @@ sub from_string {
         ) {
         $atts{end} = $atts{start} + $atts{start_offset};
         delete @atts{qw(start_offset start_pos_type end_pos_type)};
-        $atts{segment_type} = '.';
+        $atts{location_type} = '.';
     }
     $atts{end} ||= $atts{start} unless $atts{end_pos_type};
     for my $m (sort keys %atts) {
@@ -284,22 +284,22 @@ sub flip_strand {
 
 __END__
 
-=head2 segment_type
+=head2 location_type
 
-  Title   : segment_type
-  Usage   : my $segment_type = $segment->segment_type();
-  Function: Get segment type encoded as text
+  Title   : location_type
+  Usage   : my $location_type = $location->location_type();
+  Function: Get location type encoded as text
   Returns : string ('EXACT', 'WITHIN', 'IN-BETWEEN')
   Args    : none
 
 =head2 start
 
   Title   : start
-  Usage   : $start = $segment->start();
-  Function: Get the start coordinate of this segment. In
+  Usage   : $start = $location->start();
+  Function: Get the start coordinate of this location. In
             simple cases, this will return the same number as
             min_start() and max_start(), in more ambiguous cases like
-            fuzzy segments the number may be equal to one or neither
+            fuzzy locations the number may be equal to one or neither
             of both.
   Returns : A positive integer value.
   Args    : none
@@ -307,11 +307,11 @@ __END__
 =head2 end
 
   Title   : end
-  Usage   : $end = $segment->end();
-  Function: Get the end coordinate of this segment as defined by the
+  Usage   : $end = $location->end();
+  Function: Get the end coordinate of this location as defined by the
             currently active coordinate computation policy. In simple
             cases, this will return the same number as min_end() and
-            max_end(), in more ambiguous cases like fuzzy segments
+            max_end(), in more ambiguous cases like fuzzy locations
             the number may be equal to one or neither of both.
 
             We override this here from Bio::RangeI in order to delegate
@@ -339,47 +339,47 @@ information
 =head2 to_FTstring
 
   Title   : to_FTstring
-  Usage   : my $locstr = $segment->to_FTstring()
-  Function: returns the FeatureTable string of this segment
+  Usage   : my $locstr = $location->to_FTstring()
+  Function: returns the FeatureTable string of this location
   Returns : string
   Args    : none
 
 =head2 valid_Segment
 
  Title   : valid_Segment
- Usage   : if ($segment->valid_Segment) {...};
- Function: boolean method to determine whether segment is considered valid
-           (has minimum requirements for a specific Segment implementation)
- Returns : Boolean value: true if segment is valid, false otherwise
+ Usage   : if ($location->valid_Location) {...};
+ Function: boolean method to determine whether location is considered valid
+           (has minimum requirements for a specific Location implementation)
+ Returns : Boolean value: true if location is valid, false otherwise
  Args    : none
 
 =head2 is_remote
 
  Title   : is_remote
  Usage   : $is_remote_loc = $loc->is_remote()
- Function: Whether or not a segment is a remote segment.
+ Function: Whether or not a location is a remote location.
 
-           A segment is said to be remote if it is on a different
+           A location is said to be remote if it is on a different
            'object' than the object which 'has' this
-           segment. Typically, features on a sequence will sometimes
-           have a remote segment, which means that the segment of
+           location. Typically, features on a sequence will sometimes
+           have a remote location, which means that the location of
            the feature is on a different sequence than the one that is
            attached to the feature. In such a case, $loc->seq_id will
            be different from $feat->seq_id (usually they will be the
            same).
 
-           While this may sound weird, it reflects the segment of the
+           While this may sound weird, it reflects the location of the
            kind of AB18375:450-900 which can be found in GenBank/EMBL
            feature tables.
 
  Example : 
- Returns : TRUE if the segment is a remote segment, and FALSE otherwise
+ Returns : TRUE if the location is a remote location, and FALSE otherwise
  Args    : 
 
 =head2 flip_strand
 
   Title   : flip_strand
-  Usage   : $segment->flip_strand();
+  Usage   : $location->flip_strand();
   Function: Flip-flop a strand to the opposite
   Returns : None
   Args    : None
@@ -387,12 +387,12 @@ information
 =head2 start_pos_type
 
   Title   : pos_type
-  Usage   : my $start_pos_type = $segment->pos_type('start');
+  Usage   : my $start_pos_type = $location->pos_type('start');
   Function: Get indicated position type encoded as text
 
             Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100), 
             'EXACT' (5..100), 'WITHIN' ((5.10)..100), 'BETWEEN', (5^6), with
-            their meaning best explained by their GenBank/EMBL segment string
+            their meaning best explained by their GenBank/EMBL location string
             encoding in brackets.
 
   Returns : string ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
@@ -402,12 +402,12 @@ information
 =head2 end_pos_type
 
   Title   : pos_type
-  Usage   : my $start_pos_type = $segment->pos_type('start');
+  Usage   : my $start_pos_type = $location->pos_type('start');
   Function: Get indicated position type encoded as text
 
             Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100), 
             'EXACT' (5..100), 'WITHIN' ((5.10)..100), 'BETWEEN', (5^6), with
-            their meaning best explained by their GenBank/EMBL segment string
+            their meaning best explained by their GenBank/EMBL location string
             encoding in brackets.
 
   Returns : string ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
@@ -416,8 +416,8 @@ information
 =head2 seq_id
 
   Title   : seq_id
-  Usage   : my $seqid = $segment->seq_id();
-  Function: Get/Set seq_id that segment refers to
+  Usage   : my $seqid = $location->seq_id();
+  Function: Get/Set seq_id that location refers to
   Returns : seq_id (a string)
   Args    : [optional] seq_id value to set
   

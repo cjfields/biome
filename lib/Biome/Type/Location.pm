@@ -6,14 +6,14 @@
 # Moose::Util::TypeParameters, so may revert to the latter if speed becomes an
 # issue
 
-package Biome::Type::Segment;
+package Biome::Type::Location;
 
 use MooseX::Types -declare => [qw(
-                               Segment_Pos_Symbol
-                               Segment_Pos_Type
-                               Segment_Symbol
-                               Segment_Type
-                               Split_Segment_Type
+                               Location_Pos_Symbol
+                               Location_Pos_Type
+                               Location_Symbol
+                               Location_Type
+                               Split_Location_Type
 							   )];
 
 use MooseX::Types::Moose qw(Int Str Object CodeRef Any);
@@ -53,46 +53,46 @@ my %VALID_SEGMENT_POS_TYPE = map {$_ => 1}
 # TODO: some of these could probably be redef. as enums, but it makes coercion
 # easier, needs checking
 
-subtype Segment_Symbol,
+subtype Location_Symbol,
     as Str,
     where {exists $VALID_SEGMENT_SYMBOL{$_}},
-    message {"Unknown Segment symbol $_"};
+    message {"Unknown Location symbol $_"};
 
-subtype Segment_Type,
+subtype Location_Type,
     as Str,
     where {exists $VALID_SEGMENT_TYPE{$_}},
-    message {"Unknown Segment type $_"};
+    message {"Unknown Location type $_"};
 
-subtype Segment_Pos_Symbol,
+subtype Location_Pos_Symbol,
     as Str,
     where {exists $VALID_SEGMENT_POS_SYMBOL{$_}},
-    message {"Unknown Segment positional symbol $_"};
+    message {"Unknown Location positional symbol $_"};
     
-subtype Segment_Pos_Type,
+subtype Location_Pos_Type,
     as Str,
     where {exists $VALID_SEGMENT_POS_TYPE{$_}},
-    message {"Unknown Segment positional type $_"};
+    message {"Unknown Location positional type $_"};
 
-coerce Segment_Pos_Type,
-    from Segment_Pos_Symbol,
+coerce Location_Pos_Type,
+    from Location_Pos_Symbol,
     via {$TYPE_SYMBOL{$_}};
     
-coerce Segment_Pos_Symbol,
-    from Segment_Pos_Type,
+coerce Location_Pos_Symbol,
+    from Location_Pos_Type,
     via {$SYMBOL_TYPE{$_}};
 
-coerce Segment_Symbol,
-    from Segment_Type,
+coerce Location_Symbol,
+    from Location_Type,
     via {$SYMBOL_TYPE{$_}};
 
-coerce Segment_Type,
-    from Segment_Symbol,
+coerce Location_Type,
+    from Location_Symbol,
     via {$TYPE_SYMBOL{$_}};
     
 my %VALID_SPLIT_TYPE = map {$_ => 1}
     qw(JOIN ORDER BOND);
     
-subtype Split_Segment_Type,
+subtype Split_Location_Type,
     as Str,
     where {exists $VALID_SPLIT_TYPE{uc $_}},
     message {"Unknown Split Location type $_"};
