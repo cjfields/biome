@@ -2,12 +2,13 @@ package Biome::Role::Segment;
 
 use 5.010;
 use Biome::Role;
+use namespace::clean -except => 'meta';
 
-use Biome::Type::Segment qw(Segment_Type Segment_Symbol Segment_Pos_Type);
 use Biome::Type::Sequence qw(Sequence_Strand);
 
-with 'Biome::Role::Range';
-    
+use Biome::Type::Segment qw(Segment_Type Segment_Symbol
+    Segment_Pos_Type Segment_Pos_Symbol);
+
 has 'strand'  => (
     isa     => Sequence_Strand,
     is      => 'rw',
@@ -278,8 +279,6 @@ sub flip_strand {
     my $self= shift;
     $self->strand($self->strand * -1);
 }
-
-no Biome::Role;
 
 1;
 

@@ -1,198 +1,31 @@
-package Biome::Role::Segment::SegmentContainer;
+package Biome::Role::Does_Range;
 
 use Biome::Role;
-use Biome::Type::Segment qw(Split_Segment_Type);
-use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 use namespace::clean -except => 'meta';
 
-with 'Biome::Role::Range';
-
-has     'segments'  => (
-    is          => 'rw',
-    isa         => 'ArrayRef[Biome::Role::Range]',
-    traits      => ['Array'],
-    handles     => {
-        add_sub_Segment      => 'push',
-        sub_Segments         => 'elements',
-        remove_sub_Segments  => 'clear',
-        _reduce_segs         => 'reduce',
-        _sort_segs           => 'sort',
-        get_sub_Segment      => 'get',
-        num_sub_Segments     => 'count',
-    },
-    lazy        => 1,
-    default     => sub { [] }
-);
-
-has     'segment_type'    => (
-    isa         => Split_Segment_Type,
-    is          => 'rw',
-    lazy        => 1,
-    default     => 'JOIN'
-);
-
-has     'maps_to_single'    => (
-    isa         => 'Bool',
-    is          => 'rw'
-);
-
-has     'resolve_Segments'      => (
-    isa         => 'Bool',
-    is          => 'rw',
-    lazy        => 1,
-    default     => 1,
-);
-
-
-sub sub_Segment_strand {
-    my ($self) = @_;
-    my ($strand, $lstrand);
+requires qw(
+    seq_id
     
-    # this could use reduce()
-    foreach my $loc ($self->sub_Segments()) {
-        $lstrand = $loc->strand();
-        if((! $lstrand) ||
-           ($strand && ($strand != $lstrand)) ||
-           $loc->is_remote()) {
-            $strand = undef;
-            last;
-        } elsif(! $strand) {
-            $strand = $lstrand;
-        }
-    }
-    return $strand;
-}
-
-# overrides 
-
-has     'strand'      => (
-    isa         => Maybe_Sequence_Strand,
-    is          => 'rw',
-    lazy        => 1,
-    predicate   => 'has_strand',
-    default     => sub {
-        my $self = shift;
-        return $self->sub_Segment_strand;
-        },
+    start
+    end
+    strand
+    length
+    
+    overlaps
+    contains
+    equals
+    
+    intersection
+    union
+    subtract
+    overlap_extent
+    
+    flip_strand
+    
+    to_string
+    from_string
+    to_string
 );
-
-sub start {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->start if $self->is_remote;
-    return $self->_reduce('start');
-}
-
-sub end {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->end if $self->is_remote;
-    return $self->_reduce('end');
-}
-
-sub is_remote {
-    my $self = shift;
-    for my $seg ($self->sub_Segments) {
-        return 1 if $seg->is_remote;
-    }
-    0;
-}
-
-sub min_start {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->min_start if $self->is_remote;
-    return $self->_reduce('min_start');
-}
-
-sub max_start {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->max_start if $self->is_remote;
-    return $self->_reduce('max_start');
-}
-
-sub min_end {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->min_end if $self->is_remote;
-    return $self->_reduce('min_end');
-}
-
-sub max_end {
-    my $self = shift;
-    return $self->get_sub_Segment(0)->max_end if $self->is_remote;
-    return $self->_reduce('max_end');
-}
-
-sub start_pos_type {
-    my $self = shift;
-    my $type = reduce {$a eq $b ? $a : undef}
-        map {$_->start_pos_type} $self->sub_Segments;
-    return $type;
-}
-
-sub end_pos_type {
-    my $self = shift;
-    my $type = reduce {$a eq $b ? $a : undef} 
-        map {$_->end_pos_type} $self->sub_Segments;
-    return $type;
-}
-
-sub valid_Segment {
-    # TODO: add tests
-    my $self = shift;
-    my $type = reduce {$a eq $b ? 1 : 0} 
-        map {$_->valid_Segment} $self->sub_Segments;
-}
-
-sub is_fuzzy {
-    # TODO: add tests
-    my $self = shift;
-    my $type = reduce {$a eq $b ? 1 : 0} 
-        map {$_->is_fuzzy} $self->sub_Segments;
-}
-
-# no offsets for splits?  Or maybe for only the first/last one?
-sub start_offset { 0 }
-sub end_offset { 0 }
-
-# helper, just grabs the indicated value for the contained segments
-sub _reduce {
-    my ($self, $caller) = @_;
-    my @segs = sort {
-        $a->$caller <=> $b->$caller
-                     }
-    grep {$_->$caller} $self->sub_Segments;
-    return unless @segs == $self->num_sub_Segments;
-    $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
-}
-
-sub flip_strand {
-    my $self = shift;
-    my @segs = @{$self->segments()};
-    @segs = map {$_->flip_strand(); $_} reverse @segs;
-    $self->segments(\@segs);
-}
-
-sub to_string {
-    my $self = shift;
-    # JOIN assumes specific order, ORDER does not, BOND
-    my $type = $self->segment_type;
-    if ($self->resolve_Segments) {
-        my $substrand = $self->sub_Segment_strand;
-        if ($substrand && $substrand < 0) {
-            $self->flip_strand();
-            $self->strand(-1);
-        }
-    }
-    my @segs = $self->sub_Segments;
-    my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
-    if ($self->strand && $self->strand < 0) {
-        $str = "complement($str)";
-    }
-    $str;
-}
-
-# could do all string parsing here instead of FTLocationFactory...
-sub from_string {
-    shift->throw_not_implemented;
-}
 
 1;
 
@@ -200,15 +33,15 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Segment::Split - <One-line description of module's purpose>
+Biome::Role::Does_Range - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::Segment::Split version Biome::Role.
+This documentation refers to Biome::Role::Does_Range version Biome::Role.
 
 =head1 SYNOPSIS
 
-   with 'Biome::Role::Segment::Split';
+   with 'Biome::Role::Does_Range';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,
@@ -372,7 +205,7 @@ Chris Fields  (cjfields at bioperl dot org)
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) 2010 Chris Fields (cjfields at bioperl dot org). All rights reserved.
 
 followed by whatever licence you wish to release it under.
 For Perl code that is often just:
