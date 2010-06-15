@@ -1,10 +1,9 @@
-package Biome::Role::Range;
+package Biome::Role::Location::SimpleRange;
 
 use Biome::Role;
+use namespace::clean -except => 'meta';
 
 use Biome::Type::Sequence qw(Sequence_Strand);
-
-requires 'to_string', 'length';
 
 has strand  => (
     isa     => Sequence_Strand,
@@ -22,6 +21,31 @@ has end     => (
     is      => 'rw',
     isa     => 'Int'
 );
+
+has seq_id => (
+    is      => 'rw',
+    isa     => 'Str'
+);
+
+sub length {
+    $_[0]->end - $_[0]->start + 1;
+}
+
+sub to_string {
+    my ($self) = @_;
+    return sprintf("(%s, %s) strand=%s",
+                   $self->start,
+                   $self->end,
+                   $self->strand);
+}
+
+sub from_string {
+    $_[0]->throw_not_implemented;
+}
+
+sub flip_strand {
+    $_[0]->strand($_[0]->strand * -1);
+}
 
 # returns true if strands are equal and non-zero
 our %VALID_STRAND_TESTS = (
@@ -248,12 +272,6 @@ sub offset_stranded {
     $self->end($self->end + $offset_end);
     return $self;
 }
-
-# may make this abstract...
-#sub to_string {
-#    my $self = shift;
-#    return sprintf("(%s, %s) strand=%d", $self->start, $self->end, $self->strand);
-#}
 
 ############## PRIVATE ##############
 

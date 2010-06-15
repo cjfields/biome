@@ -1,22 +1,10 @@
-package Biome::Range;
+package Biome::SimpleRange;
 
 use Biome;
+use namespace::clean -except => 'meta';
 
-with 'Biome::Role::Range';
-
-sub to_string {
-    my ($self) = @_;
-    return sprintf("(%s, %s) strand=%s",
-                   $self->start,
-                   $self->end,
-                   $self->strand);
-}
-
-sub length {
-    $_[0]->end - $_[0]->start + 1;
-}
-
-no Biome;
+with 'Biome::Role::Location::SimpleRange';
+with 'Biome::Role::Does_Range'; # interface, fulfilled by above role
 
 __PACKAGE__->meta->make_immutable();
 
