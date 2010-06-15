@@ -7,7 +7,7 @@ BEGIN {
     use Test::More;
     use Test::Moose;
     use Test::Exception;
-    use_ok('Biome::SimpleRange');
+    use_ok('Biome::Location::SimpleRange');
 }
 
 =head1 Ranges
@@ -64,7 +64,7 @@ my @ranges;
 
 for my $s (@spans) {
     for my $strand (reverse (-1..1)) {
-        push @ranges, Biome::SimpleRange->new(start  => $s->[0],
+        push @ranges, Biome::Location::SimpleRange->new(start  => $s->[0],
                                    end    => $s->[1],
                                    strand => $strand);
     }
@@ -72,7 +72,7 @@ for my $s (@spans) {
 
 does_ok($ranges[0],'Biome::Role::Location::SimpleRange', 'Range role implementation');
 does_ok($ranges[0],'Biome::Role::Does_Range', 'Abstract Range role interface');
-isa_ok($ranges[0],'Biome::SimpleRange', 'Biome::SimpleRange class');
+isa_ok($ranges[0],'Biome::Location::SimpleRange', 'Biome::Location::SimpleRange class');
 ok(!$ranges[0]->isa('Biome::Role::SimpleRange'), 'Role consumed by class');
 is($ranges[0]->start, 1);
 is($ranges[0]->end, 100);

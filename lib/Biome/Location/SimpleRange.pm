@@ -1,4 +1,4 @@
-package Biome::SimpleRange;
+package Biome::Location::SimpleRange;
 
 use Biome;
 use namespace::clean -except => 'meta';
