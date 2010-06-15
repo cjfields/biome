@@ -2,6 +2,7 @@
 
 package Biome::Segment::Split;
 use Biome;
+use namespace::clean -except => 'meta';
 
 use Biome::Role::Range;
 use MooseX::Types::Moose qw(Maybe);
@@ -21,8 +22,6 @@ sub BUILD {
 }
 
 with 'Biome::Role::Segment';
-
-no Biome;
 
 __PACKAGE__->meta->make_immutable;
 

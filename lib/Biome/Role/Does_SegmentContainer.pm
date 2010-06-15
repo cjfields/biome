@@ -1,27 +1,9 @@
-package Biome::SeqFeature::Generic;
+package Biome::Role::Does_SegmentContainer;
 
-use Biome;
-use Biome::Location::SimpleRange;
+use Biome::Role;
+use namespace::clean -except => 'meta';
 
-sub BUILD {
-    my ($self, $params) = @_;
-    # role delegation with attributes using 'handles' doesn't work
-    for my $delegate (qw(start end strand seq_id)) {
-        $self->$delegate($params->{$delegate}) if exists $params->{$delegate};
-    }
-}
 
-with 'Biome::Role::Locatable';
-
-sub _build_location {
-    return Biome::Segment::Simple->new();
-}
-
-with 'Biome::Role::SeqFeature';
-
-no Biome;
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -29,15 +11,15 @@ __END__
 
 =head1 NAME
 
-Biome::SeqFeature::Generic - <One-line description of module's purpose>
+Biome::Role::Does_SegmentContainer - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::SeqFeature::Generic version 0.01.
+This documentation refers to Biome::Role::Does_SegmentContainer version Biome::Role.
 
 =head1 SYNOPSIS
 
-   use Biome::SeqFeature::Generic;
+   with 'Biome::Role::Does_SegmentContainer';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,
@@ -201,7 +183,10 @@ Chris Fields  (cjfields at bioperl dot org)
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) 2010 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+
+followed by whatever licence you wish to release it under.
+For Perl code that is often just:
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
