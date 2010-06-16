@@ -4,9 +4,9 @@ use Biome::Role;
 
 # this allows anything that does Biome::Role::Rangeable to work here
 has 'location'  => (
-    does        => 'Biome::Role::Range',
+    does        => 'Biome::Role::Location::Does_Range',
     is          => 'rw',
-    handles     => 'Biome::Role::Range',
+    handles     => 'Biome::Role::Location::Does_Range',
     lazy_build  => 1
 );
 

@@ -16,9 +16,9 @@ $LOCREG = qr{
             }xmso;     
 
 # make global for now, allow for abstraction later
-our $SIMPLE_CLASS = 'Biome::Segment::Simple';
+our $SIMPLE_CLASS = 'Biome::Location::Simple';
 
-our $SPLIT_CLASS = 'Biome::Segment::Split';
+our $SPLIT_CLASS = 'Biome::Location::Split';
 
 sub BUILD {
     my ($self) = @_;
@@ -65,7 +65,7 @@ sub from_string {
                         $loc_obj = $SIMPLE_CLASS->new(location_string => "complement($splitlocs[0])");
                     } else {
                         $loc_obj = $SPLIT_CLASS->new(-verbose => 1,
-                                                    -segment_type => uc $oparg);
+                                                    -location_type => uc $oparg);
                         while (my $splitloc = shift @splitlocs) {
                             next unless $splitloc;
                             my $sobj;
@@ -76,7 +76,7 @@ sub from_string {
                             } else {
                                 $sobj = $SIMPLE_CLASS->new(location_string => $splitloc);
                             }
-                            $loc_obj->add_sub_Segment($sobj);
+                            $loc_obj->add_sub_Location($sobj);
                         }
                     }
                 } else {
@@ -86,7 +86,7 @@ sub from_string {
                     if ($oparg eq 'complement') {
                         $loc_obj->strand(-1)
                     } else {
-                        $loc_obj->segment_type(uc $oparg) ;
+                        $loc_obj->location_type(uc $oparg) ;
                     }
                 }
             }
@@ -105,7 +105,7 @@ sub from_string {
         }
         if ($ct > 1) {
             $loc = $SPLIT_CLASS->new();
-            $loc->add_sub_Segment(shift @loc_objs) while (@loc_objs);
+            $loc->add_sub_Location(shift @loc_objs) while (@loc_objs);
             return $loc;
         } else {
             $loc = shift @loc_objs;

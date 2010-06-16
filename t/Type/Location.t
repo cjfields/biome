@@ -12,15 +12,15 @@ BEGIN {
 {
     package Foo;
     use Biome;
-    use Biome::Type::Segment qw(Segment_Pos_Type Segment_Type);
+    use Biome::Type::Location qw(Location_Pos_Type Location_Type);
     has pos_type      => (
-        isa     => Segment_Pos_Type,
+        isa     => Location_Pos_Type,
         is      => 'rw',
         coerce  => 1
     );
 
     has segment_type      => (
-        isa     => Segment_Type,
+        isa     => Location_Type,
         is      => 'rw',
         coerce  => 1
     );
@@ -63,7 +63,7 @@ for my $st (qw(. .. ^ ? ! < > : EXACT WITHIN BETWEEN BEFORE
         if (exists $real_types{$att}{$st}) {
             lives_ok {
                 $test_obj = Foo->new("-$att" => $st);
-                } "$st is a valid Segment $att type";
+                } "$st is a valid Location $att type";
             if (exists $symbols{$att}{$st}) {
                 is($test_obj->$att, $symbols{$att}{$st},
                    "$st coerced to ".$symbols{$att}{$st});

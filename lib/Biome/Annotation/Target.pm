@@ -4,9 +4,9 @@ package Biome::Annotation::Target;
 
 use Biome;
 
-extends qw(Biome::Annotation::DBLink
-           Biome::Range);
+extends qw(Biome::Annotation::DBLink);
 
+with 'Biome::Role::Location::SimpleRange';
 with 'Biome::Role::Annotate' => {'data_slots' => [qw(target_id)]};
 
 has '+DEFAULT_CB' => (

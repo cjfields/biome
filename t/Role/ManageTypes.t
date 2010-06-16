@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    use Test::More tests => 17;
+    use Test::More;
     use Test::Moose;
     use Test::Exception;
 }
@@ -30,7 +30,7 @@ use Biome::Annotation::Target;
             'annotate'      => "Biome::Role::Annotate",
             'identify'      => "Biome::Role::Identifiable",
             'describe'      => "Biome::Role::Describable",
-            'range'         => "Biome::Role::Range",
+            'range'         => "Biome::Role::Location::Does_Range",
             }
             }
         );
@@ -62,6 +62,8 @@ my $target = Biome::Annotation::Target->new(
     -end        => 200,
     -strand     => 1);
 
+does_ok($target, 'Biome::Role::Location::Does_Range');
+
 ok($tm->is_valid('dblink',$target));
 ok($tm->does_valid('annotate',$target));
 ok($tm->does_valid('range',$target));
@@ -89,3 +91,4 @@ my $link = Biome::Annotation::DBLink->new(-database => 'TSC',
 
 ok($tm->is_valid('dblink',$link));
 
+done_testing();

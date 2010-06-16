@@ -10,8 +10,8 @@ BEGIN {
 }
 
 # these are being worked on...
-my $simple_impl = "Biome::Segment::Simple";
-my $split_impl = "Biome::Segment::Split";
+my $simple_impl = "Biome::Location::Simple";
+my $split_impl = "Biome::Location::Split";
 
 # Holds strings and results. The latter is an array of expected class name,
 # min/max start position and position type, min/max end position and position
@@ -135,9 +135,9 @@ foreach my $locstr (keys %testcases) {
     is($loc->min_end(), $rest[4], "min_end: $locstr");
     is($loc->max_end(), $rest[5], "max_end: $locstr");
     is($loc->end_pos_type(), $rest[6], "end_pos_type: $locstr");
-    is($loc->segment_type(), $rest[7], "segment_type: $locstr");
-    my @locs = $loc->sub_Segments();
-    is(@locs, $rest[8], "sub_Segments: $locstr");
+    is($loc->location_type(), $rest[7], "location_type: $locstr");
+    my @locs = $loc->sub_Locations();
+    is(@locs, $rest[8], "sub_Locations: $locstr");
     is($loc->strand(), $rest[9], "strand: $locstr");
 }
 

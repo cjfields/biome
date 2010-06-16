@@ -2,54 +2,27 @@ package Biome::Role::Location::Split;
 
 use 5.010;
 use Biome::Role;
-use Biome::Type::Location qw(Split_Location_Type);
+use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Ranges);
 use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
+use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
 
-has     '_locations'  => (
+has     'locations'  => (
     is          => 'ro',
-    isa         => 'ArrayRef[Object]',
+    isa         => ArrayRef_of_Ranges,
     traits      => ['Array'],
     init_arg    => undef,
-    #handles     => {
-    #    add_sub_Location      => 'push',
-    #    sub_Locations         => 'elements',
-    #    remove_sub_Locations  => 'clear',
-    #    get_sub_Location      => 'get',
-    #    num_sub_Locations     => 'count',
-    #},
+    writer      => '_set_locations',
+    handles     => {
+        add_sub_Location      => 'push',
+        sub_Locations         => 'elements',
+        remove_sub_Locations  => 'clear',
+        get_sub_Location      => 'get',
+        num_sub_Locations     => 'count',
+    },
     lazy        => 1,
     default     => sub { [] }
 );
-
-sub add_sub_Location {
-    my ($self, $loc) = @_;
-    return unless $loc;
-    $self->throw("Must pass a Range-consuming object") unless $loc->does('Biome::Role::Location::Does_Range');
-    push @{$self->_locations}, $loc;
-}
-
-sub sub_Locations {
-    my $self = shift;
-    @{$self->_locations};
-}
-
-sub remove_sub_Locations {
-    my ($self, $index) = @_;
-    return unless $index && $index =~ /^\d+$/;
-    return ${$self->_locations}[$index];
-}
-
-sub get_sub_Location {
-    my ($self, $index) = @_;
-    return unless $index && $index =~ /^\d+$/;
-    return ${$self->_locations}[$index];
-}
-
-sub num_sub_Locations {
-    my $self = shift;
-    return scalar(@{$self->_locations});
-}
 
 has     'location_type'    => (
     isa         => Split_Location_Type,
@@ -205,7 +178,7 @@ sub flip_strand {
     my $self = shift;
     my @segs = @{$self->locations()};
     @segs = map {$_->flip_strand(); $_} reverse @segs;
-    $self->locations(\@segs);
+    $self->_set_locations(\@segs);
 }
 
 sub to_string {
