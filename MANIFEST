@@ -72,8 +72,6 @@ t/Annotation/Target.t
 t/Biome.t
 t/Factory/FTLocationFactory.t
 t/lib/MyExceptions.pm
-t/lib/MyRole1.pm
-t/lib/MyRole2.pm
 t/Location/Simple.t
 t/Location/SimpleRange.t
 t/Location/Split.t
