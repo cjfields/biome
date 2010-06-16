@@ -3,8 +3,8 @@ package Biome::Location::SimpleRange;
 use Biome;
 use namespace::clean -except => 'meta';
 
-with 'Biome::Role::Location::SimpleRange';
-with 'Biome::Role::Does_Range'; # interface, fulfilled by above role
+with 'Biome::Role::Location::SimpleRange'; # implementation
+with 'Biome::Role::Location::Does_Range'; # interface, fulfilled by above role
 
 __PACKAGE__->meta->make_immutable();
 

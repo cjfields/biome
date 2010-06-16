@@ -48,11 +48,6 @@ has 'end' => (
     }
 });
 
-has seq_id   => (
-    is      => 'rw',
-    isa     => 'Str'
-);
-
 sub length {
     my ($self) = @_;
     given ($self->location_type) {

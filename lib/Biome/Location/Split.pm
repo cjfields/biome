@@ -1,16 +1,11 @@
 # Let the code begin...
 
-package Biome::Segment::Split;
+package Biome::Location::Split;
 use Biome;
 use namespace::clean -except => 'meta';
 
-use Biome::Role::Range;
-use MooseX::Types::Moose qw(Maybe);
-use List::Util qw(reduce);
-use Biome::Type::Segment qw(Split_Segment_Type );
-use Biome::Type::Sequence qw(Sequence_Strand);
-
-with 'Biome::Role::Segment::SegmentContainer';
+with 'Biome::Role::Location::Split'; # implementation
+with 'Biome::Role::Location::Does_SplitLocation'; #interface
 
 sub BUILD {
     my ($self, $params) = @_;
@@ -20,8 +15,6 @@ sub BUILD {
         $self->from_string($params->{location_string});
     }
 }
-
-with 'Biome::Role::Segment';
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,31 +1,58 @@
-package Biome::Role::Segment::SegmentContainer;
+package Biome::Role::Location::Split;
 
+use 5.010;
 use Biome::Role;
-use Biome::Type::Segment qw(Split_Segment_Type);
+use Biome::Type::Location qw(Split_Location_Type);
 use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 use namespace::clean -except => 'meta';
 
-with 'Biome::Role::Range';
-
-has     'segments'  => (
-    is          => 'rw',
-    isa         => 'ArrayRef[Biome::Role::Range]',
+has     '_locations'  => (
+    is          => 'ro',
+    isa         => 'ArrayRef[Object]',
     traits      => ['Array'],
-    handles     => {
-        add_sub_Segment      => 'push',
-        sub_Segments         => 'elements',
-        remove_sub_Segments  => 'clear',
-        _reduce_segs         => 'reduce',
-        _sort_segs           => 'sort',
-        get_sub_Segment      => 'get',
-        num_sub_Segments     => 'count',
-    },
+    init_arg    => undef,
+    #handles     => {
+    #    add_sub_Location      => 'push',
+    #    sub_Locations         => 'elements',
+    #    remove_sub_Locations  => 'clear',
+    #    get_sub_Location      => 'get',
+    #    num_sub_Locations     => 'count',
+    #},
     lazy        => 1,
     default     => sub { [] }
 );
 
-has     'segment_type'    => (
-    isa         => Split_Segment_Type,
+sub add_sub_Location {
+    my ($self, $loc) = @_;
+    return unless $loc;
+    $self->throw("Must pass a Range-consuming object") unless $loc->does('Biome::Role::Location::Does_Range');
+    push @{$self->_locations}, $loc;
+}
+
+sub sub_Locations {
+    my $self = shift;
+    @{$self->_locations};
+}
+
+sub remove_sub_Locations {
+    my ($self, $index) = @_;
+    return unless $index && $index =~ /^\d+$/;
+    return ${$self->_locations}[$index];
+}
+
+sub get_sub_Location {
+    my ($self, $index) = @_;
+    return unless $index && $index =~ /^\d+$/;
+    return ${$self->_locations}[$index];
+}
+
+sub num_sub_Locations {
+    my $self = shift;
+    return scalar(@{$self->_locations});
+}
+
+has     'location_type'    => (
+    isa         => Split_Location_Type,
     is          => 'rw',
     lazy        => 1,
     default     => 'JOIN'
@@ -36,20 +63,31 @@ has     'maps_to_single'    => (
     is          => 'rw'
 );
 
-has     'resolve_Segments'      => (
+has     'resolve_Locations'      => (
     isa         => 'Bool',
     is          => 'rw',
     lazy        => 1,
     default     => 1,
 );
 
+sub length {
+    my ($self) = @_;
+    given ($self->location_type) {
+        when ([qw(EXACT WITHIN)]) {
+            return $self->end - $self->start + 1;
+        }
+        default {
+            return 0
+        }
+    }
+}
 
-sub sub_Segment_strand {
+sub sub_Location_strand {
     my ($self) = @_;
     my ($strand, $lstrand);
     
     # this could use reduce()
-    foreach my $loc ($self->sub_Segments()) {
+    foreach my $loc ($self->sub_Locations()) {
         $lstrand = $loc->strand();
         if((! $lstrand) ||
            ($strand && ($strand != $lstrand)) ||
@@ -72,25 +110,25 @@ has     'strand'      => (
     predicate   => 'has_strand',
     default     => sub {
         my $self = shift;
-        return $self->sub_Segment_strand;
+        return $self->sub_Location_strand;
         },
 );
 
 sub start {
     my $self = shift;
-    return $self->get_sub_Segment(0)->start if $self->is_remote;
+    return $self->get_sub_Location(0)->start if $self->is_remote;
     return $self->_reduce('start');
 }
 
 sub end {
     my $self = shift;
-    return $self->get_sub_Segment(0)->end if $self->is_remote;
+    return $self->get_sub_Location(0)->end if $self->is_remote;
     return $self->_reduce('end');
 }
 
 sub is_remote {
     my $self = shift;
-    for my $seg ($self->sub_Segments) {
+    for my $seg ($self->sub_Locations) {
         return 1 if $seg->is_remote;
     }
     0;
@@ -98,90 +136,90 @@ sub is_remote {
 
 sub min_start {
     my $self = shift;
-    return $self->get_sub_Segment(0)->min_start if $self->is_remote;
+    return $self->get_sub_Location(0)->min_start if $self->is_remote;
     return $self->_reduce('min_start');
 }
 
 sub max_start {
     my $self = shift;
-    return $self->get_sub_Segment(0)->max_start if $self->is_remote;
+    return $self->get_sub_Location(0)->max_start if $self->is_remote;
     return $self->_reduce('max_start');
 }
 
 sub min_end {
     my $self = shift;
-    return $self->get_sub_Segment(0)->min_end if $self->is_remote;
+    return $self->get_sub_Location(0)->min_end if $self->is_remote;
     return $self->_reduce('min_end');
 }
 
 sub max_end {
     my $self = shift;
-    return $self->get_sub_Segment(0)->max_end if $self->is_remote;
+    return $self->get_sub_Location(0)->max_end if $self->is_remote;
     return $self->_reduce('max_end');
 }
 
 sub start_pos_type {
     my $self = shift;
     my $type = reduce {$a eq $b ? $a : undef}
-        map {$_->start_pos_type} $self->sub_Segments;
+        map {$_->start_pos_type} $self->sub_Locations;
     return $type;
 }
 
 sub end_pos_type {
     my $self = shift;
     my $type = reduce {$a eq $b ? $a : undef} 
-        map {$_->end_pos_type} $self->sub_Segments;
+        map {$_->end_pos_type} $self->sub_Locations;
     return $type;
 }
 
-sub valid_Segment {
+sub valid_Location {
     # TODO: add tests
     my $self = shift;
     my $type = reduce {$a eq $b ? 1 : 0} 
-        map {$_->valid_Segment} $self->sub_Segments;
+        map {$_->valid_Location} $self->sub_Locations;
 }
 
 sub is_fuzzy {
     # TODO: add tests
     my $self = shift;
     my $type = reduce {$a eq $b ? 1 : 0} 
-        map {$_->is_fuzzy} $self->sub_Segments;
+        map {$_->is_fuzzy} $self->sub_Locations;
 }
 
 # no offsets for splits?  Or maybe for only the first/last one?
 sub start_offset { 0 }
 sub end_offset { 0 }
 
-# helper, just grabs the indicated value for the contained segments
+# helper, just grabs the indicated value for the contained locations
 sub _reduce {
     my ($self, $caller) = @_;
     my @segs = sort {
         $a->$caller <=> $b->$caller
                      }
-    grep {$_->$caller} $self->sub_Segments;
-    return unless @segs == $self->num_sub_Segments;
+    grep {$_->$caller} $self->sub_Locations;
+    return unless @segs == $self->num_sub_Locations;
     $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
 }
 
 sub flip_strand {
     my $self = shift;
-    my @segs = @{$self->segments()};
+    my @segs = @{$self->locations()};
     @segs = map {$_->flip_strand(); $_} reverse @segs;
-    $self->segments(\@segs);
+    $self->locations(\@segs);
 }
 
 sub to_string {
     my $self = shift;
     # JOIN assumes specific order, ORDER does not, BOND
-    my $type = $self->segment_type;
-    if ($self->resolve_Segments) {
-        my $substrand = $self->sub_Segment_strand;
+    my $type = $self->location_type;
+    if ($self->resolve_Locations) {
+        my $substrand = $self->sub_Location_strand;
         if ($substrand && $substrand < 0) {
             $self->flip_strand();
             $self->strand(-1);
         }
     }
-    my @segs = $self->sub_Segments;
+    my @segs = $self->sub_Locations;
     my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
     if ($self->strand && $self->strand < 0) {
         $str = "complement($str)";
@@ -200,15 +238,15 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Segment::Split - <One-line description of module's purpose>
+Biome::Role::Location::Split - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::Segment::Split version Biome::Role.
+This documentation refers to Biome::Role::Location::Split version Biome::Role.
 
 =head1 SYNOPSIS
 
-   with 'Biome::Role::Segment::Split';
+   with 'Biome::Role::Location::Split';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,

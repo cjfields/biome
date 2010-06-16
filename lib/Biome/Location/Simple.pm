@@ -7,7 +7,7 @@ use Biome;
 use namespace::clean -except => 'meta';
 
 with 'Biome::Role::Location::Simple';
-with 'Biome::Role::Does_Location';
+with 'Biome::Role::Location::Does_Location';
 
 sub BUILD {
     my ($self, $params) = @_;

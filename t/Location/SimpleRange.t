@@ -71,7 +71,7 @@ for my $s (@spans) {
 }
 
 does_ok($ranges[0],'Biome::Role::Location::SimpleRange', 'Range role implementation');
-does_ok($ranges[0],'Biome::Role::Does_Range', 'Abstract Range role interface');
+does_ok($ranges[0],'Biome::Role::Location::Does_Range', 'Abstract Range role interface');
 isa_ok($ranges[0],'Biome::Location::SimpleRange', 'Biome::Location::SimpleRange class');
 ok(!$ranges[0]->isa('Biome::Role::SimpleRange'), 'Role consumed by class');
 is($ranges[0]->start, 1);

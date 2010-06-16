@@ -1,10 +1,9 @@
-package Biome::Role::Does_Range;
+package Biome::Role::Location::Does_Range;
 
 use Biome::Role;
 use namespace::clean -except => 'meta';
 
 requires qw(
-    seq_id
     start
     end
     strand
@@ -14,6 +13,11 @@ requires qw(
     
     from_string
     to_string
+);
+
+has 'seq_id'    => (
+    is      => 'rw',
+    isa     => 'Str'
 );
 
 # returns true if strands are equal and non-zero

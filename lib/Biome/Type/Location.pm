@@ -16,7 +16,7 @@ use MooseX::Types -declare => [qw(
                                Split_Location_Type
 							   )];
 
-use MooseX::Types::Moose qw(Int Str Object CodeRef Any);
+use MooseX::Types::Moose qw(Int Str Object CodeRef Any ArrayRef);
 
 my %VALID_SEGMENT_SYMBOL = (
     '.'          => 'WITHIN',
@@ -96,6 +96,11 @@ subtype Split_Location_Type,
     as Str,
     where {exists $VALID_SPLIT_TYPE{uc $_}},
     message {"Unknown Split Location type $_"};
+
+#subtype ArrayRef_of_Ranges,
+#    as ArrayRef,
+#    where { $},
+#    message {"Non-Range added to Split Location"};
 
 no MooseX::Types;
 no MooseX::Types::Moose;
