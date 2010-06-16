@@ -120,6 +120,14 @@ has 'is_remote' => (
     default         => 0
 );
 
+# TODO - It should be possible to stack roles (have an implementation role
+# consume an interface role), but for some reason this isn't working here.
+# Problem isn't traceable to Biome-specific classes, so will need to simplify
+# this down to trace the problem. For time being, interface is resolved in the
+# class, not the role implementation
+
+#with 'Biome::Role::Location::Does_Location';
+
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
 # these just delegate to start, end, using the indicated offsets
