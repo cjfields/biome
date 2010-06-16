@@ -16,7 +16,7 @@ my $build = Module::Build->new(
     dist_author         => 'BioPerl Team <bioperl-l@bioperl.org>',
     dist_abstract       => 'Moose-based implementation of core BioPerl modules',
     license             => 'perl',
-    requires            => {'perl'                      => 5.010,
+    requires            => {'perl'                      => 5.012,
                             
                             # needed for Native Types (replacement for MXAH)
                             'Moose'                         => '1.00',
