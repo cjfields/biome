@@ -19,7 +19,7 @@ my $build = Module::Build->new(
     requires            => {'perl'                      => 5.010,
                             
                             # needed for Native Types (replacement for MXAH)
-                            'Moose'                         => '0.90',
+                            'Moose'                         => '1.00',
                             # tentative list of MooseX modules, for comments
                             # see CONVENTIONS
                             'MooseX::Singleton'             => 0,
@@ -42,6 +42,7 @@ my $build = Module::Build->new(
                             #'MooseX::Params::Validate'      => 0,  # replace rearrange?
 
                             # general use
+                            'Modern::Perl'                  => 0,
                             'List::MoreUtils'               => 0, 
                             'Data::Stag'                    => 0
                            },

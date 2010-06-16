@@ -72,12 +72,15 @@ t/Annotation/Target.t
 t/Biome.t
 t/Factory/FTLocationFactory.t
 t/lib/MyExceptions.pm
+t/lib/MyRole1.pm
+t/lib/MyRole2.pm
 t/Location/Simple.t
 t/Location/SimpleRange.t
 t/Location/Split.t
 t/Meta/Error.t
+t/Meta/Role/Role.t
+t/Meta/Role/StackedRole.t
 t/PrimarySeq.t
-t/Role.t
 t/Role/Delegate.t
 t/Role/IO.x
 t/Role/ManageTypes.t
