@@ -10,6 +10,9 @@ has 'location'  => (
     lazy_build  => 1
 );
 
+# arg, attributes not handled by 'handles' using a role
+sub seq_id { shift->location->seq_id(@_); }
+
 no Biome::Role;
 
 1;

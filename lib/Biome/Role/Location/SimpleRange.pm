@@ -22,11 +22,6 @@ has end     => (
     isa     => 'Int'
 );
 
-has seq_id => (
-    is      => 'rw',
-    isa     => 'Str'
-);
-
 sub length {
     $_[0]->end - $_[0]->start + 1;
 }

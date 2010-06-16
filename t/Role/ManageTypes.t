@@ -43,6 +43,7 @@ use Biome::Annotation::Target;
 my $tm = MyTypeManager->new();
 
 is($tm->type_for_key('reference'),'Biome::Annotation::Reference');
+is($tm->type_for_key('range'),'Biome::Role::Location::Does_Range');
 is($tm->type_for_key('dblink'),'Biome::Annotation::DBLink');
 is($tm->type_for_key('foo'),undef);
 
@@ -61,8 +62,6 @@ my $target = Biome::Annotation::Target->new(
     -start      => 1,
     -end        => 200,
     -strand     => 1);
-
-does_ok($target, 'Biome::Role::Location::Does_Range');
 
 ok($tm->is_valid('dblink',$target));
 ok($tm->does_valid('annotate',$target));
@@ -84,6 +83,7 @@ my $ref = Biome::Annotation::Reference->new( -authors  => 'author line',
 					   -start    => 12);
 
 ok($tm->is_valid('dblink',$ref));
+ok($tm->does_valid('range',$ref));
 
 my $link = Biome::Annotation::DBLink->new(-database => 'TSC',
 					 -primary_id => 'TSC0000030',
@@ -92,3 +92,4 @@ my $link = Biome::Annotation::DBLink->new(-database => 'TSC',
 ok($tm->is_valid('dblink',$link));
 
 done_testing();
+

@@ -42,11 +42,6 @@ requires qw(
     union
 );
 
-has 'seq_id'    => (
-    isa         => 'Str',
-    is          => 'rw'
-);
-
 has 'phase'         => (
     isa         => Sequence_Phase,
     is          => 'rw',

@@ -5,6 +5,7 @@ use namespace::clean -except => 'meta';
 
 with 'Biome::Role::Location::Does_Range';
 
+# some of these may be attributes, some methods
 requires qw(
     start_pos_type
     end_pos_type
