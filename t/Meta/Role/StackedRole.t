@@ -1,16 +1,51 @@
 BEGIN {
-    use lib qw(. t/lib);
+    use lib '.';
     use Test::More;
     use Test::Moose;
     use Test::Exception;
 }
 
+###############################
+
+# import Moose magic through meta class (no need to import separately)
+{
+package MyRole1;
+
+use Biome::Role;
+
+requires 'foo', 'bar','_build_att1', 'att2';
+
+no Biome::Role;
+
+}
+###############################
+
+{
+# import Moose magic through meta class (no need to import separately)
+package MyRole2;
+
+use Biome::Role;
+
+with 'MyRole1';
+
+requires 'bah';
+
+has 'att1'  => (isa => 'Str', is => 'rw', builder => '_build_att1');
+
+sub _build_att1 { '' }
+
+sub foo { 1 }
+
+no Biome::Role;
+
+}
+
+###############################
+
 {
 package RoleTest;
 
 use Biome;
-
-has 'att1'  => (isa => 'Str', is => 'rw');
 
 has 'att2'    => (isa => 'Int', is => 'rw');
 
@@ -25,6 +60,8 @@ sub bah {98.6 };
 no Biome;
 }
 ###############################
+
+package main;
 
 my $foo = RoleTest->new(att1 => 'hello', att2 => 12);
 
