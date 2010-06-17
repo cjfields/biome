@@ -1,6 +1,6 @@
 package Biome::Role::Annotate;
 
-use MooseX::Role::Parameterized -metaclass => 'Biome::Meta::Role::Parameterized';
+use MooseX::Role::Parameterized; # -metaclass => 'Biome::Meta::Role::Parameterizable';
 
 parameter data_slots => (
     isa         => 'ArrayRef[Str]',

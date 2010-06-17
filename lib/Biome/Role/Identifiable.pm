@@ -1,6 +1,6 @@
 package Biome::Role::Identifiable;
 
-use MooseX::Role::Parameterized -metaclass => 'Biome::Meta::Role::Parameterizable';
+use MooseX::Role::Parameterized;#  -metaclass => 'Biome::Meta::Role::Parameterizable';
 
 parameter id_slots => (
     isa         => 'ArrayRef[Str]',
@@ -21,7 +21,13 @@ role {
     my ($id_slots, $alt_slots) = ($p->id_slots, $p->alternate_slots);
     
     if (grep {!exists $ALLOWED_ALTERNATES{$_}} @$alt_slots) {
-        
+        # TODO: once custom parameterizable trait works, add proper exception
+        __PACKAGE__->meta->throw_error("Only ".join(',', keys %ALLOWED_ALTERNATES). " are allowed");
+    }
+
+    if (grep { $_ !~ /_id$/ } @$id_slots) {
+        # TODO: once custom parameterizable trait works, add proper exception
+        __PACKAGE__->meta->throw_error("ID slots must have '_id' tag");
     }
     
     has $id_slots => (
