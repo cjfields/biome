@@ -1,37 +1,13 @@
-package Biome::Role::PrimarySeqContainer;
+package Biome::Meta::Role::Parameterized;
 
-use Biome::Role;
+use Biome;
+use namespace::clean -except => 'meta';
+extends 'Moose::Role';
+#extends 'MooseX::Role::Parameterized::Meta::Role::Parameterizable';
 
-# TODO: Needs to be rewritten so it's not so Seqfeature-centric
+#sub parameterized_role_metaclass {'Biome::Meta::Role::Parameterized'};
 
-has 'seq' => (
-    is          => 'rw',
-    does        => 'Biome::Role::PrimarySeq',
-    reader      => 'entire_seq',
-    writer      => 'attach_seq',
-    predicate   => 'has_seq',
-    weak_ref    => 1,    # may be unnecessary dep. on implementation
-);
-
-sub raw_seq {
-    my $self = shift;
-    $self->entire_seq->subseq(-start   => $self->start,
-                        -end     => $self->end,
-                        -strand  => $self->strand);
-}
-
-sub primary_seq {
-    my $self = shift;
-    $self->entire_seq->trunc(-start   => $self->start,
-                       -end     => $self->end,
-                       -strand  => $self->strand);
-}
-
-sub spliced_seq {
-    $_[0]->throw_not_implemented;
-}
-
-no Biome::Role;
+# nothing yet
 
 1;
 
@@ -39,16 +15,15 @@ __END__
 
 =head1 NAME
 
-Biome::Role::PrimarySeqContainer - Role describing the basic methods and
-attributes for anything containing a Bio::Role::PrimarySeq.
+Biome::Meta::Role::Parameterizable - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::Role::PrimarySeqContainer version 0.01.
+This documentation refers to Biome::Meta::Role::Parameterizable version Biome.
 
 =head1 SYNOPSIS
 
-   use Biome::Role::PrimarySeqContainer;
+   use Biome::Meta::Role::Parameterizable;
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,
@@ -57,7 +32,9 @@ This documentation refers to Biome::Role::PrimarySeqContainer version 0.01.
 
 =head1 DESCRIPTION
 
-
+<TODO>
+A full description of the module and its features.
+May include numerous subsections (i.e., =head2, =head3, etc.).
 
 =head1 SUBROUTINES/METHODS
 
@@ -210,7 +187,7 @@ Chris Fields  (cjfields at bioperl dot org)
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) 2010 Chris Fields (cjfields at bioperl dot org). All rights reserved.
 
 followed by whatever licence you wish to release it under.
 For Perl code that is often just:

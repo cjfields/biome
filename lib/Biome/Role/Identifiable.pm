@@ -1,26 +1,47 @@
 package Biome::Role::Identifiable;
 
-use Biome::Role;
+use MooseX::Role::Parameterized -metaclass => 'Biome::Meta::Role::Parameterizable';
 
-has version => (
-    is    => 'rw',
-    isa   => 'Int'
+parameter id_slots => (
+    isa         => 'ArrayRef[Str]',
+    is          => 'ro',
+    default     => sub {[qw(object_id display_id primary_id)]} 
+);
+
+parameter alternate_slots => (
+    isa         => 'ArrayRef[Str]',
+    is          => 'ro',
+    default     => sub {[qw(version authority namespace accession_number)]} 
+);
+
+our %ALLOWED_ALTERNATES = map {$_ => 1} qw(version authority namespace accession_number);
+
+role {
+    my $p = shift;
+    my ($id_slots, $alt_slots) = ($p->id_slots, $p->alternate_slots);
+    
+    if (grep {!exists $ALLOWED_ALTERNATES{$_}} @$alt_slots) {
+        
+    }
+    
+    has $id_slots => (
+        is      => 'rw',
+        isa     => 'Str',
+    );
+    
+    has $alt_slots => (
+            is      => 'rw',
+            isa     => 'Str'
     );
 
-# object_id may be moved to Root, as it really is common to any instance and
-# should probably have a default
-has [qw(authority namespace accession_number object_id display_id primary_id)] => (
-    is    => 'rw',
-    isa   => 'Str'
-    );
+    method 'namespace_string' => sub {
+        my ($self) = @_;
+        return $self->namespace.":". $self->object_id .
+             (defined($self->version()) ? ".".$self->version : '');   
+    }
+};
 
-sub namespace_string {
-    my ($self) = @_;
-    return $self->namespace.":". $self->object_id .
-         (defined($self->version()) ? ".".$self->version : '');   
-}
-
-no Biome::Role;
+no MooseX::Role::Parameterized;
 
 1;
 
