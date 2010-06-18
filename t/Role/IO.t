@@ -179,7 +179,7 @@ SKIP: {
         use Biome;
         with 'Biome::Role::IO::Handle';
         with 'Biome::Role::IO::File';
-        with 'Biome::Role::IO::Unread';
+        with 'Biome::Role::IO::Buffer_Unread';
         no Biome;
     };
     
