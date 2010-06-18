@@ -1,27 +1,26 @@
 package Biome::SeqIO;
 
-use 5.010;
 use Biome;
-use Moose::Util qw( apply_all_roles );
+use Moose::Util qw(apply_all_roles);
 
-has     format  => (
-    is          => 'ro',
-    required    => 1,
-    trigger     => sub {
-        my ($self, $format) = @_;
-        $self->throw("Biome::SeqIO role is immutable")
-            if $self->does('Biome::Role::Stream::Seq');
-        apply_all_roles($self, 'Biome::SeqIO::'.lc $format);
-        # plugins must minimally have this Role
-        $self->throw("$format does not use Biome::Role::Stream::Seq role") unless
-            $self->does('Biome::Role::Stream::Seq');
+sub BUILD {
+    my ($self, $params) = @_;
+    if (exists $params->{format}) {
+        my $role = 'Biome::SeqIO::'.lc($params->{format});
+        $self->load_module($role);
+        __PACKAGE__->meta->make_mutable;
+        apply_all_roles($self->meta, ($role));
+        $self->throw("Module does not implement a sequence stream")
+            unless $self->does('Biome::Role::Stream::Seq');        
+        __PACKAGE__->meta->make_immutable;
+    } else {
+        # guess or die, just die for now
+        $self->throw("No format defined, you die right now!");
     }
-);
+}
 
 no Biome;
 
-__PACKAGE__->meta->make_immutable;
- 
 1;
 
 __END__
@@ -196,11 +195,11 @@ welcome.
 
 =head1 AUTHOR
 
-Chris Fields  (cjfields at bioperl dot org)
+Chris Fields  C<< <cjfields at bioperl dot org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) 2010 Chris Fields (cjfields at bioperl dot org). All rights reserved.
 
 followed by whatever licence you wish to release it under.
 For Perl code that is often just:

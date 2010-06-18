@@ -1,4 +1,4 @@
-package Biome::SeqIO::genbank;
+package Biome::SeqIO::fasta;
 
 use Biome::Role;
 
@@ -24,15 +24,15 @@ __END__
 
 =head1 NAME
 
-Biome::SeqIO::genbank - <One-line description of module's purpose>
+Biome::SeqIO::fasta - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::SeqIO::genbank version Biome.
+This documentation refers to Biome::SeqIO::fasta version Biome::Role.
 
 =head1 SYNOPSIS
 
-   use Biome::SeqIO::genbank;
+   with 'Biome::SeqIO::fasta';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,
@@ -192,11 +192,11 @@ welcome.
 
 =head1 AUTHOR
 
-Chris Fields  (cjfields at bioperl dot org)
+Chris Fields  C<< <cjfields at bioperl dot org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Fields (cjfields at bioperl dot org). All rights reserved.
+Copyright (c) 2010 Chris Fields (cjfields at bioperl dot org). All rights reserved.
 
 followed by whatever licence you wish to release it under.
 For Perl code that is often just:
