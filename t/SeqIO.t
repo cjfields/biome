@@ -12,7 +12,15 @@ BEGIN {
 
 ok my $in = Biome::SeqIO->new(-format => 'fasta');
 
+# does the plugin
 does_ok($in, 'Biome::SeqIO::fasta');
+
+# does the IO roles
+does_ok($in, 'Biome::Role::IO::Buffer_Unread');
+does_ok($in, 'Biome::Role::IO::String');
+
+# isa as well
 isa_ok($in, 'Biome::SeqIO');
+isa_ok($in, 'Biome::Root::IO');
 
 done_testing;
