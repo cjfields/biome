@@ -32,6 +32,7 @@ This documentation refers to Biome::SeqIO::fasta version Biome::Role.
 
 =head1 SYNOPSIS
 
+   # this wouldn't normallly be used 
    with 'Biome::SeqIO::fasta';
    # Brief but working code example(s) here showing the most common usage(s)
 

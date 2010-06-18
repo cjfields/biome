@@ -1,10 +1,14 @@
 package Biome::Root::IO;
 
-use Biome::Role;
+use Biome;
 
-# IO will be a role, nothing to see here just yet...
+with 'Biome::Role::IO::Handle';
+with 'Biome::Role::IO::File';
+with 'Biome::Role::IO::Tempfile';
+with 'Biome::Role::IO::String';
+with 'Biome::Role::IO::Buffer_Unread';
 
-no Biome::Role;
+no Biome;
 
 1;
 
