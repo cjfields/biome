@@ -3,21 +3,30 @@ package Biome::SeqIO;
 use Biome;
 use Moose::Util qw(apply_all_roles);
 
+extends 'Bio::Root::IO';
+
+has 'format'    => (
+    isa     => 'Str',
+    is      => 'ro',
+    required => 1,
+);
+
 sub BUILD {
     my ($self, $params) = @_;
+    
     if (exists $params->{format}) {
         my $role = 'Biome::SeqIO::'.lc($params->{format});
         $self->load_module($role);
-        __PACKAGE__->meta->make_mutable;
+        #__PACKAGE__->meta->make_mutable;
         apply_all_roles($self->meta, ($role));
         $self->throw("Module does not implement a sequence stream")
             unless $self->does('Biome::Role::Stream::Seq');        
-        __PACKAGE__->meta->make_immutable;
+        #__PACKAGE__->meta->make_immutable;
     } else {
         # guess or die, just die for now
         $self->throw("No format defined, you die right now!");
     }
-}
+};
 
 no Biome;
 
