@@ -259,6 +259,41 @@ SKIP: {
     
 #}
 
+##############################################
+# tests all-in-one class (if you really want everything)
+##############################################
+
+# this uses IO::Unread, which may become a req. module
+SKIP: {
+    eval {
+        package Foo_All;
+        
+        use Biome;
+        
+        extends 'Biome::Root::IO';
+        
+        no Biome;
+    };
+    
+    skip("IO::Unread not installed, skipping", 5) if $@;
+    
+    {
+    
+    ok my $rio = Foo_All->new(-file => $TESTINFILE);
+    
+    does_ok($rio, 'Biome::Role::IO::Handle');
+    does_ok($rio, 'Biome::Role::IO::File');
+    does_ok($rio, 'Biome::Role::IO::Tempfile');
+    does_ok($rio, 'Biome::Role::IO::Buffer_Unread');
+    does_ok($rio, 'Biome::Role::IO::String');
+    
+    }
+}
+
+##############################################
+# cleanup
+##############################################
+    
 for my $f ($testfile) {
     unlink $f if -e $f;
 }
