@@ -85,7 +85,6 @@ is   ($seq_obj2->primary_id(),  $expected2{'primary_id'},  'primary_id');
 like ($seq_obj2->description(), $expected2{'description'}, 'description');
 
 # test output
-$outseq;
 open ($outfh, '>', \$outseq) || die "Can't attach output to scalar: $!";
 $out_stream = Biome::SeqIO->new(-fh => $outfh, -format => $format);
 is($out_stream->mode, 'w', 'mode is correct');
