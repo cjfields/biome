@@ -10,8 +10,6 @@ sub readline {
     my %param =@_;
     my $fh = $self->fh or return;
     my $line = <$fh>;
-    # if the buffer been filled by pushback() then return the buffer
-    # contents, rather than read from the filehandle
     return $line;
 }
 
@@ -30,12 +28,6 @@ sub print {
     my $ret = print $fh @_;
     return $ret;
 }
-
-after 'close' => sub {
-    my ($self) = @_;
-    return if $self->no_close;
-    $self->clear_buffer;
-};
 
 no Biome::Role;
 

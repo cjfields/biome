@@ -22,7 +22,7 @@ class_type IO_String,
     {class => 'IO::String'};
 
 subtype IO_Stream,
-    as IO_Handle,
+    as FileHandle,
     message {
         (ref($_) || $_)." is not compatible for use with IO yet"
         };
@@ -33,18 +33,18 @@ coerce IO_Stream,
     from Str,
         via {
             IO::File->new($_)
-            },
+            };
     #from Str,
     #    via {
     #        IO::File->new($_)
     #        },
-    from FileHandle,
-        via {
-            # this only gives values if fh is writeable
-            my @layers = PerlIO::get_layers($_, output => 1);
-            my $st = @layers ? 'w' : 'r';
-            IO::Handle->new_from_fd($_, $st)
-            };
+    #from FileHandle,
+    #    via {
+    #        # this only gives values if fh is writeable
+    #        my @layers = PerlIO::get_layers($_, output => 1);
+    #        my $st = @layers ? 'w' : 'r';
+    #        IO::Handle->new_from_fd($_, $st)
+    #        };
 
 1;
 

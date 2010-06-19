@@ -19,7 +19,8 @@ has 'no_close'  => (
 
 has flush_on_write  => (
     is      => 'ro',
-    isa     => 'Bool'
+    isa     => 'Bool',
+    default => 1
 );
 
 has mode => (
@@ -61,6 +62,7 @@ sub close {
         
         close $fh unless ref $fh && $fh->isa('IO::String');
     }
+    $self->_clear_fh;
 }
 
 no Biome::Role;

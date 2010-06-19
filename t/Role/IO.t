@@ -33,11 +33,11 @@ ok open(my $O, '>', $testfile);
 
 ok my $rio = Foo_Handle->new(-fh => $I );
 is $rio->mode, 'r', 'handle, read';
-isa_ok($rio->fh, 'IO::Handle');
+isa_ok($rio->fh, 'GLOB');
 
 ok my $wio = Foo_Handle->new(-fh => $O);
 is $wio->mode, 'w', 'handle, write';
-isa_ok($wio->fh, 'IO::Handle');
+isa_ok($wio->fh, 'GLOB');
 
 my $warn;
 local $SIG{__WARN__} = sub { $warn = shift };
