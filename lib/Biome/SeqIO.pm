@@ -1,9 +1,12 @@
 package Biome::SeqIO;
 
+use 5.010;
 use Biome;
-use Moose::Util qw(apply_all_roles);
+use Biome::Type::Sequence qw(Sequence_Alphabet);
+use namespace::clean -except => 'meta';
 
 extends 'Biome::Root::IO';
+with 'Biome::Role::Stream::Seq';
 
 has 'format'    => (
     isa     => 'Str',
@@ -11,23 +14,34 @@ has 'format'    => (
     required => 1,
 );
 
-sub BUILD {
-    my ($self, $params) = @_;
+has 'alphabet' => (
+    isa     => Sequence_Alphabet,
+    is      => 'rw'
+);
+
+# ooooh, I know, overriding new!
+sub new {
+    my $class = shift;
+    my $real_class = Scalar::Util::blessed($class) || $class;
+    # these all come from the same base, Moose::Object, so this is fine
+    my $params = $real_class->BUILDARGS(@_);
     
-    if (my $format = $self->format) {
-        my $role = "Biome::SeqIO::$format";
-        $self->load_module($role);
-        apply_all_roles($self->meta, ($role));
-        $self->throw("Module does not implement a sequence stream")
-            unless $self->does('Biome::Role::Stream::Seq');        
-        __PACKAGE__->meta->make_immutable;
+    # switch out for the real class here
+    if (exists $params->{format}) {
+        my $biome_class = $real_class;
+        $real_class = "Biome::SeqIO::".$params->{format};
+        Class::MOP::load_class($real_class);
+        $biome_class->throw("Module does not implement a sequence stream")
+            unless $real_class->does('Biome::Role::Stream::Seq');
     } else {
-        # guess or die, just die for now
-        $self->throw("No format defined, you die right now!");
+        $real_class->throw("No format defined, you die right now!");
     }
-};
+    return Class::MOP::Class->initialize($real_class)->new_object($params);
+}
 
 no Biome;
+
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;
 

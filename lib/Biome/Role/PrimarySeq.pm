@@ -1,13 +1,12 @@
 package Biome::Role::PrimarySeq;
 
 use Biome::Role;
-use Biome::Types qw(Sequence_Alphabet);
+use Biome::Type::Sequence qw(Maybe_Sequence_Alphabet);
 
 use Biome::Tools::CodonTable;
 
-# greedy method, guaranteed to return a raw sequence
-# may need make this into a separate method as opposed to an attribute
-has raw_seq => (
+# this should always return a raw sequence
+has seq => (
     is    => 'rw',
     isa   => 'Str',
 );
@@ -15,7 +14,7 @@ has raw_seq => (
 # make a subtype or coerce input into a subtype?
 has alphabet => (
    is    => 'rw',
-   isa   => Sequence_Alphabet,
+   isa   => Maybe_Sequence_Alphabet,
 );
 
 has is_circular => (
@@ -41,13 +40,6 @@ has symbols => (
         'GAP'     => '-\.~'
     } }
     );
-
-# alias for raw_seq, to disambiguate use of this from returning an object
-# Note this isn't a first-class attribute (just an alias for one)
-sub seq {
-    my $self = shift;
-    $self->raw_seq(@_);
-}
 
 # returns raw subsequence; trunc() calls this for objects
 sub subseq {
@@ -89,7 +81,7 @@ sub subseq {
         $start--;
         $end--;
         my $seqstr;
-        my $rawseq = $self->raw_seq;
+        my $rawseq = $self->seq;
         if ($self->has_gaps) {
             my $gs = ${$self->symbols}{GAP};
             # map gaps prior and post start/end
@@ -147,14 +139,14 @@ sub revcom {
         $revseq =~ tr/tT/uU/;
     }
     
-    my $out = $self->clone(-raw_seq => $revseq);
+    my $out = $self->clone(-seq => $revseq);
     return $out;
 }
 
 sub has_gaps {
     my $self = shift;
     my @gap_sym = split('',${$self->symbols}{GAP});
-    my $rawseq = $self->raw_seq;
+    my $rawseq = $self->seq;
     for my $g (@gap_sym) {
         return 1 if (index($rawseq, $g) >= 0);
     }
@@ -163,7 +155,7 @@ sub has_gaps {
 
 sub trunc {
     my ($self) = shift;
-    return $self->clone(-raw_seq => $self->subseq(@_));
+    return $self->clone(-seq => $self->subseq(@_));
 }
 
 sub translate {
@@ -212,7 +204,7 @@ sub translate {
         my ($start, $end) = ($offset, $self->length);
         ($seq) = $self->subseq($start, $end);
     } else {
-        ($seq) = $self->raw_seq();
+        ($seq) = $self->seq();
     }
     
     # ignore frame if an ORF is supposed to be found
@@ -266,7 +258,7 @@ sub translate {
     }
 
     return $self->clone(
-                -raw_seq     => $output,
+                -seq     => $output,
                 -alphabet   => 'protein',
                   );
 }
@@ -274,7 +266,7 @@ sub translate {
 # account for sequences with gaps
 sub length {
     my $self = shift;
-    my $len = $self->raw_seq();
+    my $len = $self->seq();
     if ($self->has_gaps) {
         my $gs = ${$self->symbols}{GAP};
         $len =~ s{[$gs]}{}g;

@@ -11,10 +11,16 @@ package Biome::Type::Sequence;
 use MooseX::Types -declare => [qw(
                 Sequence_Strand
                 Maybe_Sequence_Strand
+                
                 Sequence_Strand_Int
                 Sequence_Strand_Symbol
+                
                 Sequence_Alphabet
+                Maybe_Sequence_Alphabet
+                
                 Sequence_Phase
+                
+                Output_ID_Type
                 )];
 
 use MooseX::Types::Moose qw(Int Str Object CodeRef Any Maybe);
@@ -50,8 +56,13 @@ coerce Sequence_Strand,
 
 subtype Sequence_Alphabet,
 	as Str,
-	where { /^(?:dna|rna|protein)$/xism }, # do we want more?
+	where { !defined($_) || /^(?:dna|rna|protein)$/xism }, # do we want more?
 	message { "Strand must be 'dna', 'rna', or 'protein'"};
+
+subtype Maybe_Sequence_Alphabet,
+    as Maybe[Sequence_Alphabet];
+
+enum Output_ID_Type, qw(accession accession.version display primary);
 
 no MooseX::Types;
 no MooseX::Types::Moose;

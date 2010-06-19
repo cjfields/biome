@@ -15,15 +15,16 @@ BEGIN {
 use Biome::SeqIO;
 
 my $format = 'fasta';
-my $seqio_obj = Biome::SeqIO->new(-file   => File::Spec->catfile(qq(t data test.$format)),
+my $seqio_obj = Biome::SeqIO->new(-file   => File::Spec->catfile(qw(t data test.fasta)),
                                 -format => $format);
 
 isa_ok($seqio_obj, 'Biome::SeqIO');
 does_ok($seqio_obj,'Biome::Role::Stream::Seq');
 
 # checking the first sequence object
-my $seq_obj = $seqio_obj->next_seq();
-isa_ok($seq_obj, 'Bio::Seq');
+my $seq_obj = $seqio_obj->next_Seq();
+
+isa_ok($seq_obj, 'Biome::PrimarySeq');
 my %expected = ('seq'         => 'MVNSNQNQNGNSNGHDDDFPQDSITEPEHMRKLFIGGL' .
                                  'DYRTTDENLKAHEKWGNIVDVVVMKDPRTKRSRGFGFI' .
                                  'TYSHSSMIDEAQKSRPHKIDGRVEPKRAVPRQDIDSPN' .
@@ -43,30 +44,65 @@ is   ($seq_obj->length(),      $expected{'length'},      'length');
 is   ($seq_obj->primary_id(),  $expected{'primary_id'},  'primary_id');
 like ($seq_obj->description(), $expected{'description'}, 'description');
 
+# test output
+my $outseq;
+open (my $outfh, '>', \$outseq) || die "Can't attach output to scalar: $!";
+my $out_stream = Biome::SeqIO->new(-fh => $outfh, -format => $format);
+is($out_stream->mode, 'w', 'mode is correct');
+$out_stream->write_Seq($seq_obj);
+$out_stream->close;
+
+is ($outseq, <<SEQ, 'Sequence matches');
+>roa1_drome Rea guano receptor type III >> 0.1
+MVNSNQNQNGNSNGHDDDFPQDSITEPEHMRKLFIGGLDYRTTDENLKAHEKWGNIVDVV
+VMKDPRTKRSRGFGFITYSHSSMIDEAQKSRPHKIDGRVEPKRAVPRQDIDSPNAGATVK
+KLFVGALKDDHDEQSIRDYFQHFGNIVDNIVIDKETGKKRGFAFVEFDDYDPVDKVVLQK
+QHQLNGKMVDVKKALPKNDQQGGGGGRGGPGGRAGGNRGNMGGGNYGNQNGGGNWNNGGN
+NWGNNRGNDNWGNNSFGGGGGGGGGYGGGNNSWGNNNPWDNGNGGGNFGGGGNNWNGGND
+FGGYQQNYGGGPQRGGGNFNNNRMQPYQGGGGFKAGGGNQGNYGNNQGFNNGGNNRRY
+SEQ
 
 ## checking the second sequence object
-#my $seq_obj2  = $seqio_obj->next_seq();
-#isa_ok($seq_obj2, 'Bio::Seq');
-#my %expected2 = ('seq'         => 'MVNSNQNQNGNSNGHDDDFPQDSITEPEHMRKLFIGGL' .
-#                                  'DYRTTDENLKAHEKWGNIVDVVVMKDPTSTSTSTSTST' .
-#                                  'STSTSTMIDEAQKSRPHKIDGRVEPKRAVPRQDIDSPN' .
-#                                  'AGATVKKLFVGALKDDHDEQSIRDYFQHLLLLLLLDLL' .
-#                                  'LLDLLLLDLLLFVEFDDYDPVDKVVLQKQHQLNGKMVD' .
-#                                  'VKKALPKNDQQGGGGGRGGPGGRAGGNRGNMGGGNYGN' .
-#                                  'QNGGGNWNNGGNNWGNNRGNDNWGNNSFGGGGGGGGGY' .
-#                                  'GGGNNSWGNNNPWDNGNGGGNFGGGGNNWNGGNDFGGY' .
-#                                  'QQNYGGGPQRGGGNFNNNRMQPYQGGGGFKAGGGNQGN' .
-#                                  'YGNNQGFNNGGNNRRY',
-#                 'length'      => '358',
-#                 'primary_id'  => 'roa2_drome',
-#                 'description' => qr(Rea guano ligand),
-#                );
-#is   ($seq_obj2->seq(),         $expected2{'seq'},         'sequence');
-#is   ($seq_obj2->length(),      $expected2{'length'},      'length');
-#is   ($seq_obj2->primary_id(),  $expected2{'primary_id'},  'primary_id');
-#like ($seq_obj2->description(), $expected2{'description'}, 'description');
-#    
-## from testformats.pl
+my $seq_obj2  = $seqio_obj->next_Seq();
+isa_ok($seq_obj2, 'Biome::PrimarySeq');
+my %expected2 = ('seq'         => 'MVNSNQNQNGNSNGHDDDFPQDSITEPEHMRKLFIGGL' .
+                                  'DYRTTDENLKAHEKWGNIVDVVVMKDPTSTSTSTSTST' .
+                                  'STSTSTMIDEAQKSRPHKIDGRVEPKRAVPRQDIDSPN' .
+                                  'AGATVKKLFVGALKDDHDEQSIRDYFQHLLLLLLLDLL' .
+                                  'LLDLLLLDLLLFVEFDDYDPVDKVVLQKQHQLNGKMVD' .
+                                  'VKKALPKNDQQGGGGGRGGPGGRAGGNRGNMGGGNYGN' .
+                                  'QNGGGNWNNGGNNWGNNRGNDNWGNNSFGGGGGGGGGY' .
+                                  'GGGNNSWGNNNPWDNGNGGGNFGGGGNNWNGGNDFGGY' .
+                                  'QQNYGGGPQRGGGNFNNNRMQPYQGGGGFKAGGGNQGN' .
+                                  'YGNNQGFNNGGNNRRY',
+                 'length'      => '358',
+                 'primary_id'  => 'roa2_drome',
+                 'description' => qr(Rea guano ligand),
+                );
+is   ($seq_obj2->seq(),         $expected2{'seq'},         'sequence');
+is   ($seq_obj2->length(),      $expected2{'length'},      'length');
+is   ($seq_obj2->primary_id(),  $expected2{'primary_id'},  'primary_id');
+like ($seq_obj2->description(), $expected2{'description'}, 'description');
+
+# test output
+$outseq;
+open ($outfh, '>', \$outseq) || die "Can't attach output to scalar: $!";
+$out_stream = Biome::SeqIO->new(-fh => $outfh, -format => $format);
+is($out_stream->mode, 'w', 'mode is correct');
+$out_stream->write_Seq($seq_obj2);
+$out_stream->close;
+
+is ($outseq, <<SEQ, 'Sequence matches');
+>roa2_drome Rea guano ligand
+MVNSNQNQNGNSNGHDDDFPQDSITEPEHMRKLFIGGLDYRTTDENLKAHEKWGNIVDVV
+VMKDPTSTSTSTSTSTSTSTSTMIDEAQKSRPHKIDGRVEPKRAVPRQDIDSPNAGATVK
+KLFVGALKDDHDEQSIRDYFQHLLLLLLLDLLLLDLLLLDLLLFVEFDDYDPVDKVVLQK
+QHQLNGKMVDVKKALPKNDQQGGGGGRGGPGGRAGGNRGNMGGGNYGNQNGGGNWNNGGN
+NWGNNRGNDNWGNNSFGGGGGGGGGYGGGNNSWGNNNPWDNGNGGGNFGGGGNNWNGGND
+FGGYQQNYGGGPQRGGGNFNNNRMQPYQGGGGFKAGGGNQGNYGNNQGFNNGGNNRRY
+SEQ
+
+# from testformats.pl
 #SKIP: {
 #    test_skip(-tests => 4, -requires_modules => [qw(Algorithm::Diff
 #                                                    IO::ScalarArray
@@ -111,14 +147,14 @@ like ($seq_obj->description(), $expected{'description'}, 'description');
 #
 #}
 #
-## bug 1508
-## test genbank, gcg, ace against fasta (should throw an exception on each)
-#
-#for my $file (qw(roa1.genbank test.gcg test.ace test.raw)) {
-#    my $in = Bio::SeqIO->new(-file   => test_input_file($file),
-#                             -format => 'fasta');
-#    throws_ok {$in->next_seq}
-#        qr/The sequence does not appear to be FASTA format/, "dies with $file";
-#}
+# bug 1508
+# test genbank, gcg, ace against fasta (should throw an exception on each)
+
+for my $file (qw(roa1.genbank test.gcg test.ace test.raw)) {
+    my $in = Biome::SeqIO->new(-file   => File::Spec->catfile('t', 'data', $file),
+                             -format => 'fasta');
+    throws_ok {$in->next_Seq}
+        qr/The sequence does not appear to be FASTA format/, "dies with $file";
+}
 
 done_testing();

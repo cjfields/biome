@@ -2,7 +2,16 @@ package Biome::Role::Stream::Seq;
 
 use Biome::Role;
 
-requires qw(next_seq write_seq);
+# we don't require these (which die at compile time) but delay errors until the
+# method is called
+
+sub next_Seq {
+    shift->throw_not_implemented;
+}
+
+sub write_Seq {
+    shift->throw_not_implemented;
+}
 
 no Biome::Role;
 
