@@ -4,15 +4,17 @@ use Biome;
 
 with 'Biome::Role::PrimarySeq',
      'Biome::Role::Describable', 
-     'Biome::Role::Identifiable'; 
+     'Biome::Role::Identifiable';
 
 # validate sequences by default (we might make this optional to speed things up)
-after 'raw_seq'  => sub {
-    $_[0]->validate_seq($_[1])
-};
 
 has '+object_id'    => (
     default     => sub {shift->accession_number(@_)},
+    lazy        => 1
+    );
+
+has '+primary_id'    => (
+    default     => sub {shift->display_id(@_)},
     lazy        => 1
     );
 
