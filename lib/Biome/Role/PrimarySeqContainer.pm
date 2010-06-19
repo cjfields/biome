@@ -13,7 +13,7 @@ has 'seq' => (
     weak_ref    => 1,    # may be unnecessary dep. on implementation
 );
 
-sub raw_seq {
+sub seq {
     my $self = shift;
     $self->entire_seq->subseq(-start   => $self->start,
                         -end     => $self->end,

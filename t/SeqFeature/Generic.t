@@ -54,7 +54,7 @@ is $feat->seq_id, 'ABCD1234', 'attached_id';
 my $rawseq = 'gatcagtagacccagcgacagcagggcggggcccagcaggccggccgtggcgtagagcgc'.
 'gaggacggcgaccggcgtggccaccgacaggatggctgcggcgacgcggacgacaccgga';
 my $seq = Biome::PrimarySeq->new(
-                    -raw_seq          => $rawseq,
+                    -seq          => $rawseq,
                     -display_id       => 'myseq',
                     -alphabet         => 'dna',
                     -accession_number => 'X677667',
@@ -62,10 +62,10 @@ my $seq = Biome::PrimarySeq->new(
 
 does_ok($feat, 'Biome::Role::PrimarySeqContainer');
 $feat->attach_seq($seq);
-is $feat->raw_seq, 'gccggccgtggcgtagagcgcgaggacggcgaccggcgtgg';
+is $feat->seq, 'gccggccgtggcgtagagcgcgaggacggcgaccggcgtgg';
 my $sub = $feat->primary_seq;
 isa_ok($sub, 'Biome::PrimarySeq');
-is $sub->raw_seq, 'gccggccgtggcgtagagcgcgaggacggcgaccggcgtgg';
+is $sub->seq, 'gccggccgtggcgtagagcgcgaggacggcgaccggcgtgg';
 is $feat->length, $sub->length, 'lengths match';
 
 done_testing();
