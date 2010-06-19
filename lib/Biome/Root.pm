@@ -48,7 +48,7 @@ sub BUILDARGS {
     while( @args ) {
         my $key = shift @args;
         $key =~ tr/\055//d if index($key,'-') == 0; #deletes all dashes!
-        $params->{$key} = shift @args;
+        $params->{lc $key} = shift @args;
     }
     
     return $params;
