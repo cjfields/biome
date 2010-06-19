@@ -59,7 +59,7 @@ sub subseq {
     # account for all variations and additional constraints, such as laziness,
     # fly/lightweight, etc.)
     
-    if( ref($start) && $start->does('Biome::Role::Range') ) {
+    if( ref($start) && $start->does('Biome::Role::Location::Range') ) {
         # does not handle complex locations; not sure whether we should
         # implement or not (segments are much easier, and relevant code such as
         # sliced_seq can DTRT by calling this as needed)
