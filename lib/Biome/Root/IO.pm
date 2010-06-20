@@ -5,7 +5,7 @@ use Biome;
 with 'Biome::Role::IO::Handle';
 with 'Biome::Role::IO::File';
 with 'Biome::Role::IO::Tempfile';
-with 'Biome::Role::IO::String';
+with 'Biome::Role::IO::Scalar';
 with 'Biome::Role::IO::Buffer_Unread';
 
 no Biome;

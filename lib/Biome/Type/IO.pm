@@ -8,18 +8,10 @@ use MooseX::Types -declare => [qw(
                                )];
 use namespace::clean;
 use MooseX::Types::Moose qw(Object Str FileHandle GlobRef);
-use IO::String;
 use IO::File;
-use IO::Handle;
 use Fcntl qw(S_IRUSR S_IWUSR S_IXUSR);
 
 use File::stat;
-
-class_type IO_Handle,
-    {class => 'IO::Handle'};
-
-class_type IO_String,
-    {class => 'IO::String'};
 
 subtype IO_Stream,
     as FileHandle,
@@ -34,17 +26,6 @@ coerce IO_Stream,
         via {
             IO::File->new($_)
             };
-    #from Str,
-    #    via {
-    #        IO::File->new($_)
-    #        },
-    #from FileHandle,
-    #    via {
-    #        # this only gives values if fh is writeable
-    #        my @layers = PerlIO::get_layers($_, output => 1);
-    #        my $st = @layers ? 'w' : 'r';
-    #        IO::Handle->new_from_fd($_, $st)
-    #        };
 
 1;
 

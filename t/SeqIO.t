@@ -17,7 +17,7 @@ isa_ok($in, 'Biome::SeqIO::fasta');
 
 # does the IO roles
 does_ok($in, 'Biome::Role::IO::Buffer_Unread');
-does_ok($in, 'Biome::Role::IO::String');
+does_ok($in, 'Biome::Role::IO::Scalar');
 
 # isa as well
 isa_ok($in, 'Biome::SeqIO');

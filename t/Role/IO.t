@@ -116,22 +116,22 @@ ok($rio2->close);
 }
 
 ##############################################
-# test -string (IO::String)
+# test -scalar
 ##############################################
 
 {
     package Foo_String;
     use Biome;
     with 'Biome::Role::IO::Handle';
-    with 'Biome::Role::IO::Buffer';
-    with 'Biome::Role::IO::String';
+    with 'Biome::Role::IO::Buffer_Unread';
+    with 'Biome::Role::IO::Scalar';
     no Biome;
 }
 
 {
     my $teststring = "Foo\nBar\nBaz";
-    ok my $rio = Foo_String->new(-string => $teststring), 'default -string method';
-    is $rio->mode, 'r', 'string, read';
+    ok my $rio = Foo_String->new(-scalar => \$teststring), 'default -scalar method';
+    is $rio->mode, 'r', 'scalar, read';
 
     my $line1 = $rio->readline;
     is($line1, "Foo\n");
@@ -140,10 +140,18 @@ ok($rio2->close);
     is($line2, "Bar\n");
     $rio->pushback($line2);
     
+    chomp($line1); # modify data
+    throws_ok {$rio->pushback($line1)}
+        qr/Pushing back data with modified line ending/,
+        'pushing back data modified from $/ dies';
+    
     my $line3 = $rio->readline;
     is($line3, "Bar\n");
     $line3 = $rio->readline;
     is($line3, "Baz");    
+
+    # does pushing back last line trigger error?
+    lives_ok {$rio->pushback($line3)} 'pushing back last line works';
 }
 
 ##############################################
@@ -285,7 +293,7 @@ SKIP: {
     does_ok($rio, 'Biome::Role::IO::File');
     does_ok($rio, 'Biome::Role::IO::Tempfile');
     does_ok($rio, 'Biome::Role::IO::Buffer_Unread');
-    does_ok($rio, 'Biome::Role::IO::String');
+    does_ok($rio, 'Biome::Role::IO::Scalar');
     
     }
 }

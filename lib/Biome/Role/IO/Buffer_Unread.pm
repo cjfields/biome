@@ -15,10 +15,11 @@ sub readline {
 
 sub pushback {
     my ($self, $value) = @_;
-    if (index($value, $/) >= 0) {
+    if (index($value, $/) >= 0 || eof($self->fh)) {
         unread $self->fh, $value;
     } else {
-        $self->throw("Pushing back modifed data is not supported: $value");
+        $self->throw("Pushing back data with modified line ending ".
+                     "is not supported: $value");
     }
 }
 

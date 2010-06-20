@@ -1,19 +1,20 @@
-package Biome::Role::IO::String;
+package Biome::Role::IO::Scalar;
 
 use Biome::Role;
 
 requires 'fh';
 
-has string   => (
+has scalar   => (
     is      => 'ro',
-    isa     => 'Str',
+    isa     => 'ScalarRef[Any]',
     trigger => sub {
         my ($self, $new) = @_;
         if ($self->fh) {
             close($self->fh);
             $self->_clear_fh
         }
-        open(my $fh, "<", \$new);
+        # do we want to allow writable strings?  How would we do that?
+        open(my $fh, "<", $new);
         $self->_set_fh($fh);
     }
 );
@@ -26,20 +27,27 @@ __END__
 
 =head1 NAME
 
-Biome::Role::IO::String - <One-line description of module's purpose>
-
-=head1 VERSION
-
-This documentation refers to Biome::Role::IO::String version Biome::Role.
+Biome::Role::IO::Scalar - Role for passing in 
 
 =head1 SYNOPSIS
 
-   with 'Biome::Role::IO::String';
-   # Brief but working code example(s) here showing the most common usage(s)
-
-   # This section will be as far as many users bother reading,
-
-   # so make it as educational and exemplary as possible.
+   package Foo;
+   with Biome;
+   
+   # define fh() (filehandle) either as attribute or method
+   with 'Biome::Role::IO::Scalar';
+   
+   1;
+   
+   # use above package
+   
+   my $string = "abcd\nefgh";
+   my $io = Foo->new(-scalar => \$string);
+   
+   # $string is treated like a file...
+   
+   $io->readline; # "abcd\n"
+   $io->readline; # "efgh"
 
 =head1 DESCRIPTION
 
