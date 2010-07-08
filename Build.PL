@@ -16,13 +16,16 @@ my $build = Module::Build->new(
     dist_author         => 'BioPerl Team <bioperl-l@bioperl.org>',
     dist_abstract       => 'Moose-based implementation of core BioPerl modules',
     license             => 'perl',
-    requires            => {'perl'                      => 5.012,
+    requires            => {'perl'                      => 5.010,
+                            
+                            # replacement for pushback in IO streams
+                            'IO::Unread'                => 0,
                             
                             # needed for Native Types (replacement for MXAH)
                             'Moose'                         => '1.00',
                             # tentative list of MooseX modules, for comments
                             # see CONVENTIONS
-                            'MooseX::Singleton'             => 0,
+                            #'MooseX::Singleton'             => 0,
                             
                             # use sparingly (instances where this is used may be
                             # switched over to something simpler)
