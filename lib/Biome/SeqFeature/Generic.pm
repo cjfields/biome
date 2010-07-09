@@ -1,25 +1,15 @@
 package Biome::SeqFeature::Generic;
 
 use Biome;
-use Biome::Location::Simple;
+use namespace::clean -except => qw(meta);
 
-sub BUILD {
-    my ($self, $params) = @_;
-    # role delegation with attributes using 'handles' doesn't work
-    for my $delegate (qw(start end strand seq_id)) {
-        $self->$delegate($params->{$delegate}) if exists $params->{$delegate};
-    }
-}
+with 'Biome::Role::Location::SimpleRange';
 
-with 'Biome::Role::Locatable';
+# note: due to a bug in Moose, abstract roles have to be consumed here instead
+# of in the implementing role when attributes are required.
 
-sub _build_location {
-    return Biome::Location::Simple->new();
-}
-
+with 'Biome::Role::Location::Does_Range';
 with 'Biome::Role::SeqFeature';
-
-no Biome;
 
 __PACKAGE__->meta->make_immutable;
 
