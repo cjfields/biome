@@ -12,14 +12,15 @@ has strand  => (
     coerce  => 1
 );
 
+
 has start   => (
     is      => 'rw',
-    isa     => 'Int',
+    isa     => 'Num',
 );
 
 has end     => (
     is      => 'rw',
-    isa     => 'Int'
+    isa     => 'Num'
 );
 
 # TODO - It should be possible to stack roles (have an implementation role
