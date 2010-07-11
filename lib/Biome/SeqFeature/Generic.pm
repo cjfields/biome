@@ -2,14 +2,29 @@ package Biome::SeqFeature::Generic;
 
 use Biome;
 use namespace::clean -except => qw(meta);
-
-with 'Biome::Role::Location::SimpleRange';
+use Biome::Location::Simple;
 
 # note: due to a bug in Moose, abstract roles have to be consumed here instead
 # of in the implementing role when attributes are required.
 
+with 'Biome::Role::Locatable';
 with 'Biome::Role::Location::Does_Range';
 with 'Biome::Role::SeqFeature';
+
+# Moose bug with delegation; attributes aren't caught within roles and
+# aren't delegated to properly, so do that here
+
+sub BUILD {
+    my ($self, $params) = @_;
+    for my $delegate (qw(start end strand)) {
+        $self->$delegate($params->{$delegate}) if exists $params->{$delegate};
+    }
+}
+
+# lazy builder method, required by Biome::Role::Locatable 'location' attribute
+sub _build_location {
+    return Biome::Location::Simple->new();
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -19,7 +34,7 @@ __END__
 
 =head1 NAME
 
-Biome::SeqFeature::Generic - <One-line description of module's purpose>
+Biome::SeqFeature::Generic - simple sequence feature class
 
 =head1 VERSION
 
@@ -36,9 +51,13 @@ This documentation refers to Biome::SeqFeature::Generic version 0.01.
 
 =head1 DESCRIPTION
 
-<TODO>
-A full description of the module and its features.
-May include numerous subsections (i.e., =head2, =head3, etc.).
+Biome::SeqFeature::Generic is a simplified implementation of the
+Biome::Role::SeqFeature interface. This class has a simple tag/value system for
+storing data (no official typing system or ontology specified), and uses simple
+start/end/strand for the location information (via the
+L<Biome::Role::Location::SimpleRange> interface). Note this implementation differs
+significantly from the BioPerl Bio::SeqFeature::Generic implementation, in that
+locations cannot be split.
 
 =head1 SUBROUTINES/METHODS
 
