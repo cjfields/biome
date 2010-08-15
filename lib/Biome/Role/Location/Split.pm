@@ -7,6 +7,10 @@ use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
 
+with 'Biome::Role::Location::Range' => {
+    -excludes => [qw(flip_strand from_string length to_string)]
+};
+
 has     'locations'  => (
     is          => 'ro',
     isa         => ArrayRef_of_Ranges,

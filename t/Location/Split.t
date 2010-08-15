@@ -16,9 +16,7 @@ my $container = Biome::Location::Split->new();
 
 # most complex Range role
 does_ok($container, 'Biome::Role::Location::Split');
-does_ok($container, 'Biome::Role::Location::Does_SplitLocation');
-does_ok($container, 'Biome::Role::Location::Does_Location');
-does_ok($container, 'Biome::Role::Location::Does_Range');
+does_ok($container, 'Biome::Role::Location::Range');
 
 my $f = Biome::Location::Simple->new(-start  => 13,
 				  -end    => 30,
