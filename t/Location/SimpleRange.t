@@ -71,7 +71,6 @@ for my $s (@spans) {
 }
 
 does_ok($ranges[0],'Biome::Role::Location::SimpleRange', 'Range role implementation');
-does_ok($ranges[0],'Biome::Role::Location::Does_Range', 'Abstract Range role interface');
 isa_ok($ranges[0],'Biome::Location::SimpleRange', 'Biome::Location::SimpleRange class');
 ok(!$ranges[0]->isa('Biome::Role::SimpleRange'), 'Role consumed by class');
 is($ranges[0]->start, 1);
@@ -189,7 +188,6 @@ for my $set (sort keys %geo_tests) {
     for my $method (qw(intersection union)) {
         for my $st (qw(ignore weak strong)) {
             my $ind = $method eq 'intersection' ? 0 : 1;
-            #print ."\n";
             my $test = $primary->$method(\@rest, $st);
             my $string = (defined $test) ? $test->to_string : '';
             is($string, $geo_tests{$set}->{$st}->[$ind],"$method on $set, strand test = $st");

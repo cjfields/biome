@@ -4,13 +4,11 @@ use Biome;
 use namespace::clean -except => 'meta';
 
 # TODO - It should be possible to stack roles (have an implementation role
-# consume an interface role), but for some reason this isn't working here.
-# Problem isn't traceable to Biome-specific classes, so will need to simplify
-# this down to trace the problem. For time being, interface is resolved in the
-# class, not the role implementation
+# consume an interface role).  The problem is tracable to an issue with Moose,
+# so we simply punt for now and supply a simple Role and default methods the
+# class can override
 
-with 'Biome::Role::Location::SimpleRange'; # implementation
-with 'Biome::Role::Location::Does_Range'; # interface, fulfilled by above role
+with 'Biome::Role::Location::SimpleRange'; # default implementation
 
 __PACKAGE__->meta->make_immutable();
 
