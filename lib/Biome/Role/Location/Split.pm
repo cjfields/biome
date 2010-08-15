@@ -31,11 +31,6 @@ has     'location_type'    => (
     default     => 'JOIN'
 );
 
-has     'maps_to_single'    => (
-    isa         => 'Bool',
-    is          => 'rw'
-);
-
 has     'resolve_Locations'      => (
     isa         => 'Bool',
     is          => 'rw',

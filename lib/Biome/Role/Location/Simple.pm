@@ -17,7 +17,7 @@ has 'strand'  => (
 );
 
 has 'start' => (
-    isa         => 'Int',
+    isa         => 'Num',
     is          => 'rw',
     default     => 0,
     trigger     => sub {
@@ -33,7 +33,7 @@ has 'start' => (
 });
 
 has 'end' => (
-    isa         => 'Int',
+    isa         => 'Num',
     is          => 'rw',
     default     => 0,
     trigger     => sub {
