@@ -12,15 +12,16 @@ has strand  => (
     coerce  => 1
 );
 
-
 has start   => (
     is      => 'rw',
     isa     => 'Num',
+    default => 0
 );
 
 has end     => (
     is      => 'rw',
-    isa     => 'Num'
+    isa     => 'Num',
+    default => 0
 );
 
 has 'seq_id'    => (
@@ -270,15 +271,6 @@ sub _eval_ranges {
             $self->does('Bio::Range::Segment') && $self->is_fuzzy;
     }
 }
-
-
-# TODO - It should be possible to stack roles (have an implementation role
-# consume an interface role), but for some reason this isn't working here.
-# Problem isn't traceable to Biome-specific classes, so will need to simplify
-# this down to trace the problem. For time being, interface is resolved in the
-# class, not the role implementation
-
-#with 'Biome::Role::Location::Does_Range';
 
 sub length {
     $_[0]->end - $_[0]->start + 1;
