@@ -7,13 +7,11 @@ use Biome;
 use namespace::clean -except => 'meta';
 
 # TODO - It should be possible to stack roles (have an implementation role
-# consume an interface role), but for some reason this isn't working here.
-# Problem isn't traceable to Biome-specific classes, so will need to simplify
-# this down to trace the problem. For time being, interface is resolved in the
-# class, not the role implementation
+# consume an interface role).  The problem is tracable to an issue with Moose,
+# so we simply punt for now and supply a simple Role and default methods the
+# class can override
 
 with 'Biome::Role::Location::Simple';
-with 'Biome::Role::Location::Does_Location';
 
 sub BUILD {
     my ($self, $params) = @_;

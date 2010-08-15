@@ -9,12 +9,10 @@ use Biome::Type::Sequence qw(Sequence_Strand);
 use Biome::Type::Location qw(Location_Type Location_Symbol
     Location_Pos_Type Location_Pos_Symbol);
 
-has 'strand'  => (
-    isa     => Sequence_Strand,
-    is      => 'rw',
-    default => 0,
-    coerce  => 1
-);
+# pull in simple range stuff, but exclude some things (these are redefined here)
+with 'Biome::Role::Location::SimpleRange' => {
+    -excludes => [qw(start end flip_strand from_string length to_string)]
+};
 
 has 'start' => (
     isa         => 'Num',
@@ -119,14 +117,6 @@ has 'is_remote' => (
     isa             => 'Bool',
     default         => 0
 );
-
-# TODO - It should be possible to stack roles (have an implementation role
-# consume an interface role), but for some reason this isn't working here.
-# Problem isn't traceable to Biome-specific classes, so will need to simplify
-# this down to trace the problem. For time being, interface is resolved in the
-# class, not the role implementation
-
-#with 'Biome::Role::Location::Does_Location';
 
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
