@@ -100,7 +100,7 @@ subtype Split_Location_Type,
     where {exists $VALID_SPLIT_TYPE{uc $_}},
     message {"Unknown Split Location type $_"};
 
-role_type Does_Range, { role => 'Biome::Role::Location::Does_Range' };
+role_type Does_Range, { role => 'Biome::Role::Location::Range' };
 
 subtype ArrayRef_of_Ranges,
     as ArrayRef[Does_Range],
