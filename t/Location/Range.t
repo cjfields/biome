@@ -7,7 +7,7 @@ BEGIN {
     use Test::More;
     use Test::Moose;
     use Test::Exception;
-    use_ok('Biome::Location::SimpleRange');
+    use_ok('Biome::Location::Range');
 }
 
 =head1 Ranges
@@ -64,15 +64,15 @@ my @ranges;
 
 for my $s (@spans) {
     for my $strand (reverse (-1..1)) {
-        push @ranges, Biome::Location::SimpleRange->new(start  => $s->[0],
+        push @ranges, Biome::Location::Range->new(start  => $s->[0],
                                    end    => $s->[1],
                                    strand => $strand);
     }
 }
 
-does_ok($ranges[0],'Biome::Role::Location::SimpleRange', 'Range role implementation');
-isa_ok($ranges[0],'Biome::Location::SimpleRange', 'Biome::Location::SimpleRange class');
-ok(!$ranges[0]->isa('Biome::Role::SimpleRange'), 'Role consumed by class');
+does_ok($ranges[0],'Biome::Role::Location::Range', 'Range role implementation');
+isa_ok($ranges[0],'Biome::Location::Range', 'Biome::Location::Range class');
+ok(!$ranges[0]->isa('Biome::Role::Range'), 'Role consumed by class');
 is($ranges[0]->start, 1);
 is($ranges[0]->end, 100);
 is($ranges[0]->strand, 1);
@@ -199,7 +199,7 @@ for my $set (sort keys %geo_tests) {
 
  As Ranges can be empty (length = 0), and just like any subtraction operator,
  this method always gives a Range implementor back (unlike
- Bio::SimpleRangeI::subtract()).  May change based on comments.
+ Bio::RangeI::subtract()).  May change based on comments.
 
  r0 |--------->
  r1 |---------|
@@ -270,8 +270,8 @@ for my $set (sort keys %subtract_tests) {
 }
 
 # test implemention of offsetStranded:
-#$r = Bio::SimpleRange->new(-start => 30, -end => 40, -strand => -1);
-#isa_ok($r, 'Bio::SimpleRange', 'Bio::SimpleRange object') ;
+#$r = Bio::Range->new(-start => 30, -end => 40, -strand => -1);
+#isa_ok($r, 'Bio::Range', 'Bio::Range object') ;
 #is ($r->offsetStranded(-5,10)->toString, '(20, 45) strand=-1');
 #is ($r->offsetStranded(+5,-10)->toString, '(30, 40) strand=-1');
 #$r->strand(1);
@@ -287,7 +287,7 @@ for my $set (sort keys %subtract_tests) {
 #    $i++;
 #
 #    # test for presence of method
-#    ok exists $Bio::SimpleRange::{$func};
+#    ok exists $Bio::Range::{$func};
 #    
 #    # union get caught in an infinite loop w/o parameters; skip invoke test.
 #    next if $func eq 'union';
@@ -296,7 +296,7 @@ for my $set (sort keys %subtract_tests) {
 #    next if $func eq 'disconnected_ranges';
 #    
 #    # test invocation of method
-#    eval { $Bio::SimpleRange::{$func}->(); };
+#    eval { $Bio::Range::{$func}->(); };
 #    ok($@);
 #}
 

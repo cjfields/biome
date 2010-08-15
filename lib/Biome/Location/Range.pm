@@ -1,4 +1,4 @@
-package Biome::Location::SimpleRange;
+package Biome::Location::Range;
 
 use Biome;
 use namespace::clean -except => 'meta';
@@ -8,7 +8,7 @@ use namespace::clean -except => 'meta';
 # so we simply punt for now and supply a simple Role and default methods the
 # class can override
 
-with 'Biome::Role::Location::SimpleRange'; # default implementation
+with 'Biome::Role::Location::Range'; # default implementation
 
 __PACKAGE__->meta->make_immutable();
 

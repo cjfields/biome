@@ -1,4 +1,4 @@
-package Biome::Role::Location::SimpleRange;
+package Biome::Role::Location::Range;
 
 use Biome::Role;
 use namespace::clean -except => 'meta';

@@ -17,7 +17,7 @@ my $simple = Biome::Location::Simple->new(
     -is_remote => 1);
 isa_ok($simple, 'Biome::Location::Simple');
 does_ok($simple, 'Biome::Role::Location::Simple',  'does Location');
-does_ok($simple, 'Biome::Role::Location::SimpleRange',  'has basic Range interface');
+does_ok($simple, 'Biome::Role::Location::Range',  'has basic Range interface');
 
 is($simple->start, 10, 'has a start location');
 is($simple->end, 20,  'has an end location');
@@ -176,7 +176,7 @@ ok($exact = Biome::Location::Simple->new(-start    => 10,
                                          -end      => 20,
                                          -strand   => 1, 
                                          -seq_id   => 'my1'));
-does_ok($exact, 'Biome::Role::Location::SimpleRange');
+does_ok($exact, 'Biome::Role::Location::Range');
 
 is( $exact->start, 10, 'Biome::Location::Simple EXACT');
 is( $exact->end, 20);

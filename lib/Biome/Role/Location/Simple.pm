@@ -10,7 +10,7 @@ use Biome::Type::Location qw(Location_Type Location_Symbol
     Location_Pos_Type Location_Pos_Symbol);
 
 # pull in simple range stuff, but exclude some things (these are redefined here)
-with 'Biome::Role::Location::SimpleRange' => {
+with 'Biome::Role::Location::Range' => {
     -excludes => [qw(start end flip_strand from_string length to_string)]
 };
 
