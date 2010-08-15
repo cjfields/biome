@@ -6,8 +6,7 @@ use Biome;
 
 extends qw(Biome::Annotation::DBLink);
 
-with 'Biome::Role::Location::SimpleRange';
-with 'Biome::Role::Location::Does_Range';
+with 'Biome::Role::Location::Range';
 with 'Biome::Role::Annotate' => {'data_slots' => [qw(target_id)]};
 
 has '+DEFAULT_CB' => (

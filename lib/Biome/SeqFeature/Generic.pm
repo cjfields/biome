@@ -7,8 +7,7 @@ use Biome::Location::Simple;
 # note: due to a bug in Moose, abstract roles have to be consumed here instead
 # of in the implementing role when attributes are required.
 
-with 'Biome::Role::Locatable';
-with 'Biome::Role::Location::Does_Range';
+with 'Biome::Role::Location::Split';
 with 'Biome::Role::SeqFeature';
 
 # Moose bug with delegation and 'handles'; attributes aren't caught within roles
@@ -16,7 +15,7 @@ with 'Biome::Role::SeqFeature';
 
 sub BUILD {
     my ($self, $params) = @_;
-    for my $delegate (qw(start end strand)) {
+    for my $delegate (qw(start end strand seq_id)) {
         $self->$delegate($params->{$delegate}) if exists $params->{$delegate};
     }
 }

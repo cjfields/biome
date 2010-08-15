@@ -39,16 +39,16 @@ for my $class (@sf_classes) {
     is $feat->source_tag, 'internal', 'source tag';
     
     # Locatable
-    does_ok($feat, 'Biome::Role::Location::Does_Range', "$class Does_Range abstract role");
+    does_ok($feat, 'Biome::Role::Location::Range', "$class Range abstract role");
     # delegated methods (note these are not attributes)
     is $feat->start, 40, 'start of feature location';
     is $feat->end, 80, 'end of feature location';
     is $feat->strand, 1, 'strand of feature location';
     is $feat->length, 41, 'length of feature location';
     if ($feat->does('Biome::Role::Locatable')) {
-        does_ok $feat->location, 'Biome::Role::Location::Does_Range';
+        does_ok $feat->location, 'Biome::Role::Location::Range';
     } else {
-        does_ok($feat, 'Biome::Role::Location::Does_Range');
+        does_ok($feat, 'Biome::Role::Location::Range');
     }
     
     # Taggable

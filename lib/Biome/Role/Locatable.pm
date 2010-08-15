@@ -4,14 +4,20 @@ use Biome::Role;
 
 # this allows anything that does Biome::Role::Rangeable to work here
 has 'location'  => (
-    does        => 'Biome::Role::Location::Does_Range',
+    does        => 'Biome::Role::Location::Range',
     is          => 'rw',
-    handles     => 'Biome::Role::Location::Does_Range',
+    handles     => 'Biome::Role::Location::Range',
     lazy_build  => 1
 );
 
-# arg, attributes not handled by 'handles' using a role
+# attributes not handled by 'handles' using a role
 sub seq_id { shift->location->seq_id(@_); }
+
+sub start { shift->location->start(@_); }
+
+sub end { shift->location->end(@_); }
+
+sub strand { shift->location->strand(@_); }
 
 no Biome::Role;
 

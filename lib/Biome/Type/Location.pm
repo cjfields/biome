@@ -15,7 +15,7 @@ use MooseX::Types -declare => [qw(
                                Location_Type
                                Split_Location_Type
                                
-                               Does_Range
+                               Range
                                ArrayRef_of_Ranges
 							   )];
 
@@ -100,10 +100,10 @@ subtype Split_Location_Type,
     where {exists $VALID_SPLIT_TYPE{uc $_}},
     message {"Unknown Split Location type $_"};
 
-role_type Does_Range, { role => 'Biome::Role::Location::Range' };
+role_type Range, { role => 'Biome::Role::Location::Range' };
 
 subtype ArrayRef_of_Ranges,
-    as ArrayRef[Does_Range],
+    as ArrayRef[Range],
     message {"Non-Range added to Split Location"};
 
 no MooseX::Types;
