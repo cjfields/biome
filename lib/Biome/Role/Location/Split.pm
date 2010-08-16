@@ -40,14 +40,7 @@ has     'resolve_Locations'      => (
 
 sub length {
     my ($self) = @_;
-    given ($self->location_type) {
-        when ([qw(EXACT WITHIN)]) {
-            return $self->end - $self->start + 1;
-        }
-        default {
-            return 0
-        }
-    }
+    return $self->end - $self->start + 1;
 }
 
 sub sub_Location_strand {
@@ -83,13 +76,15 @@ has     'strand'      => (
 );
 
 sub start {
-    my $self = shift;
+    my ($self, $start) = @_;
+    $self->get_sub_Location(0)->start($start) if defined($start);
     return $self->get_sub_Location(0)->start if $self->is_remote;
     return $self->_reduce('start');
 }
 
 sub end {
-    my $self = shift;
+    my ($self, $end) = @_;
+    $self->get_sub_Location(0)->end($end) if defined($end);
     return $self->get_sub_Location(0)->end if $self->is_remote;
     return $self->_reduce('end');
 }
@@ -156,18 +151,8 @@ sub is_fuzzy {
 
 # no offsets for splits?  Or maybe for only the first/last one?
 sub start_offset { 0 }
-sub end_offset { 0 }
 
-# helper, just grabs the indicated value for the contained locations
-sub _reduce {
-    my ($self, $caller) = @_;
-    my @segs = sort {
-        $a->$caller <=> $b->$caller
-                     }
-    grep {$_->$caller} $self->sub_Locations;
-    return unless @segs == $self->num_sub_Locations;
-    $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
-}
+sub end_offset { 0 }
 
 sub flip_strand {
     my $self = shift;
@@ -198,6 +183,17 @@ sub to_string {
 # could do all string parsing here instead of FTLocationFactory...
 sub from_string {
     shift->throw_not_implemented;
+}
+
+# helper, just grabs the indicated value for the contained locations
+sub _reduce {
+    my ($self, $caller) = @_;
+    my @segs = sort {
+        $a->$caller <=> $b->$caller
+                     }
+    grep {$_->$caller} $self->sub_Locations;
+    return unless @segs == $self->num_sub_Locations;
+    $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
 }
 
 1;

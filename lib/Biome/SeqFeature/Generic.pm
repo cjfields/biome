@@ -1,6 +1,8 @@
 package Biome::SeqFeature::Generic;
 
+use 5.010;
 use Biome;
+use List::MoreUtils qw(any);
 use namespace::clean -except => qw(meta);
 use Biome::Location::Simple;
 
@@ -8,6 +10,7 @@ use Biome::Location::Simple;
 # of in the implementing role when attributes are required.
 
 with 'Biome::Role::Location::Split';
+with 'Biome::Role::Location::Locatable';
 with 'Biome::Role::SeqFeature';
 
 # Moose bug with delegation and 'handles'; attributes aren't caught within roles
@@ -15,14 +18,9 @@ with 'Biome::Role::SeqFeature';
 
 sub BUILD {
     my ($self, $params) = @_;
-    for my $delegate (qw(start end strand seq_id)) {
-        $self->$delegate($params->{$delegate}) if exists $params->{$delegate};
+    if (any { exists $params->{$_} } qw(start end strand seq_id)) {
+        $self->add_sub_Location(Biome::Location::Simple->new(%$params));
     }
-}
-
-# lazy builder method, required by Biome::Role::Locatable 'location' attribute
-sub _build_location {
-    return Biome::Location::Simple->new();
 }
 
 __PACKAGE__->meta->make_immutable;

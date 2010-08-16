@@ -6,9 +6,11 @@ my @sf_classes;
 
 
 BEGIN {
-    @sf_classes = qw(Biome::SeqFeature::Simple
-               Biome::SeqFeature::Location
-               Biome::SeqFeature::Generic);
+               # Biome::SeqFeature::Simple
+               #Biome::SeqFeature::Location
+    @sf_classes = qw(
+               Biome::SeqFeature::Generic
+               );
     use lib '.';
     use Test::More;
     use Test::Moose;
@@ -32,24 +34,18 @@ for my $class (@sf_classes) {
                                 new => 1
                             }
                            );
-    
     # Generic Feature
     does_ok($feat, 'Biome::Role::SeqFeature', "$class does SeqFeature abstract role");
     is $feat->primary_tag, 'exon', 'primary tag';
     is $feat->source_tag, 'internal', 'source tag';
     
     # Locatable
-    does_ok($feat, 'Biome::Role::Location::Range', "$class Range abstract role");
+    does_ok($feat, 'Biome::Role::Location::Locatable', "$class Locatable abstract role");
     # delegated methods (note these are not attributes)
     is $feat->start, 40, 'start of feature location';
     is $feat->end, 80, 'end of feature location';
     is $feat->strand, 1, 'strand of feature location';
     is $feat->length, 41, 'length of feature location';
-    if ($feat->does('Biome::Role::Locatable')) {
-        does_ok $feat->location, 'Biome::Role::Location::Range';
-    } else {
-        does_ok($feat, 'Biome::Role::Location::Range');
-    }
     
     # Taggable
     does_ok($feat, 'Biome::Role::Taggable');

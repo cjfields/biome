@@ -5,6 +5,7 @@ use namespace::clean -except => qw(meta);
 
 # note, the only difference here is this role allows fuzzy locations
 with 'Biome::Role::Location::Simple';
+with 'Biome::Role::Location::Locatable';
 
 # note: due to a bug in Moose, abstract roles have to be consumed here instead
 # of in the implementing role when attributes are required.
