@@ -30,7 +30,7 @@ use Biome::Annotation::Target;
             'annotate'      => "Biome::Role::Annotate",
             'identify'      => "Biome::Role::Identifiable",
             'describe'      => "Biome::Role::Describable",
-            'range'         => "Biome::Role::Location::Does_Range",
+            'range'         => "Biome::Role::Location::Range",
             }
             }
         );
@@ -43,7 +43,7 @@ use Biome::Annotation::Target;
 my $tm = MyTypeManager->new();
 
 is($tm->type_for_key('reference'),'Biome::Annotation::Reference');
-is($tm->type_for_key('range'),'Biome::Role::Location::Does_Range');
+is($tm->type_for_key('range'),'Biome::Role::Location::Range');
 is($tm->type_for_key('dblink'),'Biome::Annotation::DBLink');
 is($tm->type_for_key('foo'),undef);
 

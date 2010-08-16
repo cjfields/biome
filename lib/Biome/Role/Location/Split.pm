@@ -2,14 +2,14 @@ package Biome::Role::Location::Split;
 
 use 5.010;
 use Biome::Role;
-use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Ranges);
+use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
 use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
 
 has     'locations'  => (
     is          => 'ro',
-    isa         => ArrayRef_of_Ranges,
+    isa         => ArrayRef_of_Locatable,
     traits      => ['Array'],
     init_arg    => undef,
     writer      => '_set_locations',

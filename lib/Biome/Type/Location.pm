@@ -15,8 +15,8 @@ use MooseX::Types -declare => [qw(
                                Location_Type
                                Split_Location_Type
                                
-                               Range
-                               ArrayRef_of_Ranges
+                               Locatable
+                               ArrayRef_of_Locatable
 							   )];
 
 use MooseX::Types::Moose qw(Int Str Object CodeRef Any ArrayRef);
@@ -100,11 +100,11 @@ subtype Split_Location_Type,
     where {exists $VALID_SPLIT_TYPE{uc $_}},
     message {"Unknown Split Location type $_"};
 
-role_type Range, { role => 'Biome::Role::Location::Range' };
+role_type Locatable, { role => 'Biome::Role::Location::Locatable' };
 
-subtype ArrayRef_of_Ranges,
-    as ArrayRef[Range],
-    message {"Non-Range added to Split Location"};
+subtype ArrayRef_of_Locatable,
+    as ArrayRef[Locatable],
+    message {"Non-Locatable instance added to Split Location"};
 
 no MooseX::Types;
 no MooseX::Types::Moose;
