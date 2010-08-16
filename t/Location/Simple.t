@@ -176,7 +176,7 @@ ok($exact = Biome::Location::Simple->new(-start    => 10,
                                          -end      => 20,
                                          -strand   => 1, 
                                          -seq_id   => 'my1'));
-does_ok($exact, 'Biome::Role::Location::Simple  ');
+does_ok($exact, 'Biome::Role::Location::Simple');
 
 is( $exact->start, 10, 'Biome::Location::Simple EXACT');
 is( $exact->end, 20);
