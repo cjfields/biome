@@ -8,7 +8,8 @@ use namespace::clean -except => 'meta';
 # so we simply punt for now and supply a simple Role and default methods the
 # class can override
 
-with 'Biome::Role::Location::Range'; # default implementation
+with 'Biome::Role::Location::Range'; 
+with 'Biome::Role::Location::Locatable'; 
 
 __PACKAGE__->meta->make_immutable();
 

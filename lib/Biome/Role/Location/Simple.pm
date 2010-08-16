@@ -4,15 +4,10 @@ use 5.010;
 use Biome::Role;
 use namespace::clean -except => 'meta';
 
-use Biome::Type::Sequence qw(Sequence_Strand);
-
 use Biome::Type::Location qw(Location_Type Location_Symbol
     Location_Pos_Type Location_Pos_Symbol);
 
-# pull in simple range stuff, but exclude some things (these are redefined here)
-with 'Biome::Role::Location::Range' => {
-    -excludes => [qw(start end flip_strand from_string length to_string)]
-};
+with 'Biome::Role::Location::Stranded';
 
 has 'start' => (
     isa         => 'Num',
