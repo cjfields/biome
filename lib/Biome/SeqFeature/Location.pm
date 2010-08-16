@@ -3,7 +3,6 @@ package Biome::SeqFeature::Location;
 use Biome;
 use namespace::clean -except => qw(meta);
 
-# note, the only difference here is this role allows fuzzy locations
 with 'Biome::Role::Location::Simple';
 with 'Biome::Role::Location::Locatable';
 

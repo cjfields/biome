@@ -4,11 +4,6 @@ package Biome::Location::Split;
 use Biome;
 use namespace::clean -except => 'meta';
 
-# TODO - It should be possible to stack roles (have an implementation role
-# consume an interface role).  The problem is tracable to an issue with Moose,
-# so we simply punt for now and supply a simple Role and default methods the
-# class can override
-
 with 'Biome::Role::Location::Split';
 with 'Biome::Role::Location::Locatable';
 
