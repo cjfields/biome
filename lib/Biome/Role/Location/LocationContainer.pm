@@ -1,4 +1,4 @@
-package Biome::Role::Location::HasLocations;
+package Biome::Role::Location::LocationContainer;
 
 use Biome::Role;
 use MooseX::Role::Parameterized;
@@ -8,6 +8,11 @@ use MooseX::Role::Parameterized;
 # Feature, etc).
 
 parameter class => (
+    isa         => 'Str',
+    required    => 1
+);
+
+parameter abbrev => (
     isa         => 'Str',
     required    => 1
 );
@@ -22,7 +27,7 @@ parameter plural => (
 
 parameter layered => (
     isa         => 'Bool',
-    required    => 0
+    default     => 0
 );
 
 role {
@@ -37,39 +42,20 @@ role {
     }
     
     has $singular => (
-        is      => 'rw',
+        is      => 'ro',
         isa     => 'ArrayRef[Biome::Role::Location::Simple]',  # needs a subtype or role type
         traits  => ['Array'],
         default => sub {[]},
         handles => {
             "get_$singular"     => 'get',
-            "_add_$singular"    => 'push',
             "has_$singular"     => 'count',
             "all_$plural"       => 'elements',
             "remove_$plural"    => 'clear'
             }
     );
     
-    method "add_$singular" => sub {
-        my ($self, $loc, $expand) = @_;
-        return unless $loc;
-        #if ($self->start >= $loc->start) {
-        #    $self->throw("Location start") unless $expand;
-        #}
-        #if ($self->end <= $loc->start) {
-        #}
-        
-    };
-    
-    #method "increment_$name" => sub {
-    #    my $self = shift;
-    #    $self->$name($self->$name + 1);
-    #};
-    #
-    #method "reset_$name" => sub {
-    #    my $self = shift;
-    #    $self->$name(0);
-    #};
+    # implementing class must provide this, is implementation-specific
+    requires "add_$singular";
 };
 
 
@@ -82,17 +68,21 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Location::HasLocations - <One-line description of module's purpose>
+Biome::Role::Location::LocationContainer - Parameterizable role for a Location
+container.
 
 =head1 SYNOPSIS
 
-   with 'Biome::Role::Location::HasLocations';
-   # Brief but working code example(s) here showing the most common usage(s)
-
-   # This section will be as far as many users bother reading,
-
-   # so make it as educational and exemplary as possible.
-
+   package Foo;
+   
+   use Biome;
+   with 'Biome::Role::Location::LocationContainer' =>
+            { class   => 'Biome::SeqFeature::Generic',
+              abbrev  => 'Feature'};
+   
+   # Foo now can contain an array of Biome::SeqFeature::Generic.  Adding
+   # a new 
+   
 =head1 DESCRIPTION
 
 <TODO>
