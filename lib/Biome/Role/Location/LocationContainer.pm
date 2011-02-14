@@ -9,10 +9,9 @@ use MooseX::Role::Parameterized;
 
 parameter class => (
     isa         => 'Str',
-    required    => 1
 );
 
-parameter abbrev => (
+parameter short_name => (
     isa         => 'Str',
     required    => 1
 );
@@ -22,7 +21,7 @@ parameter abbrev => (
 parameter plural => (
     isa         => 'Str',
     lazy        => 1,
-    default     => sub { shift->class.'s' }
+    default     => sub { shift->short_name.'s' }
 );
 
 parameter layered => (
@@ -33,12 +32,13 @@ parameter layered => (
 role {
     my $p = shift;
 
-    my $singular = $p->class;
-    my $plural = $p->plural;
-
+    my ($class, $singular, $plural) = ($p->class, $p->short_name, $p->plural);
+    
+    $class ||= 'Biome::Role::Location::Simple';  # any location consumer
+    
     if ($p->layered) {
-        $singular = "sub_$singular";
-        $plural = "sub_$plural";
+        $singular = "sub$singular";
+        $plural = "sub$plural";
     }
     
     has $singular => (
@@ -57,8 +57,6 @@ role {
     # implementing class must provide this, is implementation-specific
     requires "add_$singular";
 };
-
-
 
 no Biome::Role;
 
@@ -85,9 +83,23 @@ container.
    
 =head1 DESCRIPTION
 
-<TODO>
-A full description of the module and its features.
-May include numerous subsections (i.e., =head2, =head3, etc.).
+Simple parameterizable role for anything that has one or more Locations
+(Biome::Role::Location::Simple consumers). This requires the implementation
+provide several things:
+
+=over3
+
+=item *
+
+
+
+=item *
+
+A method to add new Locations; as this is implementation-specific,
+this is required for anything consuming this class.  For instance, a consumer
+
+
+=back 
 
 =head1 SUBROUTINES/METHODS
 

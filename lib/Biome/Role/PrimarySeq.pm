@@ -2,8 +2,9 @@ package Biome::Role::PrimarySeq;
 
 use Biome::Role;
 use Biome::Type::Sequence qw(Maybe_Sequence_Alphabet);
-
 use Biome::Tools::CodonTable;
+
+requires qw(start end);
 
 # this should always return a raw sequence
 has seq => (

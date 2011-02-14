@@ -17,6 +17,17 @@ has end     => (
     default => 0
 );
 
+sub ucsc_start {
+    my ($self, $newstart) = shift;
+    if (defined $newstart) {
+        $self->start($newstart + 1);
+    }
+    my $st = $self->start;
+    $st ? $st - 1 : 0;
+}
+
+sub ucsc_end {shift->end}
+
 sub length {$_[0]->end - $_[0]->start + 1;}
 
 sub to_string {
@@ -39,7 +50,7 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Range - Base role for simple ranges or segments
+Biome::Role::Range - Base role for simple biological ranges or segments.
 
 =head1 VERSION
 
@@ -56,8 +67,13 @@ This documentation refers to Biome::Role::Range version 0.001.
 
 =head1 DESCRIPTION
 
-This Role describes simple attributes and actions for a Range.  In
-biological terms, a Range is a 
+This Role describes simple attributes and actions for a Range. In biological
+terms, a Range is a segment with a start and an end. Ranges may optionally have
+a strand defined; the strand must be 1 (forward, or '+'), -1 (reverse, or '-'),
+or 0 (strand is not set or not defined, the default). The coordinate system is
+the same as for BioPerl, namely coordinates are completely inclusive and start
+at 1 (as opposed to the UCSC system, where coordinates are 0-based, start
+inclusive only).
 
 =head1 ATTRIBUTES
 

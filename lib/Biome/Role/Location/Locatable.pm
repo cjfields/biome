@@ -5,6 +5,9 @@ use namespace::clean -except => 'meta';
 
 requires qw(start end strand from_string to_string);
 
+# This should not be set here, and should be Biome::Role::Identifiable to make
+# the primary ID less Seq-specific
+
 has 'seq_id'    => (
     is      => 'rw',
     isa     => 'Str'
@@ -260,11 +263,8 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Range - Base role for simple ranges or segments
-
-=head1 VERSION
-
-This documentation refers to Biome::Role::Range version 0.001.
+Biome::Role::Location::Locatable - Base role that defines methods for comparing
+ranges with start/end coordinates
 
 =head1 SYNOPSIS
 
@@ -277,8 +277,10 @@ This documentation refers to Biome::Role::Range version 0.001.
 
 =head1 DESCRIPTION
 
-This Role describes simple attributes and actions for a Range.  In
-biological terms, a Range is a 
+This role is set up to perform simple tests between two or more objects that
+have a designated start, end, and strand.  This is not combined with any
+specific range-like implementation in order to decouple these methods from
+any assumptions made by the underlying range-like implementation.
 
 =head1 ATTRIBUTES
 
