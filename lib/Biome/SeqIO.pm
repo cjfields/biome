@@ -27,14 +27,6 @@ sub new {
     my $params = $real_class->BUILDARGS(@_);
     
     # switch out for the real class here
-    # Technically, we could implement SeqIO plugins several ways:
-    # 1) Run-time loading - currently implemented.  Catch the plugin name
-    #    in new(), load correct class.  May become brittle as this overrides
-    #    Moose's new() 
-    # 2) Run-time mixin - catch in BUILD, mixin a role with the proper methods
-    #    Each plugin role would need to implement the correct methods
-    # 3) Switchable plugins - the plugin is a separate object delegated to.  
-    
     if (exists $params->{format}) {
         my $biome_class = $real_class;
         $real_class = "Biome::SeqIO::".$params->{format};
@@ -46,6 +38,8 @@ sub new {
     }
     return Class::MOP::Class->initialize($real_class)->new_object($params);
 }
+
+no Biome;
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
