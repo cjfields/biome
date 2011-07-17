@@ -1,53 +1,9 @@
-package Biome::SeqIO;
+package Biome::Role::SeqRecord;
 
-use 5.010;
-use Biome;
-use Biome::Type::Sequence qw(Sequence_Alphabet);
+use Biome::Role;
 use namespace::clean -except => 'meta';
 
-extends 'Biome::Root::IO';
-with 'Biome::Role::Stream::Seq';
-
-has 'format'    => (
-    isa     => 'Str',
-    is      => 'ro',
-    required => 1,
-);
-
-has 'alphabet' => (
-    isa     => Sequence_Alphabet,
-    is      => 'rw'
-);
-
-# ooooh, I know, overriding new!
-sub new {
-    my $class = shift;
-    my $real_class = Scalar::Util::blessed($class) || $class;
-    # these all come from the same base, Moose::Object, so this is fine
-    my $params = $real_class->BUILDARGS(@_);
-    
-    # switch out for the real class here
-    # Technically, we could implement SeqIO plugins several ways:
-    # 1) Run-time loading - currently implemented.  Catch the plugin name
-    #    in new(), load correct class.  May become brittle as this overrides
-    #    Moose's new() 
-    # 2) Run-time mixin - catch in BUILD, mixin a role with the proper methods
-    #    Each plugin role would need to implement the correct methods
-    # 3) Switchable plugins - the plugin is a separate object delegated to.  
-    
-    if (exists $params->{format}) {
-        my $biome_class = $real_class;
-        $real_class = "Biome::SeqIO::".$params->{format};
-        Class::MOP::load_class($real_class);
-        $biome_class->throw("Module does not implement a sequence stream")
-            unless $real_class->does('Biome::Role::Stream::Seq');
-    } else {
-        $real_class->throw("No format defined, you die right now!");
-    }
-    return Class::MOP::Class->initialize($real_class)->new_object($params);
-}
-
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+with qw(Biome::Role::PrimarySeqContainer);
 
 1;
 
@@ -55,15 +11,15 @@ __END__
 
 =head1 NAME
 
-Biome::SeqIO - <One-line description of module's purpose>
+Biome::Role::SeqRecord - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Biome::SeqIO version Biome.
+This documentation refers to Biome::Role::SeqRecord version Biome::Role.
 
 =head1 SYNOPSIS
 
-   use Biome::SeqIO;
+   with 'Biome::Role::SeqRecord';
    # Brief but working code example(s) here showing the most common usage(s)
 
    # This section will be as far as many users bother reading,
@@ -223,7 +179,7 @@ welcome.
 
 =head1 AUTHOR
 
-Chris Fields  C<< <cjfields at bioperl dot org> >>
+Chris Fields  (cjfields at bioperl dot org)
 
 =head1 LICENCE AND COPYRIGHT
 
