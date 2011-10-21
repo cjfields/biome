@@ -50,7 +50,7 @@ See L<Biome::Role::Location::CoordinatePolicy> for more information
 
 =cut
 
-requires 'start' ; 
+requires 'start' ;
 
 
 =head2 end
@@ -93,11 +93,11 @@ requires 'end';
 
 =cut
 
-has 'each_Location' => ( 
-	is => 'ro', 
-	builder => '_build_each_Location', 
-	lazy => 1, 
-); 
+has 'each_Location' => (
+	is => 'ro',
+	builder => '_build_each_Location',
+	lazy => 1,
+);
 
 =head2 to_FTstring
 
@@ -109,10 +109,10 @@ has 'each_Location' => (
 
 =cut
 
-has  'to_FTstring' => ( 
-	is => 'ro', 
-	builder => '_build_FTstring', 
-	lazy => 1, 
+has  'to_FTstring' => (
+	is => 'ro',
+	builder => '_build_FTstring',
+	lazy => 1,
 );
 
 
@@ -127,10 +127,10 @@ has  'to_FTstring' => (
 
 =cut
 
-has 'valid_Location' => ( 
-	is => 'ro', 
-	builder => '_build_valid_Location', 
-	lazy => 1, 
+has 'valid_Location' => (
+	is => 'ro',
+	builder => '_build_valid_Location',
+	lazy => 1,
 );
 
 sub _build_valid_Location {
@@ -193,16 +193,16 @@ requires 'coordinate_policy' ;
            kind of AB18375:450-900 which can be found in GenBank/EMBL
            feature tables.
 
- Example : 
+ Example :
  Returns : TRUE if the location is a remote location, and FALSE otherwise
- Args    : 
+ Args    :
 
 
 =cut
 
-has 'is_remote' => ( 
-	is => 'rw', 
-	isa => 'Int', 
+has 'is_remote' => (
+	is => 'rw',
+	isa => 'Int',
 );
 
 =head2 strand
@@ -272,7 +272,7 @@ requires 'max_start';
   Usage   : my $start_pos_type = $location->start_pos_type();
   Function: Get start position type encoded as text
 
-            Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100), 
+            Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100),
             'EXACT' (5..100), 'WITHIN' ((5.10)..100), 'BETWEEN', (5^6), with
             their meaning best explained by their GenBank/EMBL location string
             encoding in brackets.
@@ -289,7 +289,7 @@ requires 'start_pos_type';
 
   Title   : min_end
   Usage   : my $minend = $location->min_end();
-  Function: Get minimum ending point of feature. 
+  Function: Get minimum ending point of feature.
 
             Note that an implementation must not call end() in this method
             unless end() is overridden such as not to delegate to the
@@ -327,7 +327,7 @@ requires 'max_end';
   Usage   : my $end_pos_type = $location->end_pos_type();
   Function: Get end position encoded as text.
 
-            Known valid values are 'BEFORE' (5..<100), 'AFTER' (5..>100), 
+            Known valid values are 'BEFORE' (5..<100), 'AFTER' (5..>100),
             'EXACT' (5..100), 'WITHIN' (5..(90.100)), 'BETWEEN', (5^6), with
             their meaning best explained by their GenBank/EMBL location string
             encoding in brackets.
@@ -350,9 +350,9 @@ requires 'end_pos_type';
 
 =cut
 
-has 'seq_id' => ( 
-	is => 'rw', 
-	isa => 'Str', 
+has 'seq_id' => (
+	is => 'rw',
+	isa => 'Str',
 );
 
 

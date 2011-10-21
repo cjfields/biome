@@ -46,7 +46,7 @@ sub length {
 sub sub_Location_strand {
     my ($self) = @_;
     my ($strand, $lstrand);
-    
+
     # this could use reduce()
     foreach my $loc ($self->sub_Locations()) {
         $lstrand = $loc->strand();
@@ -62,7 +62,7 @@ sub sub_Location_strand {
     return $strand;
 }
 
-# overrides 
+# overrides
 
 has     'strand'      => (
     isa         => Maybe_Sequence_Strand,
@@ -130,7 +130,7 @@ sub start_pos_type {
 
 sub end_pos_type {
     my $self = shift;
-    my $type = reduce {$a eq $b ? $a : undef} 
+    my $type = reduce {$a eq $b ? $a : undef}
         map {$_->end_pos_type} $self->sub_Locations;
     return $type;
 }
@@ -138,14 +138,14 @@ sub end_pos_type {
 sub valid_Location {
     # TODO: add tests
     my $self = shift;
-    my $type = reduce {$a eq $b ? 1 : 0} 
+    my $type = reduce {$a eq $b ? 1 : 0}
         map {$_->valid_Location} $self->sub_Locations;
 }
 
 sub is_fuzzy {
     # TODO: add tests
     my $self = shift;
-    my $type = reduce {$a eq $b ? 1 : 0} 
+    my $type = reduce {$a eq $b ? 1 : 0}
         map {$_->is_fuzzy} $self->sub_Locations;
 }
 

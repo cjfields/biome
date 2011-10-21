@@ -10,13 +10,13 @@ BEGIN {
 
 {
     package MyTagCollection;
-    
+
     use Biome;
-    
+
     with 'Biome::Role::Taggable';
-    
+
     no Biome;
-    
+
     __PACKAGE__->meta->make_immutable();
 }
 

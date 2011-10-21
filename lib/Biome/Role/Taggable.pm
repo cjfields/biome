@@ -29,7 +29,7 @@ has tag_map => (
     coerce      => 1,
 );
 
-# should these be delegated to reserved tag/value pairs?  
+# should these be delegated to reserved tag/value pairs?
 has 'primary_tag'   => (
     isa         => 'Str',
     is          => 'rw',
@@ -48,7 +48,7 @@ sub get_tag_values {
 
 sub set_tag_values {
     my ($self, $tag, @vals) = @_;
-    $self->_set_tag_values($tag, \@vals);    
+    $self->_set_tag_values($tag, \@vals);
 }
 
 sub remove_tag {
@@ -73,7 +73,7 @@ sub get_tagset_values {
             push(@vals, $self->get_tag_values($arg));
         }
     }
-    return @vals;    
+    return @vals;
 }
 
 no Biome::Role;
@@ -95,26 +95,26 @@ This documentation refers to Biome::Role::Taggable version 0.01.
     package MyCollection;
     use Biome;
     with 'Biome::Role::Taggable';
-    
+
     # and later in main...
-    
+
     my $tc = MyCollection->new();
-    
+
     # add 'bar', 'baz' values to 'foo' tag
     $tc->add_tag_values('foo', 'bar', 'baz');
-    
+
     # retrieves tag names
     say $tc->get_all_tags;                         # 'foo'
-    
+
     # retrieve values for a specific tag
     say join(',',sort $tc->get_tag_values('foo')); # 'bar,baz';
-    
-    
+
+
     # deletes all values for a tag(key)
     $tc->remove_tag('values');
     # check tags (predicate)
     $tc->has_tag('values');     # undef
-    
+
     # replace tag values
     $tc->set_tag_values('foo', (1,2));
     say join(',',sort $tc->get_tag_values('foo')); # '1,2'
@@ -125,7 +125,7 @@ This documentation refers to Biome::Role::Taggable version 0.01.
 
 =head1 DESCRIPTION
 
-A Role that acts as a simple tag collection.  
+A Role that acts as a simple tag collection.
 
 =head1 SUBROUTINES/METHODS
 
@@ -163,12 +163,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

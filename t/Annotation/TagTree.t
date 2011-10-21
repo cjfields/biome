@@ -37,7 +37,7 @@ my $ann_struct2 = Biome::Annotation::TagTree->new(-tagname => 'gn',
 						-value => $ann_struct->node);
 is($ann_struct2->value, $val,'roundtrip');
 
-# formats 
+# formats
 like($ann_struct2->value, qr/Name: CALM1/,'itext');
 $ann_struct2->tagformat('sxpr');
 like($ann_struct2->value, qr/\(Name "CALM1"\)/,'spxr');

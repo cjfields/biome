@@ -11,7 +11,7 @@ with 'Biome::Role::Location';
 
 
 
-#still not sure how and whether we need to set strand value when both start and end values are passed 
+#still not sure how and whether we need to set strand value when both start and end values are passed
 #during object construction. Maybe running the tests will reveal that
 
 =head2 start
@@ -26,7 +26,7 @@ with 'Biome::Role::Location';
 =cut
 
 sub _build_start {
-  my ($self,  $value ) = @_;	
+  my ($self,  $value ) = @_;
   $self->min_start($value) ;
 }
 
@@ -42,7 +42,7 @@ sub _build_start {
 =cut
 
 sub _build_end {
-  my ($self,  $value ) = @_;	
+  my ($self,  $value ) = @_;
   $self->min_end($value) ;
 }
 
@@ -68,9 +68,9 @@ sub _build_end {
 
 =cut
 
-has 'seq_id' => ( 
-	is => 'rw', 
-	isa => Str, 
+has 'seq_id' => (
+	is => 'rw',
+	isa => Str,
 );
 
 =head2 length
@@ -86,18 +86,18 @@ has 'seq_id' => (
 =cut
 
 has 'length' => (
-   is => 'ro', 
-   default => sub {  
-   		my ($self) = @_; 
+   is => 'ro',
+   default => sub {
+   		my ($self) = @_;
    		return abs($self->end() - $self->start()) + 1;
-	}, 
+	},
 );
 
 =head2 min_start
 
   Title   : min_start
   Usage   : my $minstart = $location->min_start();
-  Function: Get minimum starting location of feature startpoint   
+  Function: Get minimum starting location of feature startpoint
   Returns : integer or undef if no minimum starting point.
   Args    : none
 
@@ -120,7 +120,7 @@ has 'length' => (
 
   Title   : min_end
   Usage   : my $minend = $location->min_end();
-  Function: Get minimum ending location of feature endpoint 
+  Function: Get minimum ending location of feature endpoint
   Returns : integer or undef if no minimum ending point.
   Args    : none
 
@@ -130,7 +130,7 @@ has 'length' => (
 
   Title   : max_end
   Usage   : my $maxend = $location->max_end();
-  Function: Get maximum ending location of feature endpoint 
+  Function: Get maximum ending location of feature endpoint
 
             In this implementation this is exactly the same as min_end().
 
@@ -140,8 +140,8 @@ has 'length' => (
 =cut
 
 has [qw /min_start max_start min_end max_end/] => (
-	is => 'rw', 
-	isa => Int, 
+	is => 'rw',
+	isa => Int,
 );
 
 
@@ -153,7 +153,7 @@ has [qw /min_start max_start min_end max_end/] => (
 
             In this implementation this will always be 'EXACT'.
 
-  Returns : type of position coded as text 
+  Returns : type of position coded as text
             ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
   Args    : none
 
@@ -163,11 +163,11 @@ has [qw /min_start max_start min_end max_end/] => (
 
   Title   : end_pos_type
   Usage   : my $end_pos_type = $location->end_pos_type();
-  Function: Get end position type (ie <,>, ^) 
+  Function: Get end position type (ie <,>, ^)
 
             In this implementation this will always be 'EXACT'.
 
-  Returns : type of position coded as text 
+  Returns : type of position coded as text
             ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
   Args    : none
 
@@ -184,8 +184,8 @@ has [qw /min_start max_start min_end max_end/] => (
 =cut
 
 has [qw /start_pos_type end_pos_type location_type/]  => (
-	is => 'ro', 
-	default => 'EXACT', 
+	is => 'ro',
+	default => 'EXACT',
 );
 
 
@@ -199,7 +199,7 @@ has [qw /start_pos_type end_pos_type location_type/]  => (
            single location or one containing sublocations.
  Returns : an array of Bio::LocationI implementing objects - for
            Simple locations, the return value is just itself.
- Args    : 
+ Args    :
 
 =cut
 
@@ -218,7 +218,7 @@ sub _build_each_Location {
 
 =cut
 
-sub _build_FTstring {  
+sub _build_FTstring {
     	my($self) = @_;
     	if( $self->start == $self->end ) {
 			return $self->start;
@@ -241,7 +241,7 @@ sub _build_FTstring {
 
 =cut
 
-sub _build_valid_Location { 
+sub _build_valid_Location {
 		my ($self) = @_;
     	return 1 if $self->start && $self->end;
     	return 0;
@@ -280,9 +280,9 @@ See L<Bio::Location::CoordinatePolicyI> for more information
 
 # have to make a type out of it probably by coercion which checks for roles
 has 'coordinate_policy' => (
-	is => 'rw', 
-	isa => 'CoordinatePolicy', 
-	default => sub { Biome::Location::WidestCoordinatePolicy->new() }, 
+	is => 'rw',
+	isa => 'CoordinatePolicy',
+	default => sub { Biome::Location::WidestCoordinatePolicy->new() },
 );
 
 =head2 trunc
@@ -365,15 +365,15 @@ of the Bioperl mailing lists.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs

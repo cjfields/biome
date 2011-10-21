@@ -7,7 +7,7 @@ that pertain to the sequence as a whole (thus implementing
 Bio::AnnotationI), and those that are isolated to particular regions, or
 'locations', of a sequence (thus implementing {{PM|Bio::SeqFeatureI}}). A group
 of classes ('''Bio::Location''') was devised in order to describe simple
-locations in a generic way. 
+locations in a generic way.
 
 =head2 How location data is handled in BioPerl
 
@@ -37,13 +37,13 @@ The following all implement {{PM|Bio::LocationI}}.
 
 ==Split==
 
-At this time, all split locations are handled by one class ({{PM|Bio::Location::Split}}), which implements methods from {{PM|Bio::Location::SplitLocationI}} and {{PM|Bio::LocationI}}.  
+At this time, all split locations are handled by one class ({{PM|Bio::Location::Split}}), which implements methods from {{PM|Bio::Location::SplitLocationI}} and {{PM|Bio::LocationI}}.
 
 ===<tt>join(location,location, ... location)</tt>===
 
 The indicated elements should be joined (placed end-to-end) to form one contiguous sequence.  Far and away the most common split location type.  Use of this operator implies that the locations are meant to be joined together in the order listed.
 
-There are some ambiguities in the way this location type is handled in BioPerl, particularly re: circular sequences where the location is split across the origin.  
+There are some ambiguities in the way this location type is handled in BioPerl, particularly re: circular sequences where the location is split across the origin.
 
 '''Examples''':<font color="blue">'''Simple subLocations'''</font>
 
@@ -180,7 +180,7 @@ From [http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=AF081826 
 
 ===<tt>bond(location,location...location)</tt>===
 
-Found in protein files.  These generally are used to describe disulfide bonds.  Some of these location types imply that the order of the location is important (see the example below for 1XDA_D).  
+Found in protein files.  These generally are used to describe disulfide bonds.  Some of these location types imply that the order of the location is important (see the example below for 1XDA_D).
 
 Note that this split location type is not described in the GenBank/EMBL/DDBJ Feature Table definition, presumably because it pertains to protein sequences, not nucleotide sequences.
 
@@ -252,7 +252,7 @@ The following split location operators were in GenBank releases prior to rel. 12
  group(location, location, .. location): The elements are related and
  should be grouped together, but no order is implied.
 
-This differs from <tt>order</tt> in that there is no 5'->3' order of the sublocations.  
+This differs from <tt>order</tt> in that there is no 5'->3' order of the sublocations.
 
 ====<tt>one-of</tt>====
 

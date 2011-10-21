@@ -2,7 +2,7 @@
 
 use strict;
 
-BEGIN { 
+BEGIN {
     use lib '.';
     use Test::More;
     use Test::Moose;

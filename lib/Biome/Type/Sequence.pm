@@ -11,15 +11,15 @@ package Biome::Type::Sequence;
 use MooseX::Types -declare => [qw(
                 Sequence_Strand
                 Maybe_Sequence_Strand
-                
+
                 Sequence_Strand_Int
                 Sequence_Strand_Symbol
-                
+
                 Sequence_Alphabet
                 Maybe_Sequence_Alphabet
-                
+
                 Sequence_Phase
-                
+
                 Output_ID_Type
                 )];
 
@@ -32,7 +32,7 @@ subtype Sequence_Strand,
 
 subtype Maybe_Sequence_Strand,
 	as Maybe[Sequence_Strand];
-    
+
 subtype Sequence_Phase,
 	as Maybe[Int],
 	where  { $_ >= 0 && $_ <= 2},
@@ -42,8 +42,8 @@ subtype Sequence_Strand_Symbol,
 	as Str,
 	where { /^(?:[\+\-\.])$/},
 	message { "Strand symbol can be one of [-.+], not $_"};
-    
-    
+
+
 my %STRAND_SYMBOL = (
     '+'     => 1,
     '.'     => 0,

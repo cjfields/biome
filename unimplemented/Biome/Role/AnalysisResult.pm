@@ -1,13 +1,13 @@
 package Biome::Role::AnalysisResult;
 
-use Biome::Role; 
+use Biome::Role;
 
 
 
 =head2 analysis_query
 
  Usage     : $query_obj = $result->analysis_query();
- Purpose   : Get a Bio::PrimarySeqI-compatible object representing the entity 
+ Purpose   : Get a Bio::PrimarySeqI-compatible object representing the entity
              on which the analysis was performed. Lacks sequence information.
  Argument  : n/a
  Returns   : A Bio::PrimarySeqI-compatible object without sequence information.
@@ -48,9 +48,9 @@ requires 'analysis_subject';
 
 =cut
 
-sub analysis_subject_version { 
+sub analysis_subject_version {
 #---------------
-    my ($self) = @_; 
+    my ($self) = @_;
     return;
 }
 
@@ -80,9 +80,9 @@ sub analysis_date {
 
 =cut
 
-sub analysis_method { 
+sub analysis_method {
 #-------------
-    my ($self) = @_;  
+    my ($self) = @_;
     $self->throw_not_implemented;
 }
 
@@ -98,7 +98,7 @@ sub analysis_method {
 
 sub analysis_method_version {
 #---------------------
-    my ($self) = @_; 
+    my ($self) = @_;
     $self->throw_not_implemented;
 }
 

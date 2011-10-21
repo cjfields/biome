@@ -15,11 +15,11 @@ use Biome::Annotation::Target;
 
 {
     package MyTypeManager;
-    
+
     use Biome;
-    
+
     with 'Biome::Role::ManageTypes';
-    
+
     has '+type_map' => (
         default     => sub {
             {
@@ -34,9 +34,9 @@ use Biome::Annotation::Target;
             }
             }
         );
-    
+
     no Biome;
-    
+
     __PACKAGE__->meta->make_immutable();
 }
 

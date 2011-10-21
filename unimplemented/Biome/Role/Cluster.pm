@@ -1,6 +1,6 @@
 package Biome::Role::Cluster;
 
-use Biome::Role; 
+use Biome::Role;
 use Moose::Meta::Attribute::Native;
 
 requires 'display_id';     # Identifiable
@@ -64,10 +64,10 @@ used to return a specific subset of objects based on object attributes.
 =head2 display_id
 
  Title    : display_id
- Usage    : 
+ Usage    :
  Function : Get the display name or identifier for the cluster
  Returns  : a string
- Args     : 
+ Args     :
  Status   :
 
 =head2 description
@@ -75,17 +75,17 @@ used to return a specific subset of objects based on object attributes.
  Title    : description
  Usage    : $cluster->description("POLYUBIQUITIN")
  Function : get/set for the consensus description of the cluster
- Returns  : the description string 
- Args     : Optional the description string 
+ Returns  : the description string
+ Args     : Optional the description string
  Status   :
 
 =head2 size
 
  Title    : size
  Usage    : $cluster->size();
- Function : get/set for the size of the family, 
+ Function : get/set for the size of the family,
             calculated from the number of members
- Returns  : the size of the family 
+ Returns  : the size of the family
  Args     :
  Status   :
 
@@ -97,7 +97,7 @@ used to return a specific subset of objects based on object attributes.
             represent the score in which the clustering
             algorithm assigns to this cluster.
  Returns  : a number
- Args     : 
+ Args     :
  Status   :
 
 =head2 get_members
@@ -106,32 +106,32 @@ used to return a specific subset of objects based on object attributes.
  Usage    : Bio::ClusterI->get_members(($seq1, $seq2));
  Function : retrieve the members of the family by some criteria, for
             example :
-            
-            $cluster->get_members(-species => 'homo sapiens'); 
+
+            $cluster->get_members(-species => 'homo sapiens');
             Will return all members if no criteria are provided.
-            
+
  Returns  : the array of members
  Args     :
- Status   : 
- 
+ Status   :
+
 =head2 get_member_ids
 
  Title    : get_members
  Usage    : Bio::ClusterI->get_member_ids();
- Function : retrieve the indicated Bio::Identifiable attribute of the family 
+ Function : retrieve the indicated Bio::Identifiable attribute of the family
  Returns  : the array of members
- Args     : 
+ Args     :
  Status   :
 
 =head2 next_member
 
  Title    : get_members
  Usage    : Bio::ClusterI->get_members(($seq1, $seq2));
- Function : retrieve the indicated Bio::Identifiable attribute of the family 
+ Function : retrieve the indicated Bio::Identifiable attribute of the family
  Returns  : the array of members
- Args     : 
+ Args     :
  Status   :
- 
+
 =head1 DIAGNOSTICS
 
 Implementation-dependent
@@ -157,12 +157,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all
@@ -204,7 +204,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 ACKNOWLEDGEMENTS
 
-The original BioPerl interface author (Shawn Hoon).  
+The original BioPerl interface author (Shawn Hoon).
 
 =head1 AUTHOR
 

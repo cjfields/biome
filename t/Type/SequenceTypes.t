@@ -2,7 +2,7 @@
 
 use strict;
 
-BEGIN { 
+BEGIN {
     use lib '.';
     use Test::More tests => 13;
     use Test::Moose;
@@ -18,7 +18,7 @@ BEGIN {
         is      => 'rw',
         coerce  => 1
     );
-    
+
     no Biome;
 }
 

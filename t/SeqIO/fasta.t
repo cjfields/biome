@@ -110,7 +110,7 @@ SEQ
 #    eval "use Algorithm::Diff qw(diff LCS);";
 #    use_ok('IO::ScalarArray');
 #    use_ok('IO::String');
-#    
+#
 #    my ($file, $type) = ("test.$format", $format);
 #    my $filename = test_input_file($file);
 #    print "processing file $filename\n" if $verbose;
@@ -123,7 +123,7 @@ SEQ
 #    my $seqout = new Bio::SeqIO( -fh => $out,
 #                 -format => $type);
 #    my $seq;
-#    while( defined($seq = $seqin->next_seq) ) { 
+#    while( defined($seq = $seqin->next_seq) ) {
 #    $seqout->write_seq($seq);
 #    }
 #    $seqout->close();
@@ -132,7 +132,7 @@ SEQ
 #    my @dataout = map { $_."\n"} split(/\n/, $$strref );
 #    my @diffs = &diff( \@datain, \@dataout);
 #    is(@diffs, 0, "$format format can round-trip");
-#    
+#
 #    if(@diffs && $verbose) {
 #        foreach my $d ( @diffs ) {
 #            foreach my $diff ( @$d ) {
@@ -141,7 +141,7 @@ SEQ
 #            }
 #        }
 #        print "in is \n", join('', @datain), "\n";
-#        print "out is \n", join('',@dataout), "\n"; 
+#        print "out is \n", join('',@dataout), "\n";
 #    }
 #
 #}

@@ -83,9 +83,9 @@ sub intersection {
         }
 
         my $compare = shift(@ranges);
-        
+
         last if !defined $compare;
-        
+
         if (!$compare->_testStrand($intersect, $so)) {
             return
         }
@@ -112,16 +112,16 @@ sub intersection {
                                     -strand => $intersect_strand);
         }
     }
-    return $intersect;     
+    return $intersect;
 }
 
 sub union {
     my ($self, $given, $so) = @_;
-    
-    # strand test doesn't matter here 
-    
+
+    # strand test doesn't matter here
+
     $self->_eval_ranges(@$given);
-    
+
     my @start = sort {$a <=> $b} map { $_->start() } ($self, @$given);
     my @end   = sort {$a <=> $b} map { $_->end()   } ($self, @$given);
 
@@ -196,18 +196,18 @@ sub subtract {
         return $self;  # no Range; maybe this should be Range?
     }
 
-    # Subtracts everything (empty Range of length = 0 and strand = 0 
+    # Subtracts everything (empty Range of length = 0 and strand = 0
     if ($self->equals($range) || $range->contains($self)) {
         return (blessed $self)->new(-start => 0, -end => 0, -strand => 0);
     }
 
     my $int = $self->intersection($range, $so);
     my ($start, $end, $strand) = ($int->start, $int->end, $int->strand);
-    
+
     #Subtract intersection from $self
     my @outranges = ();
     if ($self->start < $start) {
-        push(@outranges, 
+        push(@outranges,
 		 (blessed $self)->new(
                 '-start'=> $self->start,
 			    '-end'=>$start - 1,
@@ -215,11 +215,11 @@ sub subtract {
 			   ));
     }
     if ($self->end > $end) {
-        push(@outranges, 
+        push(@outranges,
 		 (blessed $self)->new('-start'=>$end + 1,
 			    '-end'=>$self->end,
 			    '-strand'=>$self->strand,
-			   ));   
+			   ));
     }
     return @outranges;
 }
@@ -227,7 +227,7 @@ sub subtract {
 # should be genericized for nonstranded Ranges.  I'm not sure about
 # modifying the object in place...
 
-sub offset_stranded { 
+sub offset_stranded {
     my ($self, $offset_fiveprime, $offset_threeprime) = @_;
     my ($offset_start, $offset_end) = $self->strand() eq -1 ?
         (- $offset_threeprime, - $offset_fiveprime) :
@@ -243,7 +243,7 @@ sub offset_stranded {
 sub _eval_ranges {
     my ($self, @ranges) = @_;
     #$self->throw("start is undefined in calling instance") if !defined $self->start;
-    #$self->throw("end is undefined in calling instance") if !defined $self->end;    
+    #$self->throw("end is undefined in calling instance") if !defined $self->end;
     for my $obj ($self, @ranges) {
         $self->throw("Not an object") unless ref($obj);
         $self->throw("start is undefined in instance ".$obj->to_string) if !defined $obj->start;
@@ -278,7 +278,7 @@ This documentation refers to Biome::Role::Range version 0.001.
 =head1 DESCRIPTION
 
 This Role describes simple attributes and actions for a Range.  In
-biological terms, a Range is a 
+biological terms, a Range is a
 
 =head1 ATTRIBUTES
 
@@ -485,12 +485,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

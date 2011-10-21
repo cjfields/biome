@@ -5,13 +5,13 @@ use MooseX::Role::Parameterized;#  -metaclass => 'Biome::Meta::Role::Parameteriz
 parameter id_slots => (
     isa         => 'ArrayRef[Str]',
     is          => 'ro',
-    default     => sub {[qw(object_id display_id primary_id)]} 
+    default     => sub {[qw(object_id display_id primary_id)]}
 );
 
 parameter alternate_slots => (
     isa         => 'ArrayRef[Str]',
     is          => 'ro',
-    default     => sub {[qw(version authority namespace accession_number)]} 
+    default     => sub {[qw(version authority namespace accession_number)]}
 );
 
 our %ALLOWED_ALTERNATES = map {$_ => 1} qw(version authority namespace accession_number);
@@ -19,7 +19,7 @@ our %ALLOWED_ALTERNATES = map {$_ => 1} qw(version authority namespace accession
 role {
     my $p = shift;
     my ($id_slots, $alt_slots) = ($p->id_slots, $p->alternate_slots);
-    
+
     if (grep {!exists $ALLOWED_ALTERNATES{$_}} @$alt_slots) {
         # TODO: once custom parameterizable trait works, add proper exception
         __PACKAGE__->meta->throw_error("Only ".join(',', keys %ALLOWED_ALTERNATES). " are allowed");
@@ -29,12 +29,12 @@ role {
         # TODO: once custom parameterizable trait works, add proper exception
         __PACKAGE__->meta->throw_error("ID slots must have '_id' tag");
     }
-    
+
     has $id_slots => (
         is      => 'rw',
         isa     => 'Str',
     );
-    
+
     has $alt_slots => (
             is      => 'rw',
             isa     => 'Str'
@@ -43,7 +43,7 @@ role {
     method 'namespace_string' => sub {
         my ($self) = @_;
         return $self->namespace.":". $self->object_id .
-             (defined($self->version()) ? ".".$self->version : '');   
+             (defined($self->version()) ? ".".$self->version : '');
     }
 };
 
@@ -168,7 +168,7 @@ __END__
 =head2 id
 
  Note    : The generic attribute id() is not implemented in Biome
- 
+
 =cut
 
 =head2 namespace_string

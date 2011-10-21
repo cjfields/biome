@@ -25,7 +25,7 @@ my $TESTINFILE = File::Spec->catfile(qw(t data lorem.txt));
 my $testfile = 'testfile.txt';
 
 {
-    
+
 # test with handles
 
 ok open(my $I, $TESTINFILE);
@@ -59,7 +59,7 @@ ok !$warn, 'no warnings';
     use Biome;
     with 'Biome::Role::IO::Handle';
     with 'Biome::Role::IO::File';
-    with 'Biome::Role::IO::Buffer';    
+    with 'Biome::Role::IO::Buffer';
     no Biome;
 }
 
@@ -98,7 +98,7 @@ is $line1, $line3;
 is $line2, $line4;
 isnt $line5, $line4;
 
-# now test to see if buffer carries over (should be localized to the 
+# now test to see if buffer carries over (should be localized to the
 ok $rio->pushback($line2);
 ok $rio->pushback($line5);
 
@@ -135,20 +135,20 @@ ok($rio2->close);
 
     my $line1 = $rio->readline;
     is($line1, "Foo\n");
-    
+
     my $line2 = $rio->readline;
     is($line2, "Bar\n");
     $rio->pushback($line2);
-    
+
     chomp($line1); # modify data
     throws_ok {$rio->pushback($line1)}
         qr/Pushing back data with modified line ending/,
         'pushing back data modified from $/ dies';
-    
+
     my $line3 = $rio->readline;
     is($line3, "Bar\n");
     $line3 = $rio->readline;
-    is($line3, "Baz");    
+    is($line3, "Baz");
 
     # does pushing back last line trigger error?
     lives_ok {$rio->pushback($line3)} 'pushing back last line works';
@@ -168,7 +168,7 @@ ok($rio2->close);
 }
 
 {
-    
+
 my $tmp_obj = Foo_Tempfile->new();
 
 my ($tfh, $fn) = $tmp_obj->tempfile();
@@ -190,44 +190,44 @@ SKIP: {
         with 'Biome::Role::IO::Buffer_Unread';
         no Biome;
     };
-    
+
     skip("Tests require IO::Unread", 9) if ($@);
 
     {
     # IO::Unread has a buffering layer built in, but the order is different;
-    # (stack instead of queue).  
-    
+    # (stack instead of queue).
+
     my $rio = Foo_Unread->new(-file => $TESTINFILE );
-    
+
     my $line1 = $rio->readline; # Lorem ...
     my $line2 = $rio->readline; # pulvinar ...
-    
+
     # Note order
     ok $rio->pushback($line2); # pulvinar ...
     ok $rio->pushback($line1); # Lorem ...
-    
+
     my $line3 = $rio->readline; # Lorem ...
     my $line4 = $rio->readline; # pulvinar ...
     my $line5 = $rio->readline;
-    
+
     is $line1, $line3;
     is $line2, $line4;
     isnt $line5, $line4;
-    
+
     # now test to see if buffer carries over (should be localized to the
     # instance)
-    
+
     ok $rio->pushback($line2);
     ok $rio->pushback($line5);
-    
+
     my $rio2 = Foo_Unread->new(-file => $TESTINFILE );
-    
+
     my $newline1 = $rio2->readline;
     my $newline2 = $rio2->readline;
-    
+
     is($newline1, $line1);
     is($newline2, $line2);
-    
+
     }
 }
 
@@ -264,7 +264,7 @@ SKIP: {
     #my $TESTURL = 'http://www.google.com/index.html';
     #
     #ok(my $rio = Foo->new(-url=>$TESTURL), 'default -url method');
-    
+
 #}
 
 ##############################################
@@ -275,33 +275,33 @@ SKIP: {
 SKIP: {
     eval {
         package Foo_All;
-        
+
         use Biome;
-        
+
         extends 'Biome::Root::IO';
-        
+
         no Biome;
     };
-    
+
     skip("IO::Unread not installed, skipping", 5) if $@;
-    
+
     {
-    
+
     ok my $rio = Foo_All->new(-file => $TESTINFILE);
-    
+
     does_ok($rio, 'Biome::Role::IO::Handle');
     does_ok($rio, 'Biome::Role::IO::File');
     does_ok($rio, 'Biome::Role::IO::Tempfile');
     does_ok($rio, 'Biome::Role::IO::Buffer_Unread');
     does_ok($rio, 'Biome::Role::IO::Scalar');
-    
+
     }
 }
 
 ##############################################
 # cleanup
 ##############################################
-    
+
 for my $f ($testfile) {
     unlink $f if -e $f;
 }

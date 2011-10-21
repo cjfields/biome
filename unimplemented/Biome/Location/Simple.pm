@@ -252,7 +252,7 @@ sub length {
 
   Title   : min_end
   Usage   : my $minend = $location->min_end();
-  Function: Get minimum ending location of feature endpoint 
+  Function: Get minimum ending location of feature endpoint
   Returns : integer or undef if no minimum ending point.
   Args    : none
 
@@ -262,7 +262,7 @@ sub length {
 
   Title   : max_end
   Usage   : my $maxend = $location->max_end();
-  Function: Get maximum ending location of feature endpoint 
+  Function: Get maximum ending location of feature endpoint
 
             In this implementation this is exactly the same as min_end().
 
@@ -282,7 +282,7 @@ has [qw /min_start max_start min_end max_end/] => (
   Usage   : my $start_pos_type = $location->start_pos_type();
   Function: Get start position type (ie <,>, ^).
 
-  Returns : type of position coded as text 
+  Returns : type of position coded as text
             ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
   Args    : none
 
@@ -292,9 +292,9 @@ has [qw /min_start max_start min_end max_end/] => (
 
   Title   : end_pos_type
   Usage   : my $end_pos_type = $location->end_pos_type();
-  Function: Get end position type (ie <,>, ^) 
+  Function: Get end position type (ie <,>, ^)
 
-  Returns : type of position coded as text 
+  Returns : type of position coded as text
             ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
   Args    : none
 
@@ -384,7 +384,7 @@ around 'location_type' => sub {
            single location or one containing sublocations.
  Returns : an array of Bio::LocationI implementing objects - for
            Simple locations, the return value is just itself.
- Args    : 
+ Args    :
 
 =cut
 
@@ -580,15 +580,15 @@ of the Bioperl mailing lists.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs

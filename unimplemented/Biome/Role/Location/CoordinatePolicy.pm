@@ -15,7 +15,7 @@ use Biome::Role;
 
 =cut
 
-requires  'start'; 
+requires  'start';
 
 =head2 end
 
@@ -28,7 +28,7 @@ requires  'start';
 
 =cut
 
-requires 'end'; 
+requires 'end';
 
 no Biome::Role;
 

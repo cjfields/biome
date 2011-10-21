@@ -18,11 +18,11 @@ BEGIN {
 
 {
     package Foo;
-    
+
     use Biome;
-    
+
     has foo => ( is => 'ro');
-    
+
     main::isa_ok('Foo', 'Biome::Root');
     main::isa_ok(Foo->meta, 'Biome::Meta::Class');
     main::isa_ok(Foo->meta->error_class, 'Biome::Meta::Error');
@@ -41,11 +41,11 @@ throws_ok {$test1->throw('Arg!');} qr/MSG: Arg!/, 'simple throw';
 {
     # create one's own Biome::Root::Error based exception class
     package Biome::CustomError;
-    
+
     use Biome;
-    
+
     extends 'Biome::Meta::Error';
-    
+
     has really_bad_stuff => (is => 'rw', default => 'really bad stuff');
 }
 
@@ -54,7 +54,7 @@ throws_ok {$test1->throw(-text  => 'Grr!', -class => 'Biome::CustomError');}
 
 isa_ok($@, 'Biome::CustomError', 'custom error metaclass');
 isa_ok($@, 'Biome::Meta::Error', 'inherited');
-    
+
 # small repeat of Moose exception tests, geared towards Biome
 my $line;
 sub blah { $line = __LINE__; shift->foo(4) }
@@ -71,7 +71,7 @@ sub create_error {
         error => $e,
     };
 }
-    
+
 my $e = create_error( my $foo = Foo->new );
 isa_ok( $e->{error}, "Biome::Meta::Error" );
 #isa_ok( $e->{error}, "Exception::Class::Base" );
@@ -93,17 +93,17 @@ SKIP: {
     skip('Exception::Class not found, skipping', 10) unless $EXCEPTION_CLASS;
     {
         package Foo_EC;
-        
+
         use Biome;
         use lib 't/lib';
-        
+
         sub unimplemented {
             shift->throw(
                 -class => 'MyExceptions::VirtualMethod',
                 -text => 'Abstract method'
             );
         }
-        
+
         sub bad_param {
             my ($self, $param) = @_;
             $self->throw(
@@ -111,7 +111,7 @@ SKIP: {
                 -text => 'Bad Param "'.$param.'"'
             );
         }
-        
+
         sub bad_state {
             shift->throw(
                 -class => 'MyExceptions::ObjectState',
@@ -119,7 +119,7 @@ SKIP: {
             );
         }
     }
-    
+
     my $inst = Foo_EC->new();
     throws_ok {$inst->bad_state} qr/Bad\sState/, 'Simple error message';
     isa_ok($@, 'MyExceptions::ObjectState', 'special exception class');

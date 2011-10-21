@@ -262,7 +262,7 @@ is $ref->as_text, 'Reference: title line';
 #isa_ok($ann_tree, 'Bio::AnnotationI');
 #$ann_tree->tree_id('test');
 #is $ann_tree->tree_id(), 'test', "tree_id()";
-#$ann_tree->tagname('tree'); 
+#$ann_tree->tagname('tree');
 #is $ann_tree->tagname(), 'tree', "tagname()";
 #my $aln_filename = test_input_file('longnames.aln');
 #use Bio::AlignIO;
@@ -320,7 +320,7 @@ is $ref->as_text, 'Reference: title line';
 #						-value => $val);
 #is($ann_struct2->value, $val,'roundtrip');
 #
-## formats 
+## formats
 #like($ann_struct2->value, qr/Name: CALM1/,'itext');
 #$ann_struct2->tagformat('sxpr');
 #like($ann_struct2->value, qr/\(Name "CALM1"\)/,'spxr');

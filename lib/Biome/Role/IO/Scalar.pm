@@ -27,25 +27,25 @@ __END__
 
 =head1 NAME
 
-Biome::Role::IO::Scalar - Role for passing in 
+Biome::Role::IO::Scalar - Role for passing in
 
 =head1 SYNOPSIS
 
    package Foo;
    with Biome;
-   
+
    # define fh() (filehandle) either as attribute or method
    with 'Biome::Role::IO::Scalar';
-   
+
    1;
-   
+
    # use above package
-   
+
    my $string = "abcd\nefgh";
    my $io = Foo->new(-scalar => \$string);
-   
+
    # $string is treated like a file...
-   
+
    $io->readline; # "abcd\n"
    $io->readline; # "efgh"
 
@@ -112,12 +112,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

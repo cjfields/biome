@@ -38,7 +38,7 @@ for my $class (@sf_classes) {
     does_ok($feat, 'Biome::Role::SeqFeature', "$class does SeqFeature abstract role");
     is $feat->primary_tag, 'exon', 'primary tag';
     is $feat->source_tag, 'internal', 'source tag';
-    
+
     # Locatable
     does_ok($feat, 'Biome::Role::Location::Locatable', "$class Locatable abstract role");
     # delegated methods (note these are not attributes)
@@ -46,18 +46,18 @@ for my $class (@sf_classes) {
     is $feat->end, 80, 'end of feature location';
     is $feat->strand, 1, 'strand of feature location';
     is $feat->length, 41, 'length of feature location';
-    
+
     # Taggable
     does_ok($feat, 'Biome::Role::Taggable');
     is join(',',sort $feat->get_all_tags), 'new,silly', 'tag names';
     is join(',',$feat->get_tag_values('new')), '1', 'tag 1';
     is join(',',$feat->get_tag_values('silly')), '20', 'tag 2';
-    
+
     # SeqFeature
     does_ok($feat, 'Biome::Role::SeqFeature');
     does_ok($feat, 'Biome::Role::SeqFeature::Collection');
     is $feat->seq_id, 'ABCD1234', 'attached_id';
-    
+
     # PrimarySeqContainer
     my $rawseq = 'gatcagtagacccagcgacagcagggcggggcccagcaggccggccgtggcgtagagcgc'.
     'gaggacggcgaccggcgtggccaccgacaggatggctgcggcgacgcggacgacaccgga';
@@ -67,7 +67,7 @@ for my $class (@sf_classes) {
                         -alphabet         => 'dna',
                         -accession_number => 'X677667',
                         -description      => 'Sample PrimarySeq object');
-    
+
     does_ok($feat, 'Biome::Role::PrimarySeqContainer');
     $feat->attach_seq($seq);
     is $feat->seq, 'gccggccgtggcgtagagcgcgaggacggcgaccggcgtgg';

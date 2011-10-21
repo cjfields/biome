@@ -2,7 +2,7 @@
 
 use strict;
 
-BEGIN { 
+BEGIN {
     use lib '.';
     use Test::More;
     use Test::Moose;
@@ -17,11 +17,11 @@ Test out simple ranges.  Locations will expand on these...
  r0 |--------->
  r1 |---------|
  r2 <---------|
- 
+
  r3    |-->
  r4    |--|
  r5    <--|
- 
+
  r6       |-------->
  r7       |--------|
  r8       <--------|
@@ -35,8 +35,8 @@ Logic table for overlaps, contains, equals
 m = method, o = overlaps()  c = contains()  e = equals
 st = strand tests,  i = ignore, w = weak, s = strong
 
-    r0       r1       r2       r3       r4       r5       r6       r7       r8       r9       r10      r11      
-    o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  
+    r0       r1       r2       r3       r4       r5       r6       r7       r8       r9       r10      r11
+    o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e  o  c  e
     iwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiwsiws
 r0  111111111110110110100100100111111000110110000100100000111000000110000000100000000000000000000000000000000000
 r1  xxxxxxxxx110110110110110110110110000110110000110110000110000000110000000110000000000000000000000000000000000
@@ -51,7 +51,7 @@ r9  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 r10 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx110110110110110110
 r11 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111
 
-=cut 
+=cut
 
 my @spans = (
     [1, 100],
@@ -84,7 +84,7 @@ is($ranges[11]->end, 150);
 is($ranges[11]->strand, -1);
 is($ranges[11]->length, 50);
 
-# see above for logic table 
+# see above for logic table
 my %map = (
 r0  => '111111111111111000111000000110110110110110000110000000100100100100100000100000000000000000000000000000000000',
 r1  => 'xxxxxxxxx111111000111111000110110000110110000110110000100100000100100000100100000000000000000000000000000000',
@@ -97,7 +97,7 @@ r7  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111000
 r8  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111100000000100100000100100100',
 r9  => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111111111000111000000',
 r10 => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111000111111000',
-r11 => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111',  
+r11 => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx111111111',
 );
 
 # cover all variations
@@ -125,11 +125,11 @@ With these ranges:
  r0 |--------->
  r1 |---------|
  r2 <---------|
- 
+
  r3    |-->
  r4    |--|
  r5    <--|
- 
+
  r6       |-------->
  r7       |--------|
  r8       <--------|
@@ -143,14 +143,14 @@ With these ranges:
  intersection of r6, r10    => [101, 125, 0] for ignore, weak, undef for strong
  intersection of r6, r11    => [101, 125, 0] for ignore, undef for weak & strong
  intersection of r0, r6, r9 => undef for all
- 
+
  union of r0, r3, r6        => [1,125,1] for all st
  union of r6, r9            => [75, 150, 1] for all st
  union of r6, r10           => [75, 150, 0] for all st
  union of r6, r11           => [75, 150, 0] for all st
  union of r0, r6, r9        => [1,150,1] for all st
 
-=cut 
+=cut
 
 # geometric tests
 
@@ -204,11 +204,11 @@ for my $set (sort keys %geo_tests) {
  r0 |--------->
  r1 |---------|
  r2 <---------|
- 
+
  r3    |-->
  r4    |--|
  r5    <--|
- 
+
  r6       |-------->
  r7       |--------|
  r8       <--------|
@@ -219,37 +219,37 @@ for my $set (sort keys %geo_tests) {
 
  subtraction of r3 from r0  => two Ranges [1, 24, 1] and [76, 100, 1]
  subtraction of r0 from r3  => one Range [0,0,1] - empty
- subtraction of r6 from r0  => one Range [1, 74, 1] 
+ subtraction of r6 from r0  => one Range [1, 74, 1]
  subtraction of r0 from r6  => one Range [101,125,1]
  subtraction of r9 from r6  => one Range [75,100,1]
  subtraction of r6 from r9  => one Range [126,150,1]
- subtraction of r9 from r0  => original (or clone?) r0 Range [1, 100, 1] 
+ subtraction of r9 from r0  => original (or clone?) r0 Range [1, 100, 1]
  subtraction of r0 from r9  => original (or clone?) r9 Range [101,150,1]
 
 =cut
 
 my %subtract_tests = ( # rx->subtract(ry)               ry->subtract(rx)
- '0,3' =>   {   
+ '0,3' =>   {
     'strong' =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
     'weak'   =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
     'ignore' =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
             },
- '0,4' =>   {   
+ '0,4' =>   {
     'strong' =>  ['(1, 100) strand=1',                  '(25, 75) strand=0'],
     'weak'   =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
     'ignore' =>  ['(1, 24) strand=1,(76, 100) strand=1','(0, 0) strand=0'],
             },
- '0,6' =>   {   
+ '0,6' =>   {
     'strong' =>  ['(1, 74) strand=1',                   '(101, 125) strand=1'],
     'weak'   =>  ['(1, 74) strand=1',                   '(101, 125) strand=1'],
     'ignore' =>  ['(1, 74) strand=1',                   '(101, 125) strand=1'],
             },
- '6,9' =>   {   
+ '6,9' =>   {
     'strong' =>  ['(75, 100) strand=1',                 '(126, 150) strand=1'],
     'weak'   =>  ['(75, 100) strand=1',                 '(126, 150) strand=1'],
     'ignore' =>  ['(75, 100) strand=1',                 '(126, 150) strand=1'],
             },
- '0,9' =>   {   
+ '0,9' =>   {
     'strong' =>  ['(1, 100) strand=1',                  '(101, 150) strand=1'],
     'weak'   =>  ['(1, 100) strand=1',                  '(101, 150) strand=1'],
     'ignore' =>  ['(1, 100) strand=1',                  '(101, 150) strand=1'],
@@ -265,7 +265,7 @@ for my $set (sort keys %subtract_tests) {
         is($string, $subtract_tests{$set}->{$st}->[0], "Subtract ".join(' from ',@ind).", strand test = $st");
         my @sub2 = $r2->subtract($r1, $st);
         $string = join(',',map {$_->to_string} @sub2);
-        is($string, $subtract_tests{$set}->{$st}->[1], "Subtract ".join(' from ',reverse @ind).", strand test = $st");        
+        is($string, $subtract_tests{$set}->{$st}->[1], "Subtract ".join(' from ',reverse @ind).", strand test = $st");
     }
 }
 
@@ -288,13 +288,13 @@ for my $set (sort keys %subtract_tests) {
 #
 #    # test for presence of method
 #    ok exists $Bio::Range::{$func};
-#    
+#
 #    # union get caught in an infinite loop w/o parameters; skip invoke test.
 #    next if $func eq 'union';
-#    
+#
 #    # call to strand complains without a value; skip invoke test.
 #    next if $func eq 'disconnected_ranges';
-#    
+#
 #    # test invocation of method
 #    eval { $Bio::Range::{$func}->(); };
 #    ok($@);

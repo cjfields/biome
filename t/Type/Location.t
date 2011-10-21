@@ -2,7 +2,7 @@
 
 use strict;
 
-BEGIN { 
+BEGIN {
     use lib '.';
     use Test::More;
     use Test::Moose;
@@ -24,7 +24,7 @@ BEGIN {
         is      => 'rw',
         coerce  => 1
     );
-    
+
     no Biome;
 }
 
@@ -48,7 +48,7 @@ my %symbols = (
         '.'          => 'WITHIN',
     },
     'pos_type' => {
-        '..'         => 'EXACT',        
+        '..'         => 'EXACT',
         '<'          => 'BEFORE',
         '>'          => 'AFTER',
         '.'          => 'WITHIN',

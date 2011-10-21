@@ -3,7 +3,7 @@
 
 use strict;
 
-BEGIN { 
+BEGIN {
     use lib '.';
     use Test::More tests => 53;
     use Test::Moose;
@@ -54,7 +54,7 @@ is($seq->subseq(-start => 2, -end => 9, -strand => 1, -gaps => 0), 'TGGTGGCG');
 is($seq->subseq(-start => 7, -end => 15, -strand => 1), 'G---CGTCA--ACT');
 
 # TODO: Locations NYI
-#my $location = Bio::Location::Simple->new('-start' => 2, 
+#my $location = Bio::Location::Simple->new('-start' => 2,
 #                                                     '-end' => 5,
 #                                                     '-strand' => -1);
 #is ($seq->subseq($location), 'ACCA');
@@ -169,7 +169,7 @@ $seq->seq("ggggggttgtagcccc"); # ttg tag
 $aa = $seq->translate(-orf => 1);
 is $aa->seq, 'L*' or diag("Translation: ". $aa->seq);
 
-# Replace L at 1st position with M by setting complete to 1 
+# Replace L at 1st position with M by setting complete to 1
 $seq->seq("ggggggttgtagcccc"); # ttg tag
 $aa = $seq->translate(-orf => 1,
                     -complete => 1);
@@ -194,9 +194,9 @@ $seq = Biome::PrimarySeq->new(
 		-id				=> 'foo',
         -description 	=> 'Alias desc');
 is($seq->description, 'Alias desc');
-is($seq->display_id, 'myID'); 
-$seq->display_id('foo'); 
-is($seq->display_id, 'foo'); 
+is($seq->display_id, 'myID');
+$seq->display_id('foo');
+is($seq->display_id, 'foo');
 ok(!$seq->can('id'), 'we do not use the generic id()');
 
 # test that x's are ignored and n's are assumed to be 'dna' no longer true!

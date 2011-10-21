@@ -22,7 +22,7 @@ We may migrate to a perl 5.12.0 minimal requirement, or just allow the use of
 5.12 features for specific modules.  In general, take advantage of several key
 features for that release, including pluggable keywords, module version syntax,
 better switch statements and smart matching, parallel tests, default 'use
-strict', and so on. 
+strict', and so on.
 
 =head1 Moose and MooseX
 
@@ -33,7 +33,7 @@ latest release. As for MooseX modules, some of what we are using:
     MooseX::ClassAttributes
     MooseX::Role::Parameterized
     MooseX::Aliases
-    
+
 Others may be added along the way. MooseX::AttributeHelpers has been moved into
 the Moose core, therefore at that point we will remove that module as a
 dependency and bump the required Moose core version.
@@ -44,10 +44,10 @@ MooseX::Method::Signatures. This is primarily based on three concerns:
   * Performance - Using MooseX::Declare and/or MooseX::Method::Signatures has
     been reported to cause a fairly decent performance hit. However, this
     needs to be substantiated within this framework.
-  
+
   * Stability - MooseX::Method::Signatures works best with MooseX::Declare, but
     both are still considered to be alpha software.
-    
+
   * Dependencies - the dependency tree for both modules is quite extensive.
 
 If demonstrated that usage of either module isn't detrimental to overall
@@ -68,7 +68,7 @@ The best source for an overall picture of how to document code is the
     docs, including NAME, SYNOPSIS, DESCRIPTION, AUTHOR. Optional sections may
     be VERSION, DEPENDENCIES, CONFIGURATION/ENVIRONMENT, INCOMPATIBILITIES,
     BUGS/LIMITATIONS, etc.
-    
+
   * All POD should be placed in one place, preferably at the end of the file
     after the __END__ directives
 
@@ -100,7 +100,7 @@ action or behavior (Biome::Role::Annotate). If it represents a collection
 behavior, possibly use '*able' (Biome::Role::Annotatable, a collection of
 instances that do Biome::Role::Annotate).
 
-=item * Anything that simply delegates to a 
+=item * Anything that simply delegates to a
 
 =back
 
