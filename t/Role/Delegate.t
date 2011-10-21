@@ -11,7 +11,7 @@ BEGIN {
 {
     package Foo;
     use Moose;
-    
+
     with 'Biome::Role::Delegate'   => {
             delegates => {
                 'file_temp'    => {
@@ -22,8 +22,8 @@ BEGIN {
                 }
             }
         };
-    
-    
+
+
     no Moose;
 }
 

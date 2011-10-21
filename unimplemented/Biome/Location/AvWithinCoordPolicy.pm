@@ -59,7 +59,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-Bio::Location::AvWithinCoordPolicy - class implementing 
+Bio::Location::AvWithinCoordPolicy - class implementing
 Bio::Location::CoordinatePolicy as the average for WITHIN and the widest possible and reasonable range otherwise
 
 =head1 SYNOPSIS
@@ -88,15 +88,15 @@ of the Bioperl mailing lists.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs

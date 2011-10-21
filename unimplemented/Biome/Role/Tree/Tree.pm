@@ -14,14 +14,14 @@ requires qw(
     find_Nodes
     find_Node_by_id
     remove_Node
-    
+
     total_branch_length
     subtree_length
     height
     as_text
     id
     score
-    
+
     splice
     get_lca
     merge_lineage
@@ -49,7 +49,7 @@ __END__
 #
 # BioPerl module for Bio::Tree::TreeI
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Jason Stajich <jason@bioperl.org>
 #
@@ -93,15 +93,15 @@ the Bioperl mailing list.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs
@@ -135,7 +135,7 @@ Internal methods are usually preceded with a _
  Usage   : my @nodes = $tree->get_nodes()
  Function: Return list of Tree::NodeI objects
  Returns : array of Tree::NodeI objects
- Args    : (named values) hash with one value 
+ Args    : (named values) hash with one value
            order => 'b|breadth' first order or 'd|depth' first order
 
 =cut
@@ -190,7 +190,7 @@ Internal methods are usually preceded with a _
  Usage   : my $id = $tree->id();
  Function: An id value for the tree
  Returns : scalar
- Args    : 
+ Args    :
 
 
 =cut
@@ -200,7 +200,7 @@ Internal methods are usually preceded with a _
  Title   : score
  Usage   : $obj->score($newval)
  Function: Sets the associated score with this tree
-           This is a generic slot which is probably best used 
+           This is a generic slot which is probably best used
            for log likelihood or other overall tree score
  Returns : value of score
  Args    : newvalue (optional)
@@ -239,7 +239,7 @@ These methods associate tag/value pairs with a Tree
 
  Title   : add_tag_value
  Usage   : $tree->add_tag_value($tag,$value)
- Function: Adds a tag value to a tree 
+ Function: Adds a tag value to a tree
  Returns : number of values stored for this tag
  Args    : $tag   - tag name
            $value - value to store for the tag
@@ -262,7 +262,7 @@ These methods associate tag/value pairs with a Tree
 
  Title   : remove_all_tags
  Usage   : $tree->remove_all_tags()
- Function: Removes all tags 
+ Function: Removes all tags
  Returns : None
  Args    : None
 

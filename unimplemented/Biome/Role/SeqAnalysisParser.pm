@@ -11,7 +11,7 @@ use Biome::Role;
  Example :
  Returns : A Bio::SeqFeatureI implementing object, or undef if there are no
            more features.
- Args    : none    
+ Args    : none
 
 =cut
 

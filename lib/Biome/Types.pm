@@ -13,18 +13,18 @@ use MooseX::Types -declare => [qw(
 							   Sequence_Strand_Int
 							   Sequence_Strand_Symbol
 							   Sequence_Alphabet
-                               
+
                                Segment_Pos_Symbol
                                Segment_Pos_Type
                                Segment_Symbol
                                Segment_Type
                                Split_Segment_Type
-                               
+
                                SplitLocationType
                                FuzzyPosition
-                               
+
                                PositionType
-                               
+
                                CoordinatePolicy
                                SimpleLocationType
                                StartPosition
@@ -44,8 +44,8 @@ subtype Sequence_Strand_Symbol,
 	as Str,
 	where { /^(?:[\+\-\.])$/},
 	message { "Strand symbol can be one of [-.+], not $_"};
-    
-    
+
+
 my %STRAND_SYMBOL = (
     '+'     => 1,
     '.'     => 0,
@@ -110,7 +110,7 @@ subtype Segment_Pos_Symbol,
     as Str,
     where {exists $VALID_SEGMENT_POS_SYMBOL{$_}},
     message {"Unknown Segment positional symbol $_"};
-    
+
 subtype Segment_Pos_Type,
     as Str,
     where {exists $VALID_SEGMENT_POS_TYPE{$_}},
@@ -119,7 +119,7 @@ subtype Segment_Pos_Type,
 coerce Segment_Pos_Type,
     from Segment_Pos_Symbol,
     via {$TYPE_SYMBOL{$_}};
-    
+
 coerce Segment_Pos_Symbol,
     from Segment_Pos_Type,
     via {$SYMBOL_TYPE{$_}};
@@ -131,10 +131,10 @@ coerce Segment_Symbol,
 coerce Segment_Type,
     from Segment_Symbol,
     via {$TYPE_SYMBOL{$_}};
-    
+
 my %VALID_SPLIT_TYPE = map {$_ => 1}
     qw(JOIN ORDER BOND);
-    
+
 subtype Split_Segment_Type,
     as Str,
     where {exists $VALID_SPLIT_TYPE{uc $_}},
@@ -144,7 +144,7 @@ subtype FuzzyPosition,
     as Str,
     where { /^[\?<]?\d+(?:[\.\^]\d+)?/ },
     message {"Not a fuzzy position type : $_"};
-    
+
 subtype SplitLocationType,
     as Str,
     where {exists $VALID_SPLIT_TYPE{$_}},
@@ -154,12 +154,12 @@ enum PositionType, (qw(INCLUSIVE EXCLUSIVE AVERAGE));
 
 subtype CoordinatePolicy,
 	as Object,
-	where { $_->meta->does_role('Biome::Role::Location::CoordinatePolicy')}, 
+	where { $_->meta->does_role('Biome::Role::Location::CoordinatePolicy')},
 	message { "The object should consume Biome::Role::Location::CoordinatePolicy role"};
 
 subtype Location,
 	as Object,
-	where { $_->meta->does_role('Biome::Role::Location')}, 
+	where { $_->meta->does_role('Biome::Role::Location')},
 	message { "The object should consume Biome::Role::Location role"};
 
 subtype StartPosition,  as Int;
@@ -167,15 +167,15 @@ subtype StartPosition,  as Int;
 subtype EndPosition,  as Int;
 
 coerce StartPosition,
-	from Location, 
+	from Location,
 	 	via {
 			my $pos = $_->min_start();
 			$pos = $_->max_start() if !$pos;
 			return $pos;
 		};
 
-coerce EndPosition,  
-	from Location, 
+coerce EndPosition,
+	from Location,
 	 	via {
 			my $pos = $_->max_end();
 			$pos = $_->min_end() if !$pos;
@@ -184,9 +184,9 @@ coerce EndPosition,
 
 enum SimpleLocationType ,   ('EXACT',  'IN-BETWEEN',  '^',  '..');
 
-subtype SplitType,  as Str; 
-coerce SplitType, 
-	from Str, 
+subtype SplitType,  as Str;
+coerce SplitType,
+	from Str,
 		via { uc $_ };
 
 no MooseX::Types;

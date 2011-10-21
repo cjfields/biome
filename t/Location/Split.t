@@ -74,7 +74,7 @@ is($fuzzy->to_string(), 'complement(<10..20)');
 is($simple->to_string(), '10..20');
 $simple->strand(-1);
 is($simple->to_string(), 'complement(10..20)');
-is( $container->to_string(), 
+is( $container->to_string(),
     'join(13..30,30..90,18..22,19..20,<50..61)');
 
 # test for bug #1074
@@ -82,14 +82,14 @@ $f = Biome::Location::Simple->new(-start  => 5,
 			       -end    => 12,
 			       -strand => -1);
 $container->add_sub_Location($f);
-is( $container->to_string(), 
+is( $container->to_string(),
     'join(13..30,30..90,18..22,19..20,<50..61,complement(5..12))',
 	'Bugfix 1074');
 $container->strand(-1);
 
 TODO: {
     local $TODO = "Check this test, may not be correct with this implementation";
-    is( $container->to_string(), 
+    is( $container->to_string(),
     'complement(join(13..30,30..90,18..22,19..20,<50..61,5..12))');
 }
 

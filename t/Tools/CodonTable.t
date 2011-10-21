@@ -3,7 +3,7 @@
 
 use strict;
 
-BEGIN { 
+BEGIN {
 	use lib '.';
     use Test::More tests => 40;
     use Test::Moose;
@@ -54,7 +54,7 @@ my @res = qw(T   T   X   V  L   Z  );
 my $test = 1;
 for my $i (0..$#ii) {
     if ($res[$i] ne $myCodonTable->translate($ii[$i]) ) {
-		$test = 0; 
+		$test = 0;
 		print $ii[$i], ": |", $res[$i], "| ne |", $myCodonTable->translate($ii[$i]), "|\n";
 		last ;
     }
@@ -63,7 +63,7 @@ ok ($test);
 is $myCodonTable->translate('ag'), '';
 is $myCodonTable->translate('jj'), '';
 is $myCodonTable->translate('jjg'), 'X';
-is $myCodonTable->translate('gt'), 'V'; 
+is $myCodonTable->translate('gt'), 'V';
 is $myCodonTable->translate('g'), '';
 
 # a more comprehensive test on ambiguous codes
@@ -75,7 +75,7 @@ ggkggyggsggvgghggdggbggxgtmgtrgtwgtkgtygtsgtvgthgtdgtbgtxtartaytcmtcrtcwt
 cktcytcstcvtchtcdtcbtcxtgyttrttytramgamggmgrracratrayytaytgytrsaasagsartaa;
 SEQ
 $seq =~ s/\s+//g;
-@ii = grep { length == 3 } split /(.{3})/, $seq; 
+@ii = grep { length == 3 } split /(.{3})/, $seq;
 ##print join (' ', @ii), "\n" if( $DEBUG);
 
 my $prot = <<PROT;
@@ -88,7 +88,7 @@ $prot =~ s/\s//;
 $test = 1;
 for my $i (0..$#ii) {
     if ($res[$i] ne $myCodonTable->translate($ii[$i]) ) {
-		$test = 0; 
+		$test = 0;
 		last ;
     }
 }
@@ -96,7 +96,7 @@ ok $test;
 
 =head1 NYI
 
-# reverse translate amino acids 
+# reverse translate amino acids
 
 is $myCodonTable->revtranslate('U'), 0;
 is $myCodonTable->revtranslate('O'), 0;
@@ -121,7 +121,7 @@ $test = 1;
 	 for my $j (0..$#codonres) {
 	     if ($codonres[$j] ne $res[$i][$j]) {
 		 $test = 0;
-		 print $ii[$i], ': ', $codonres[$j], " ne ", 
+		 print $ii[$i], ': ', $codonres[$j], " ne ",
 		 $res[$i][$j], "\n" if( $DEBUG);
 		 last TESTING;
 	     }
@@ -135,7 +135,7 @@ ok $test;
 #  boolean tests
 $myCodonTable->id(1);
 
-ok $myCodonTable->is_start_codon('ATG');  
+ok $myCodonTable->is_start_codon('ATG');
 is $myCodonTable->is_start_codon('GGH'), 0;
 ok $myCodonTable->is_start_codon('HTG');
 is $myCodonTable->is_start_codon('CCC'), 0;
@@ -187,7 +187,7 @@ is $myCodonTable->translate('atgaaraayacmacracwacka'), 'MKXXTTT';
 #
 ##
 ## test reverse_translate_best(), requires a Bio::CodonUsage::Table object
-## 
+##
 #
 #ok $seq = Bio::PrimarySeq->new(-seq =>'ACDEFGHIKLMNPQRSTVWY');
 #ok my $io = Bio::CodonUsage::IO->new(-file => test_input_file('MmCT'));

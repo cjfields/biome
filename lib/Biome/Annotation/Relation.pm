@@ -33,7 +33,7 @@ __END__
 #
 # BioPerl module for Bio::Annotation::Relation
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by bioperl <bioperl-l@bioperl.org>
 #
@@ -71,15 +71,15 @@ of the Bioperl mailing lists. Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs
@@ -175,9 +175,9 @@ The rest of the documentation details each of the object methods. Internal metho
 
 =cut
 
-=head2 type 
+=head2 type
 
- Title   : type 
+ Title   : type
  Usage   : $obj->type($newval)
  Function: Get/Set the type
  Returns : type of relation

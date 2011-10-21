@@ -9,7 +9,7 @@ use Biome::Role;
  Usage   : $pobj->set_parameters(%params);
  Function: sets the parameters listed in the hash or array
  Returns : None
- Args    : [optional] hash or array of parameter/values.  
+ Args    : [optional] hash or array of parameter/values.
 
 =cut
 

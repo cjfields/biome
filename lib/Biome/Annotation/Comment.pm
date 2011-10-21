@@ -31,7 +31,7 @@ __END__
 #
 # BioPerl module for Bio::Annotation::Comment
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Ewan Birney <birney@ebi.ac.uk>
 #
@@ -58,7 +58,7 @@ Bio::Annotation::Comment - A comment object, holding text
 A holder for comments in annotations, just plain text. This is a very simple
 object, and justifiably so.
 
-=head1 AUTHOR - Ewan Birney 
+=head1 AUTHOR - Ewan Birney
 
 Email birney@ebi.ac.uk
 
@@ -91,7 +91,7 @@ methods. Internal methods are usually preceded with a _
  Usage   :
  Function:
  Example :
- Returns : 
+ Returns :
  Args    :
 
 =cut
@@ -118,7 +118,7 @@ methods. Internal methods are usually preceded with a _
  Usage   :
  Function:
  Example :
- Returns : 
+ Returns :
  Args    :
 
 =cut
@@ -136,7 +136,7 @@ methods. Internal methods are usually preceded with a _
            under which it was stored unless the object has a tag
            stored already.
 
- Example : 
+ Example :
  Returns : value of tagname (a scalar)
  Args    : new value (a scalar, optional)
 
@@ -153,7 +153,7 @@ methods. Internal methods are usually preceded with a _
  Function: get/set for the text field. A comment object
            just holds a single string which is accessible through
            this method
- Example : 
+ Example :
  Returns : value of text
  Args    : newvalue (optional)
 
@@ -178,7 +178,7 @@ methods. Internal methods are usually preceded with a _
  Function: get/set for the comment type field.  The comment type
            is normally found as a subfield within comment sections
            in some files, such as SwissProt
- Example : 
+ Example :
  Returns : value of text
  Args    : newvalue (optional)
 

@@ -108,7 +108,7 @@ has 'location_type'  => (
 );
 
 has 'is_remote' => (
-    is              => 'rw', 
+    is              => 'rw',
     isa             => 'Bool',
     default         => 0
 );
@@ -156,7 +156,7 @@ sub valid_Location {
 
 sub to_string {
     my ($self) = @_;
-    
+
     my %data;
     for (qw(
         start end
@@ -169,7 +169,7 @@ sub to_string {
         location_type)) {
         $data{$_} = $self->$_;
     }
-    
+
     for my $pos (qw(start end)) {
         my $pos_str = $data{$pos} || '';
         if ($pos eq 'end' && $data{start} == $data{end}) {
@@ -191,8 +191,8 @@ sub to_string {
         }
         $data{"${pos}_string"} = $pos_str;
     }
-    
-    my $str = $data{start_string}. ($data{end_string} ? 
+
+    my $str = $data{start_string}. ($data{end_string} ?
             to_Location_Symbol($data{location_type}).
             $data{end_string} : '');
     $str = "$data{seq_id}:$str" if $data{seq_id} && $data{is_remote};
@@ -220,7 +220,7 @@ sub from_string {
         $atts{strand} = 1; # though, this assumes nucleotide sequence...
     }
     my @loc_data = split(/(\.{2}|\^|\:)/, $string);
-    
+
     # SeqID
     if (@loc_data == 5) {
         $atts{seq_id} = shift @loc_data;
@@ -256,7 +256,7 @@ sub from_string {
     $atts{end} ||= $atts{start} unless $atts{end_pos_type};
     for my $m (sort keys %atts) {
         if (defined $atts{$m}){
-            $self->$m($atts{$m}) 
+            $self->$m($atts{$m})
         }
     }
 }
@@ -360,9 +360,9 @@ information
            kind of AB18375:450-900 which can be found in GenBank/EMBL
            feature tables.
 
- Example : 
+ Example :
  Returns : TRUE if the location is a remote location, and FALSE otherwise
- Args    : 
+ Args    :
 
 =head2 flip_strand
 
@@ -378,14 +378,14 @@ information
   Usage   : my $start_pos_type = $location->pos_type('start');
   Function: Get indicated position type encoded as text
 
-            Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100), 
+            Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100),
             'EXACT' (5..100), 'WITHIN' ((5.10)..100), 'BETWEEN', (5^6), with
             their meaning best explained by their GenBank/EMBL location string
             encoding in brackets.
 
   Returns : string ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
   Args    : none
-  
+
 
 =head2 end_pos_type
 
@@ -393,7 +393,7 @@ information
   Usage   : my $start_pos_type = $location->pos_type('start');
   Function: Get indicated position type encoded as text
 
-            Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100), 
+            Known valid values are 'BEFORE' (<5..100), 'AFTER' (>5..100),
             'EXACT' (5..100), 'WITHIN' ((5.10)..100), 'BETWEEN', (5^6), with
             their meaning best explained by their GenBank/EMBL location string
             encoding in brackets.
@@ -408,5 +408,5 @@ information
   Function: Get/Set seq_id that location refers to
   Returns : seq_id (a string)
   Args    : [optional] seq_id value to set
-  
+
 =cut

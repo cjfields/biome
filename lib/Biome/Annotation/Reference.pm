@@ -43,7 +43,7 @@ __END__
 #
 # BioPerl module for Biome::Annotation::Reference
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Ewan Birney <birney@ebi.ac.uk>
 #
@@ -80,7 +80,7 @@ without losing data, we keep them as strings. Feel free to post the
 list for a better solution, but in general this gets very messy very
 fast...
 
-=head1 AUTHOR - Ewan Birney 
+=head1 AUTHOR - Ewan Birney
 
 Email birney@ebi.ac.uk
 

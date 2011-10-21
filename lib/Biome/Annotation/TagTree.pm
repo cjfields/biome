@@ -37,7 +37,7 @@ coerce 'Biome::StagI'
     => from 'ArrayRef'
         => via { Data::Stag->nodify($_) }
     ;
-    
+
 has '+DEFAULT_CB' => (
     default => sub {sub { $_[0]->value || '' }},
     lazy    => 1
@@ -175,15 +175,15 @@ of the Bioperl mailing lists. Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs
@@ -194,7 +194,7 @@ or the web:
 
   http://bugzilla.open-bio.org/
 
-=head1 AUTHOR 
+=head1 AUTHOR
 
 Chris Fields
 
@@ -304,7 +304,7 @@ methods are usually preceded with a _
 
  Title   : node
  Usage   : $obj->node()
- Function: Get/set the topmost Data::Stag node used for this annotation.  
+ Function: Get/set the topmost Data::Stag node used for this annotation.
  Returns : Data::Stag node implementation
            (default is Data::Stag::StagImpl)
  Args    : (optional) Data::Stag node implementation
@@ -316,7 +316,7 @@ methods are usually preceded with a _
 
  Title   : clone_node
  Usage   : my $copy = $obj->clone_node()
- Function: Get/set the topmost Data::Stag node used for this annotation.  
+ Function: Get/set the topmost Data::Stag node used for this annotation.
  Returns : copy of whatever is in node()
  Args    : none
 
@@ -391,9 +391,9 @@ grabbing the Data::Stag instance using node().
 =head2 get
 
  Title   : get
- Usage   : 
+ Usage   :
  Function: Returns the nodes or value for the named element or path
- Example : 
+ Example :
  Returns : returns array of nodes or a scalar (if node is terminal)
            dependent on wantarray
  Args    : none
@@ -403,10 +403,10 @@ grabbing the Data::Stag instance using node().
 =head2 find
 
  Title   : find
- Usage   : 
+ Usage   :
  Function: Recursively searches for and returns the nodes or values for the
            named element or path
- Example : 
+ Example :
  Returns : returns array of nodes or scalars (for terminal nodes)
  Args    : none
 
@@ -415,10 +415,10 @@ grabbing the Data::Stag instance using node().
 =head2 findnode
 
  Title   : findnode
- Usage   : 
+ Usage   :
  Function: Recursively searches for and returns a list of nodes
            of the given element path
- Example : 
+ Example :
  Returns : returns array of nodes
  Args    : none
 
@@ -427,9 +427,9 @@ grabbing the Data::Stag instance using node().
 =head2 findval
 
  Title   : findval
- Usage   : 
- Function: 
- Example : 
+ Usage   :
+ Function:
+ Example :
  Returns : returns array of nodes or values
  Args    : none
 
@@ -462,7 +462,7 @@ grabbing the Data::Stag instance using node().
            <foo>bar1</foo>
            <foo>bar2</foo>
            <foo>bar3</foo>
- Returns : 
+ Returns :
  Args    : first arg = element name
            all other args are added as tag-value pairs
 
@@ -496,8 +496,8 @@ grabbing the Data::Stag instance using node().
  Title   : free
  Usage   : $struct->free
  Function: removes all data from the current node
- Returns : 
- Args    : 
+ Returns :
+ Args    :
 
 =cut
 

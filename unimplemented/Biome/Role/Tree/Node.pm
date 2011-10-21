@@ -11,7 +11,7 @@ requires qw(
     get_all_Descendents
     get_Descendents
     descendent_count
-    
+
     ancestor
     branch_length
     bootstrap
@@ -19,7 +19,7 @@ requires qw(
     id
     internal_id
     id_output
-    
+
     is_Leaf
     to_string
     height
@@ -33,7 +33,7 @@ requires qw(
     get_all_tags
     get_tag_values
     has_tag
-    
+
     reverse_edge
 );
 
@@ -51,7 +51,7 @@ __END__
 #
 # Biome module for Bio::Role::Tree::Node
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Jason Stajich <jason@bioperl.org>
 #
@@ -88,10 +88,10 @@ Bio::Role::Tree::Node - abstract Role describing a Tree Node
     # process all the children
     my $example_leaf_node;
     foreach my $node ( $rootnode->get_all_Descendents() ) {
-	if( $node->is_Leaf ) { 
-	    print "node is a leaf ... "; 
+	if( $node->is_Leaf ) {
+	    print "node is a leaf ... ";
             # for example use below
-            $example_leaf_node = $node unless defined $example_leaf_node; 
+            $example_leaf_node = $node unless defined $example_leaf_node;
 	}
 	print "branch len is ", $node->branch_length, "\n";
     }
@@ -104,7 +104,7 @@ Bio::Role::Tree::Node - abstract Role describing a Tree Node
     # parent won't likely have an description because it is an internal node
     # but child will because it is a leaf
 
-    print "Parent id: ", $parent->id," child id: ", 
+    print "Parent id: ", $parent->id," child id: ",
           $example_leaf_node->id, "\n";
 
 
@@ -135,15 +135,15 @@ the Bioperl mailing list.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs
@@ -184,7 +184,7 @@ Internal methods are usually preceded with a _
 
  Title   : each_Descendent
  Usage   : my @nodes = $node->each_Descendent;
- Function: all the descendents for this Node (but not their descendents 
+ Function: all the descendents for this Node (but not their descendents
 					      i.e. not a recursive fetchall)
  Returns : Array of Bio::Tree::NodeI objects
  Args    : none
@@ -202,7 +202,7 @@ Internal methods are usually preceded with a _
  Function: Recursively fetch all the nodes and their descendents
            *NOTE* This is different from each_Descendent
  Returns : Array or Bio::Tree::NodeI objects
- Args    : $sortby [optional] "height", "creation", "alpha", "revalpha", 
+ Args    : $sortby [optional] "height", "creation", "alpha", "revalpha",
            or a coderef to be used to sort the order of children nodes.
 
 =cut
@@ -210,7 +210,7 @@ Internal methods are usually preceded with a _
 =head2 is_Leaf
 
  Title   : is_Leaf
- Usage   : if( $node->is_Leaf ) 
+ Usage   : if( $node->is_Leaf )
  Function: Get Leaf status
  Returns : boolean
  Args    : none
@@ -221,7 +221,7 @@ Internal methods are usually preceded with a _
 
  Title   : descendent_count
  Usage   : my $count = $node->descendent_count;
- Function: Counts the number of descendents a node has 
+ Function: Counts the number of descendents a node has
            (and all of their subnodes)
  Returns : integer
  Args    : none
@@ -280,7 +280,7 @@ Internal methods are usually preceded with a _
 
  Title   : id
  Usage   : $obj->id($newval)
- Function: The human readable identifier for the node 
+ Function: The human readable identifier for the node
  Returns : value of human readable id
  Args    : newvalue (optional)
 
@@ -359,7 +359,7 @@ These methods associate tag/value pairs with a Node
 
  Title   : add_tag_value
  Usage   : $node->add_tag_value($tag,$value)
- Function: Adds a tag value to a node 
+ Function: Adds a tag value to a node
  Returns : number of values stored for this tag
  Args    : $tag   - tag name
            $value - value to store for the tag
@@ -382,7 +382,7 @@ These methods associate tag/value pairs with a Node
 
  Title   : remove_all_tags
  Usage   : $node->remove_all_tags()
- Function: Removes all tags 
+ Function: Removes all tags
  Returns : None
  Args    : None
 
@@ -431,7 +431,7 @@ These methods associate tag/value pairs with a Node
  Title   : id_output
  Usage   : my $id = $node->id_output;
  Function: Return an id suitable for output in format like newick
-           so that if it contains spaces or ():; characters it is properly 
+           so that if it contains spaces or ():; characters it is properly
            quoted
  Returns : $id string if $node->id has a value
  Args    : none

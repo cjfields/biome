@@ -13,25 +13,25 @@ parameter biome_slots => (
 role {
     my $p = shift;
     my ($sslots, $bslots) = ($p->data_slots, $p->biome_slots);
-    
+
     $sslots ||= [];
-    
+
     push @$sslots, 'tagname';
-    
+
     has $sslots => (
         is      => 'rw',
         isa     => 'Str',
         # should these have a specific trait for first-class data, maybe for
         # hash_tree?
     );
-    
+
     if ($bslots) {
         has $bslots => (
             is      => 'rw',
             isa     => 'Biome::Root'
             # this should have a passed coercion, maybe as a way of
             # serializing data
-        )        
+        )
     }
 
     requires qw(as_text);
@@ -41,7 +41,7 @@ role {
         isa         => 'CodeRef',
         required    => 1,
         );
-    
+
     has type => (
         is          => 'ro',
         isa         => 'Str',
@@ -57,7 +57,7 @@ role {
     method hash_tree => sub {
         my ($self) = @_;
         my $h = {};
-        # do a little introspection using the meta class 
+        # do a little introspection using the meta class
         for my $att ($self->meta->get_all_attributes) {
             next unless $att->has_value($self);
             $h->{$att->name} = $att->get_value($self);

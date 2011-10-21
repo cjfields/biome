@@ -71,7 +71,7 @@ sub get_num_Annotations {
     my ($self) = @_;
     my $count = 0;
     map { $count += scalar @$_ } values %{$self->annotation_map};
-    return $count;    
+    return $count;
 }
 
 *add_Annotation = \&add_Annotations;
@@ -90,33 +90,33 @@ sub add_Annotations {
         $self->throw("Annotation object must have a tagname if key omitted")
             unless $key;
     }
- 
+
     if( !defined $object ) {
         $self->throw("Must have at least key and object in add_Annotation");
     }
- 
+
     if( !ref $object ) {
         $self->throw("Must add an object. Use Biome::Annotation::{Comment,SimpleValue} for simple text additions");
     }
- 
+
     if( !$object->does("Biome::Role::Annotate") ) {
         $self->throw("object must use Annotatable Role, otherwise we won't add it!");
     }
- 
+
     # ok, now we are ready! If we don't have an archetype, set it
     # from the type of the object
- 
+
     if( !defined $archetype ) {
         $archetype = ref $object;
     }
- 
+
     # check typemap, storing if needed.
     my $stored_map = $self->type_for_key($key);
- 
+
     if( defined $stored_map ) {
         # check validity, irregardless of archetype. A little cheeky
         # this means isa stuff is executed correctly
- 
+
         if( !$self->is_valid($key,$object) ) {
             $self->throw("Object $object was not valid with key $key. ".
               "If you were adding new keys in, perhaps you want to make use\n".
@@ -125,12 +125,12 @@ sub add_Annotations {
     } else {
         $self->_add_type_map($key,$archetype);
     }
-    
+
     $object->tagname($key) if (!$object->tagname);
 
-    # we are ok to store 
+    # we are ok to store
     push(@{$map->{$key}},$object);
- 
+
     return 1;
 }
 
@@ -146,7 +146,7 @@ sub remove_Annotations {
         delete $annmap->{$key};
         delete $typemap->{$key};
     }
-    return @anns;    
+    return @anns;
 }
 
 sub flatten_Annotations {
@@ -155,12 +155,12 @@ sub flatten_Annotations {
 
 # create an iterator and return one at a time...
 sub next_Annotation {
-    shift->throw_not_implemented    
+    shift->throw_not_implemented
 }
 
 # create an iterator and return one at a time...
 sub next_Collection {
-    shift->throw_not_implemented    
+    shift->throw_not_implemented
 }
 
 # Annotate Role
@@ -173,7 +173,7 @@ has '+DEFAULT_CB' => (
     );
 
 sub as_text {
-    shift->throw_not_implemented    
+    shift->throw_not_implemented
 }
 
 no Biome;
@@ -213,8 +213,8 @@ Root collection ----|----- Ann2 (simple data/stringified objects)
                                 '-key' => \@keys,
                                 '-recursive => 1);
  Function: Retrieves all the Biome::Role::Annotate objects for one or more
-           specific key(s). If -recursive is set to true, traverses the nested 
-           annotation collections recursively and returns all annotations 
+           specific key(s). If -recursive is set to true, traverses the nested
+           annotation collections recursively and returns all annotations
            matching the key(s).
 
            If no key is given, returns all annotation objects.
@@ -225,7 +225,7 @@ Root collection ----|----- Ann2 (simple data/stringified objects)
 
  Returns : list of Biome::Role::Annotate - empty if no objects stored for a key
  Args    : -keys      => arrayref of keys to search for (optional)
-           -recursive => boolean, whether or not to recursively traverse the 
+           -recursive => boolean, whether or not to recursively traverse the
             nested annotations and return annotations with matching keys.
 
 =head2 get_all_Annotations
@@ -254,7 +254,7 @@ Root collection ----|----- Ann2 (simple data/stringified objects)
            in this collection.
  Returns : integer
  Args    : none
- 
+
 =head2 get_Annotation_keys()
 
  Usage   : $ac->get_Annotation_keys()
@@ -274,9 +274,9 @@ Root collection ----|----- Ann2 (simple data/stringified objects)
  Function: Iterates through the contained Annotations
  Returns : list of Biome::Role::Annotate - empty if no objects stored for a key
  Args    : -keys      => arrayref of keys to search for (optional)
-           -recursive => boolean, whether or not to recursively traverse the 
+           -recursive => boolean, whether or not to recursively traverse the
             nested annotations and return annotations with matching keys.
- Status  : Unstable 
+ Status  : Unstable
 
 =head1 Adding/removing annotation
 
@@ -312,7 +312,7 @@ Root collection ----|----- Ann2 (simple data/stringified objects)
            remove annotations (optional; if none given, flushes all
            annotations)
  Status  : Unstable (could allow removing specific annotations by an identifier)
- 
+
 =head2 flatten_Annotations
 
  Title   : flatten_Annotations

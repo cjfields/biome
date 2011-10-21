@@ -14,7 +14,7 @@ use MooseX::Types -declare => [qw(
                                Location_Symbol
                                Location_Type
                                Split_Location_Type
-                               
+
                                Locatable
                                ArrayRef_of_Locatable
 							   )];
@@ -70,7 +70,7 @@ subtype Location_Pos_Symbol,
     as Str,
     where {exists $VALID_SEGMENT_POS_SYMBOL{$_}},
     message {"Unknown Location positional symbol $_"};
-    
+
 subtype Location_Pos_Type,
     as Str,
     where {exists $VALID_SEGMENT_POS_TYPE{$_}},
@@ -79,7 +79,7 @@ subtype Location_Pos_Type,
 coerce Location_Pos_Type,
     from Location_Pos_Symbol,
     via {$TYPE_SYMBOL{$_}};
-    
+
 coerce Location_Pos_Symbol,
     from Location_Pos_Type,
     via {$SYMBOL_TYPE{$_}};
@@ -91,10 +91,10 @@ coerce Location_Symbol,
 coerce Location_Type,
     from Location_Symbol,
     via {$TYPE_SYMBOL{$_}};
-    
+
 my %VALID_SPLIT_TYPE = map {$_ => 1}
     qw(JOIN ORDER BOND);
-    
+
 subtype Split_Location_Type,
     as Str,
     where {exists $VALID_SPLIT_TYPE{uc $_}},

@@ -28,7 +28,7 @@ requires 'sub_Location' ;
 
 =cut
 
-requires 'splittype'; 
+requires 'splittype';
 
 
 =head2 is_single_sequence

@@ -18,7 +18,7 @@ my $split_impl = "Biome::Location::Split";
 # type, location type, the number of locations, and the strand.
 
 my %testcases = (
-   # note: the following are directly taken from 
+   # note: the following are directly taken from
    # http://www.ncbi.nlm.nih.gov/collab/FT/#location
     "467" => [0, $simple_impl,
         467, 467, "EXACT", 467, 467, "EXACT", "EXACT", 0, 1],
@@ -28,7 +28,7 @@ my %testcases = (
          undef, 345, "BEFORE", 500, 500, "EXACT", "EXACT", 0, 1],
     "<1..888" => [0, $simple_impl,
          undef, 1, "BEFORE", 888, 888, "EXACT", "EXACT", 0, 1],
-    
+
     "(102.110)" => [0, $simple_impl,
          102, 102, "EXACT", 110, 110, "EXACT", "WITHIN", 0, 1],
     "(23.45)..600" => [0, $simple_impl,
@@ -41,15 +41,15 @@ my %testcases = (
          145, 145, "EXACT", 146, 146, "EXACT", "IN-BETWEEN", 0, 1],
     "J00194:100..202" => [0, $simple_impl,
          100, 100, "EXACT", 202, 202, "EXACT", "EXACT", 0, 1],
-    
+
     # these variants are not really allowed by the FT definition
     # document but we want to be able to cope with it
-    
+
     "J00194:(100..202)" => ['J00194:100..202', $simple_impl,
          100, 100, "EXACT", 202, 202, "EXACT", "EXACT", 0, 1],
     "((122.133)..(204.221))" => ['(122.133)..(204.221)', $simple_impl,
          122, 133, "WITHIN", 204, 221, "WITHIN", "EXACT", 0, 1],
-    
+
     # UNCERTAIN locations and positions (Swissprot)
     "?2465..2774" => [0, $simple_impl,
         2465, 2465, "UNCERTAIN", 2774, 2774, "EXACT", "EXACT", 0, 1],
@@ -72,9 +72,9 @@ my %testcases = (
     # Not sure if this is legal...
     "?" => [0, $simple_impl,
         undef, undef, "UNCERTAIN", undef, undef, "EXACT", "EXACT", 0, 1],
-    
+
     # SPLITS
-    
+
     "join(AY016290.1:108..185,AY016291.1:1546..1599)"=> [0, $split_impl,
         108, 108, "EXACT", 185, 185, "EXACT", "JOIN", 2, undef],
     "join(12..78,134..202)" => [0, $split_impl,
@@ -93,9 +93,9 @@ my %testcases = (
         2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1],
     "complement(34..(122.126))" => [0, $simple_impl,
         34, 34, "EXACT", 122, 126, "WITHIN", "EXACT", 0, -1],
-    
+
     # complex, technically not legal FT types but we handle and resolve these as needed
-    
+
     'join(11025..11049,join(complement(239890..240081),complement(241499..241580),complement(251354..251412),complement(315036..315294)))'
         => ['join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))',
             $split_impl,11025,11025, 'EXACT', 315294, 315294, 'EXACT', 'JOIN', 2, undef],
@@ -106,11 +106,11 @@ my %testcases = (
     'join(20464..20694,21548..22763,join(complement(231520..231669),complement(232596..232990),complement(314652..314672)))'
         => ['join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))',$split_impl,
             20464,20464, 'EXACT', 314672, 314672, 'EXACT', 'JOIN', 3, undef],
-        
+
     # not passing yet, getting redundant commas, probably from recursive joins
     'join(1000..2000,join(3000..4000,join(5000..6000,7000..8000)),9000..10000)'
         => [0, $split_impl,1000,1000,'EXACT', 10000, 10000, 'EXACT', 'JOIN', 3, 1],
-    
+
     'order(S67862.1:72..75,join(S67863.1:1..788,1..19))'
         => [0, $split_impl, 72, 72, 'EXACT', 75, 75, 'EXACT', 'ORDER', 2, undef],
           );
@@ -124,10 +124,10 @@ foreach my $locstr (keys %testcases) {
     if (!$replace) {
         is($loc->to_string, $locstr, "compare round-trip on $locstr")
     } else {
-        # these are ones we want converted.  They both have 
+        # these are ones we want converted.  They both have
         is($loc->to_string, $replace, "compare conversion of $locstr to $replace");
     }
-    
+
     isa_ok($loc, $rest[0]);
     is($loc->min_start(), $rest[1], "min_start: $locstr");
     is($loc->max_start(), $rest[2], "max_start: $locstr");

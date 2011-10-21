@@ -25,14 +25,14 @@ which has multiple locations (start/end points)
 							       -strand=>1));
     $splitlocation->add_sub_Location(Bio::Location::Simple->new(-start=>50,
 							       -end=>61,
-							       -strand=>1));   
+							       -strand=>1));
     my @sublocs = $splitlocation->sub_Location();
 
     my $count = 1;
     # print the start/end points of the sub locations
-    foreach my $location ( sort { $a->start <=> $b->start } 
+    foreach my $location ( sort { $a->start <=> $b->start }
 			   @sublocs ) {
-	printf "sub feature %d [%d..%d]\n", 
+	printf "sub feature %d [%d..%d]\n",
 	       $count, $location->start,$location->end, "\n";
         $count++;
     }
@@ -60,15 +60,15 @@ of the Bioperl mailing lists.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
+=head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 
 I<bioperl-l@bioperl.org>
 
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs
@@ -132,10 +132,10 @@ has 'locationstack' => (
         locations      => 'elements',
         count_location => 'count',
         has_location   => 'count',
-        sorted_by_start => 'sort_in_place', 
-        sorted_by_end => 'sort_in_place', 
-        get_location => 'get', 
-        has_no_location => 'is_empty', 
+        sorted_by_start => 'sort_in_place',
+        sorted_by_end => 'sort_in_place',
+        get_location => 'get',
+        has_no_location => 'is_empty',
     },
 );
 
@@ -328,8 +328,8 @@ has 'guide_strand' => (
            all have the same strand. If so, it returns that shared
            strand value. Otherwise it returns undef.
 
- Example : 
- Returns : on get, value of strand if identical between sublocations 
+ Example :
+ Returns : on get, value of strand if identical between sublocations
            (-1, 1, or undef)
  Args    : new value (-1 or 1, optional)
 
@@ -405,10 +405,10 @@ sub flip_strand {
 
 =cut
 
-has 'start' => ( 
-	is => 'rw', 
-	isa => 'Int', 
-	lazy_build => 1, 
+has 'start' => (
+	is => 'rw',
+	isa => 'Int',
+	lazy_build => 1,
 );
 
 sub _build_start {
@@ -428,10 +428,10 @@ sub _build_start {
 
 =cut
 
-has 'end' => ( 
-	is => 'rw', 
-	isa => 'Int', 
-	lazy_build => 1, 
+has 'end' => (
+	is => 'rw',
+	isa => 'Int',
+	lazy_build => 1,
 );
 
 
@@ -451,14 +451,14 @@ sub _build_end {
 =cut
 
 has 'min_start' => (
-	is => 'ro', 
-	isa => 'Int', 
-	lazy_build => 1, 
+	is => 'ro',
+	isa => 'Int',
+	lazy_build => 1,
 );
 
 sub _build_min_start {
     my ( $self ) = @_;
-    return if $self->has_no_location; 
+    return if $self->has_no_location;
     $self->sorted_by_start( sub { $_[0]->start <=> $_[1]->start });
     return $self->get_location(0)->start;
 }
@@ -467,21 +467,21 @@ sub _build_min_start {
 
   Title   : max_start
   Usage   : my $maxstart = $location->max_start();
-  Function: Get maximum starting location of feature startpoint  
+  Function: Get maximum starting location of feature startpoint
   Returns : integer or undef if no maximum starting point.
   Args    : none
 
 =cut
 
 has 'max_start' => (
-	is => 'ro', 
-	isa => 'Int', 
-	lazy_build => 1, 
+	is => 'ro',
+	isa => 'Int',
+	lazy_build => 1,
 );
 
 sub _build_max_start {
     my ( $self ) = @_;
-    return if $self->has_no_location; 
+    return if $self->has_no_location;
     $self->sorted_by_start( sub { $_[1]->start <=> $_[0]->start });
     return $self->get_location(0)->start;
 }
@@ -491,22 +491,22 @@ sub _build_max_start {
 
   Title   : start_pos_type
   Usage   : my $start_pos_type = $location->start_pos_type();
-  Function: Get start position type (ie <,>, ^) 
-  Returns : type of position coded as text 
+  Function: Get start position type (ie <,>, ^)
+  Returns : type of position coded as text
             ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
   Args    : none
 
 =cut
 
 has 'start_pos_type' => (
-	is => 'ro', 
-	isa => 'Str', 
-	lazy_build => 1, 
+	is => 'ro',
+	isa => 'Str',
+	lazy_build => 1,
 );
 
 sub _build_start_pos_type {
     my ( $self ) = @_;
-    return if $self->has_no_location; 
+    return if $self->has_no_location;
     return $self->get_location(0)->start_pos_type;
 }
 
@@ -514,21 +514,21 @@ sub _build_start_pos_type {
 
   Title   : min_end
   Usage   : my $minend = $location->min_end();
-  Function: Get minimum ending location of feature endpoint 
+  Function: Get minimum ending location of feature endpoint
   Returns : integer or undef if no minimum ending point.
   Args    : none
 
 =cut
 
 has 'min_end' => (
-	is => 'ro', 
-	isa => 'Int', 
-	lazy_build => 1, 
+	is => 'ro',
+	isa => 'Int',
+	lazy_build => 1,
 );
 
 sub _build_min_end {
     my ( $self ) = @_;
-    return if $self->has_no_location; 
+    return if $self->has_no_location;
     $self->sorted_by_end( sub { $_[0]->end <=> $_[1]->end });
     return $self->get_location(0)->end;
 }
@@ -537,21 +537,21 @@ sub _build_min_end {
 
   Title   : max_end
   Usage   : my $maxend = $location->max_end();
-  Function: Get maximum ending location of feature endpoint 
+  Function: Get maximum ending location of feature endpoint
   Returns : integer or undef if no maximum ending point.
   Args    : none
 
 =cut
 
 has 'max_end' => (
-	is => 'ro', 
-	isa => 'Int', 
-	lazy_build => 1, 
+	is => 'ro',
+	isa => 'Int',
+	lazy_build => 1,
 );
 
 sub _build_max_end {
     my ( $self ) = @_;
-    return if $self->has_no_location; 
+    return if $self->has_no_location;
     $self->sorted_by_end( sub { $_[1]->end <=> $_[0]->end });
     return $self->get_location(0)->end;
 }
@@ -560,22 +560,22 @@ sub _build_max_end {
 
   Title   : end_pos_type
   Usage   : my $end_pos_type = $location->end_pos_type();
-  Function: Get end position type (ie <,>, ^) 
-  Returns : type of position coded as text 
+  Function: Get end position type (ie <,>, ^)
+  Returns : type of position coded as text
             ('BEFORE', 'AFTER', 'EXACT','WITHIN', 'BETWEEN')
   Args    : none
 
 =cut
 
 has 'end_pos_type' => (
-	is => 'ro', 
-	isa => 'Str', 
-	lazy_build => 1, 
+	is => 'ro',
+	isa => 'Str',
+	lazy_build => 1,
 );
 
 sub _build_end_pos_type {
     my ( $self ) = @_;
-    return if $self->has_no_location; 
+    return if $self->has_no_location;
     return $self->get_location(0)->end_pos_type;
 }
 
@@ -639,8 +639,8 @@ after 'seq_id' => sub {
 =cut
 
 has 'coordinate_policy' => (
-	is => 'rw', 
-	isa => CoordinatePolicy, 
+	is => 'rw',
+	isa => CoordinatePolicy,
 );
 
 
@@ -682,9 +682,9 @@ sub to_FTstring {
         # we only append the remote seq_id if it hasn't been done already
         # by the sub-location (which it should if it knows it's remote)
         # (and of course only if it's necessary)
-        if (   !$loc->is_remote 
-            && defined $self->seq_id 
-            && defined $loc->seq_id 
+        if (   !$loc->is_remote
+            && defined $self->seq_id
+            && defined $loc->seq_id
             && ( $loc->seq_id ne $self->seq_id ) )
         {
             $str = sprintf( "%s:%s", $loc->seq_id, $str );

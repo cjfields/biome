@@ -6,14 +6,14 @@ requires qw(
     get_Annotations
     get_all_Annotations
     get_num_Annotations
-    
+
     get_Annotation_keys
     get_all_Annotation_keys
-    
+
     add_Annotations
     remove_Annotations
     flatten_Annotations
-    
+
     next_Annotation
 );
 
@@ -35,22 +35,22 @@ This documentation refers to Biome::Role::CollectAnnotation version 0.01.
 =head1 SYNOPSIS
 
     package MyAnnotationCollection;
-    
+
     use Biome;
-    
+
     with qw(Biome::Role::CollectAnnotation
             Biome::Role::ManageTypes);  # class consumes both roles
 
     # .....
-    
+
     package main;
 
     use MyAnnotation;
     use MyAnnotationCollection;
-    
+
     # Biome::Role::Annotate consumer
     my $ann = MyAnnotation->new(-tagname => 'foo', -bar => 'baz');
-    
+
 =head1 DESCRIPTION
 
 Describes the basic abstract interface role for collecting any
@@ -69,9 +69,9 @@ role.
             This returns only the keys at the first level in the hierarchy (ones
             immediately available)
  Returns  : Array of strings
- Args     : none 
+ Args     : none
  Status   : Virtual
- 
+
 =head2 get_all_Annotation_keys()
 
  Title    : get_all_Annotation_keys
@@ -84,7 +84,7 @@ role.
  Status   : Virtual
 
 =head2 get_Annotations()
- 
+
  Title    : get_Annotations
  Usage    : my @annotations = $collection->get_Annotations('key')
  Function : Retrieves all the Biome::Role::Annotate objects for a specific key
@@ -99,8 +99,8 @@ role.
                                 '-key' => \@keys,
                                 '-recursive => 1);
  Function : Retrieves all the Biome::Role::Annotate objects for one or more
-            specific key(s). If -recursive is set to true, traverses the nested 
-            annotation collections recursively and returns all annotations 
+            specific key(s). If -recursive is set to true, traverses the nested
+            annotation collections recursively and returns all annotations
             matching the key(s).
 
             If no key is given, returns all annotation objects.
@@ -110,21 +110,21 @@ role.
             already set.
  Returns  : list of Biome::Role::Annotate - empty if no objects stored for a key
  Args     : -keys      => arrayref of keys to search for (optional)
-            -recursive => boolean, whether or not to recursively traverse the 
+            -recursive => boolean, whether or not to recursively traverse the
              nested annotations and return annotations with matching keys.
  Status   : Virtual
 
 =head2 get_all_Annotations
 
  Title    : get_all_Annotations
- Usage    : 
+ Usage    :
  Function : Similar to get_Annotations, but traverses and flattens nested
             annotation collections. This means that collections in the
             tree will be replaced by their components.
 
             Keys will not be passed on to nested collections. I.e., if the
             tag name of a nested collection matches the key, it will be
-            flattened in its entirety. 
+            flattened in its entirety.
 
             Hence, for un-nested annotation collections this will be identical
             to get_Annotations.
@@ -137,7 +137,7 @@ role.
 
  Title    : get_num_of_Annotations
  Usage    : my $count = $collection->get_num_of_Annotations()
- Function : Returns the count of all annotations stored in this collection 
+ Function : Returns the count of all annotations stored in this collection
  Returns  : integer
  Args     : none
  Status   : Virtual
@@ -153,7 +153,7 @@ role.
  Returns :  list of Biome::Role::Annotate - empty if no objects stored for a key
  Args    :  -keys      => arrayref of keys to search for (optional)
             -type      => arrayref of types to search for (optional)
-            -recursive => boolean, whether or not to recursively traverse the 
+            -recursive => boolean, whether or not to recursively traverse the
              nested annotations and return annotations with matching keys.
  Status   : Virtual
 
@@ -165,7 +165,7 @@ role.
  Function : Iterates through the contained Annotations
  Returns  : list of Biome::Role::Annotate - empty if no objects stored for a key
  Args     : -keys      => arrayref of keys to search for (optional)
-            -recursive => boolean, whether or not to recursively traverse the 
+            -recursive => boolean, whether or not to recursively traverse the
              nested annotations and return annotations with matching keys.
  Status   : Virtual
 
@@ -181,7 +181,7 @@ role.
  Function : Adds an annotation for a specific key.
 
             If the key is omitted, the object to be added must provide a value
-            via its tagname(). 
+            via its tagname().
 
             If the archetype is provided, this and future objects added under
             that tag have to comply with the archetype and will be rejected

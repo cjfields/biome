@@ -36,7 +36,7 @@ class_has reverse_codons  => (
 class_has codon_size => (
     isa         => 'Int',
     is          => 'ro',
-    init_arg    => undef,  
+    init_arg    => undef,
     default     => 3
     );
 
@@ -69,7 +69,7 @@ class_has genetic_code => (
             start => '---M----------------------------MMMM---------------M------------'},
     6  => { name  => 'Ciliate, Dasycladacean and Hexamita Nuclear',
             code  => 'FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
-            start => '-----------------------------------M----------------------------'}, 
+            start => '-----------------------------------M----------------------------'},
     9  => { name  => 'Echinoderm Mitochondrial',
             code  => 'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG',
             start => '-----------------------------------M----------------------------'},
@@ -104,7 +104,7 @@ class_has genetic_code => (
             code  => 'FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
             start => '--------------------------------M--M---------------M------------'},
     }
-    }  
+    }
     );
 
 class_has iupac_dna => (
@@ -174,7 +174,7 @@ sub tables {
 
  Title   : translate
  Usage   : $obj->translate('YTR')
- Function: Returns a string of one letter amino acid codes from 
+ Function: Returns a string of one letter amino acid codes from
            nucleotide sequence input. The imput can be of any length.
 
            Returns 'X' for unknown codons and codons that code for
@@ -214,14 +214,14 @@ sub translate {
     $seq = lc $seq;
     $seq =~ tr/u/t/;
     my $protein = "";
-    
+
     if ($seq =~ /[^actg]/ ) { #ambiguous chars
         for (my $i = 0; $i < (length($seq) - ($codonsize-1)); $i+= $codonsize) {
             my $triplet = substr($seq, $i, $codonsize);
             if( $triplet eq $codongap ) {
                 $protein .= $gap;
             } elsif (exists $codons->{$triplet}) {
-                $protein .= substr($table, 
+                $protein .= substr($table,
                        $codons->{$triplet},1);
             } else {
                 $protein .= $self->_translate_ambiguous_codon($triplet, $partial, $table, $codons);
@@ -229,7 +229,7 @@ sub translate {
         }
     } else { # simple, strict translation
         for (my $i = 0; $i < (length($seq) - ($codonsize -1)); $i+=$codonsize) {
-            my $triplet = substr($seq, $i, $codonsize); 
+            my $triplet = substr($seq, $i, $codonsize);
             if( $triplet eq $codongap) {
                 $protein .= $gap;
             } if (exists $codons->{$triplet}) {
@@ -244,7 +244,7 @@ sub translate {
         if( $triplet eq $codongap ) {
             $protein .= $gap;
         } elsif (exists $codons->{$triplet}) {
-            my $aa = substr($table, $codons->{$triplet},1);       
+            my $aa = substr($table, $codons->{$triplet},1);
             $protein .= $aa;
         } else {
             $protein .= $self->_translate_ambiguous_codon($triplet, $partial, $table, $codons);
@@ -303,10 +303,10 @@ sub _translate_ambiguous_codon {
 sub translate_strict{
     my ($self, $value) = @_;
     my $code = ${$self->genetic_code}{$self->id};
- 
+
     $value  = lc $value;
     $value  =~ tr/u/t/;
- 
+
     if (length $value != 3 ) {
         return '';
     } else {
@@ -349,10 +349,10 @@ sub translate_strict{
 #        $value = ucfirst $value;
 #        $value = $THREELETTERSYMBOLS{$value};
 #    }
-#    if ( defined $value and $value =~ /$VALID_PROTEIN/ 
+#    if ( defined $value and $value =~ /$VALID_PROTEIN/
 #          and length($value) == 1 ) {
 #        $value = uc $value;
-#        @aas = @{$IUPAC_AA{$value}};    
+#        @aas = @{$IUPAC_AA{$value}};
 #        foreach my $aa (@aas) {
 #            #print $aa, " -2\n";
 #            $aa = '\*' if $aa eq '*';
@@ -368,7 +368,7 @@ sub translate_strict{
 #          $codons[$i] =~ tr/t/u/;
 #       }
 #   }
-#    
+#
 #   return @codons;
 #}
 #
@@ -390,7 +390,7 @@ sub translate_strict{
 #=cut
 #
 #sub reverse_translate_all {
-#    
+#
 #    my ($self, $obj, $cut, $threshold) = @_;
 #
 #    ## check args are OK
@@ -408,7 +408,7 @@ sub translate_strict{
 #
 #    ## if we're not supplying a codon usage table...
 #    if( !$cut && !$threshold) {
-#        ## get lists of possible codons for each aa. 
+#        ## get lists of possible codons for each aa.
 #        for my $aa (@seq) {
 #            if ($aa =~ /x/i) {
 #                push @data, (['NNN']);
@@ -419,7 +419,7 @@ sub translate_strict{
 #        }
 #    }else{
 #    #else we are supplying a codon usage table, we just want common codons
-#    #check args first. 
+#    #check args first.
 #        if(!$cut->isa('Bio::CodonUsage::Table'))    {
 #            $self->throw("I need a Bio::CodonUsage::Table object, not a [".
 #                     ref($cut). "].");
@@ -479,7 +479,7 @@ sub translate_strict{
 #        if ( defined $cod_ref->{$aa} ) {
 #            $str .= $cod_ref->{$aa};
 #        } else {
-#            $self->throw("Input sequence contains invalid character: $aa");         
+#            $self->throw("Input sequence contains invalid character: $aa");
 #        }
 #    }
 #   $str;
@@ -499,11 +499,11 @@ sub translate_strict{
 
 sub is_start_codon{
     my ($self, $value) = @_;
-    
+
     my $code = ${$self->genetic_code}{$self->id};
     $value  = lc $value;
     $value  =~ tr/u/t/;
- 
+
     if (length $value != 3  )  {
         return 0;
     }
@@ -531,11 +531,11 @@ sub is_start_codon{
 
 sub is_ter_codon{
     my ($self, $value) = @_;
- 
+
     my $code = ${$self->genetic_code}{$self->id};
     $value  = lc $value;
     $value  =~ tr/u/t/;
- 
+
     if (length $value != 3  )  {
         return 0;
     }
@@ -565,10 +565,10 @@ sub is_ter_codon{
 sub is_unknown_codon{
     my ($self, $value) = @_;
     my $code = ${$self->genetic_code}{$self->id};
- 
+
     $value  = lc $value;
     $value  =~ tr/u/t/;
- 
+
     if (length $value != 3  )  {
         return 1;
     }
@@ -630,7 +630,7 @@ sub add_table {
     my $top = (sort {$a <=> $b} keys %$data)[-1];
     $top++;
     $name ||= 'Custom'. $self->_code_elements + 1;
-    $starts ||= $data->{1}->{start}; 
+    $starts ||= $data->{1}->{start};
     $self->throw('Suspect input!')
         unless length($table) == 64 and length($starts) == 64;
     $self->_add_table($top,
@@ -652,7 +652,7 @@ sub add_table {
 #    my $iupac_string = ''; ## the string to be returned
 #    for my $aa (@$cod_ref) {
 #
-#        ## scan through codon positions, record the differing values,   
+#        ## scan through codon positions, record the differing values,
 #        # then look up in the iub hash
 #        for my $index(0..2) {
 #            my %h;
@@ -660,7 +660,7 @@ sub add_table {
 #                $h{$k}  = undef;} @$aa;
 #            my $lookup_key = join '', sort{$a cmp $b}keys %h;
 #
-#            ## extend string 
+#            ## extend string
 #            $iupac_string .= $iupac_hash{uc$lookup_key};
 #        }
 #    }
@@ -697,7 +697,7 @@ __END__
 #
 # bioperl module for Bio::Tools::CodonTable
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Heikki Lehvaslaiho <heikki-at-bioperl-dot-org>
 #
@@ -779,7 +779,7 @@ acid transcripts. The CodonTable object accepts codons of both type as
 input and allows the user to set the mode for output when reverse
 translating. Its default for output is DNA.
 
-Note: 
+Note:
 
 This class deals primarily with individual codons and amino
 acids. However in the interest of speed you can L<translate>
@@ -845,15 +845,15 @@ Bioperl mailing lists  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs

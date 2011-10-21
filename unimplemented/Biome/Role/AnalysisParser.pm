@@ -10,7 +10,7 @@ use Biome::Role;
  Function: Returns the next result available from the input, or
            undef if there are no more results.
  Example :
- Returns : A Bio::Search::Result::ResultI implementing object, 
+ Returns : A Bio::Search::Result::ResultI implementing object,
            or undef if there are no more results.
  Args    : none
 

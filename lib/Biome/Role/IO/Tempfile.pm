@@ -31,24 +31,24 @@ sub tempfile {
     #        my $v = $params{$key};
     #        delete $params{$key};
     #        $params{uc(substr($key,1))} = $v;
-    #    } else { 
+    #    } else {
     #        # this is to upper case
     #        my $v = $params{$key};
-    #        delete $params{$key};       
+    #        delete $params{$key};
     #        $params{uc($key)} = $v;
     #    }
     #}
-    
+
     $args{'TMPDIR'} = 1 if(! exists($args{'DIR'}));
-    
-    #unless (exists $params{'UNLINK'} && 
+
+    #unless (exists $params{'UNLINK'} &&
     #    defined $params{'UNLINK'} &&
     #    ! $params{'UNLINK'} ) {
     #    $params{'UNLINK'} = 1;
     #} else {
     #    $params{'UNLINK'} = 0
     #}
-    
+
     if(exists($args{'TEMPLATE'})) {
         my $template = $args{'TEMPLATE'};
         delete $args{'TEMPLATE'};
@@ -60,7 +60,7 @@ sub tempfile {
     $self->_set_fh($tfh);
     if(  $args{'UNLINK'} ) {
         $self->add_tempfile($file);
-    } 
+    }
     return wantarray ? ($tfh,$file) : $tfh;
 }
 
@@ -163,12 +163,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

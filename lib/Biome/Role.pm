@@ -12,7 +12,7 @@ sub init_meta {
 	shift;
 	return Moose::Role->init_meta(
 		@_,
-		metaclass => 'Biome::Meta::Role'); 
+		metaclass => 'Biome::Meta::Role');
 }
 
 1;

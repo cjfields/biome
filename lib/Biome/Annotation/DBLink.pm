@@ -50,7 +50,7 @@ __END__
 #
 # BioPerl module for Bio::Annotation::DBLink
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Ewan Birney <birney@ebi.ac.uk>
 #
@@ -70,7 +70,7 @@ Bio::Annotation::DBLink - untyped links between databases
                                         -primary_id => 'TSC0000030'
 					);
 
-   #or 
+   #or
 
    $link2 = Bio::Annotation::DBLink->new();
    $link2->database('dbSNP');
@@ -137,7 +137,7 @@ methods. Internal methods are usually preceded with a _
  Usage   :
  Function:
  Example :
- Returns : 
+ Returns :
  Args    :
 
 
@@ -165,7 +165,7 @@ methods. Internal methods are usually preceded with a _
  Usage   :
  Function:
  Example :
- Returns : 
+ Returns :
  Args    :
 
 
@@ -184,7 +184,7 @@ methods. Internal methods are usually preceded with a _
            under which it was stored unless the object has a tag
            stored already.
 
- Example : 
+ Example :
  Returns : value of tagname (a scalar)
  Args    : new value (a scalar, optional)
 
@@ -201,7 +201,7 @@ methods. Internal methods are usually preceded with a _
  Usage   : $self->database($newval)
  Function: set/get on the database string. Databases are just
            a string here which can then be interpreted elsewhere
- Example : 
+ Example :
  Returns : value of database
  Args    : newvalue (optional)
 
@@ -212,10 +212,10 @@ methods. Internal methods are usually preceded with a _
  Title   : primary_id
  Usage   : $self->primary_id($newval)
  Function: set/get on the primary id (a string)
-           The primary id is the main identifier used for this object in 
+           The primary id is the main identifier used for this object in
            the database. Good examples would be accession numbers. The id
            is meant to be the main, stable identifier for this object
- Example : 
+ Example :
  Returns : value of primary_id
  Args    : newvalue (optional)
 
@@ -234,7 +234,7 @@ methods. Internal methods are usually preceded with a _
            identifier" of objects, and people can use/abuse optional
            ids to their heart's content to provide precise mappings.
 
- Example : 
+ Example :
  Returns : value of optional_id
  Args    : newvalue (optional)
 
@@ -256,7 +256,7 @@ methods. Internal methods are usually preceded with a _
  Usage   : $self->comment($newval)
  Function: get/set of comments (comment object)
            Sets or gets comments of this dblink, which is sometimes relevant
- Example : 
+ Example :
  Returns : value of comment (Bio::Annotation::Comment)
  Args    : newvalue (optional)
 
@@ -294,7 +294,7 @@ methods. Internal methods are usually preceded with a _
  Title   : authority
  Usage   : $authority    = $obj->authority()
  Function: a string which represents the organisation which
-           granted the namespace, written as the DNS name for  
+           granted the namespace, written as the DNS name for
            organisation (eg, wormbase.org)
  Returns : A scalar
 
@@ -306,7 +306,7 @@ methods. Internal methods are usually preceded with a _
  Usage   : $string    = $obj->namespace()
  Function: A string representing the name space this identifier
            is valid in, often the database name or the name
-           describing the collection 
+           describing the collection
            For DBLink this is the same as database().
  Returns : A scalar
 

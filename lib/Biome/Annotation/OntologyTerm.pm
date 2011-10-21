@@ -384,13 +384,13 @@ sub add_dblink {
  Function: Pushes one or more dblinks
            into the list of dblinks.
  Returns :
- Args    : 
+ Args    :
 
 =cut
 
 sub add_dbxref {
     return shift->term->add_dbxref(@_);
-} 
+}
 
 =head2 remove_dblinks
 
@@ -422,7 +422,7 @@ sub remove_dblinks {
 
 sub remove_dbxrefs {
     return shift->term->remove_dbxrefs(@_);
-} 
+}
 
 =head2 get_secondary_ids
 
@@ -483,7 +483,7 @@ __END__
 #
 # BioPerl module for Bio::Annotation::OntologyTerm
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Hilmar Lapp <hlapp at gmx.net>
 #
@@ -550,15 +550,15 @@ of the Bioperl mailing lists. Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs

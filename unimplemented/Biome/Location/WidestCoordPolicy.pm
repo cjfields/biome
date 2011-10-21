@@ -23,9 +23,9 @@ use Biome::Types qw/StartPosition EndPosition/;
 
 
 has 'start' => (
-    is => 'ro', 
-    isa => StartPosition, 
-    coerce => 1, 
+    is => 'ro',
+    isa => StartPosition,
+    coerce => 1,
 );
 
 
@@ -43,9 +43,9 @@ has 'start' => (
 
 
 has 'end' => (
-is => 'ro', 
-isa => EndPosition, 
-coerce => 1, 
+is => 'ro',
+isa => EndPosition,
+coerce => 1,
 );
 
 with 'Biome::Role::Location::CoordinatePolicy';
@@ -58,7 +58,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-Bio::Location::WidestCoordPolicy - class implementing 
+Bio::Location::WidestCoordPolicy - class implementing
 Bio::Location::CoordinatePolicy as the widest possible and reasonable range
 
 =head1 SYNOPSIS
@@ -85,15 +85,15 @@ of the Bioperl mailing lists.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs

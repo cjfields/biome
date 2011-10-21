@@ -10,7 +10,7 @@ use Biome::Role;
 
 =cut
 
-requirs 'analysis_name'; 
+requirs 'analysis_name';
 
 
 =head2 analysis_spec
@@ -25,7 +25,7 @@ C<supplier>, C<installation>, C<description>.
 
 =cut
 
-requires 'analysis_spec'; 
+requires 'analysis_spec';
 
 
 =head2 input_spec
@@ -42,7 +42,7 @@ pairs).
 
 =cut
 
-requires 'input_spec'; 
+requires 'input_spec';
 
 
 =head2 result_spec
@@ -66,7 +66,7 @@ Here is an example of the result specification:
 
 =cut
 
-requires 'result_spec'; 
+requires 'result_spec';
 
 
 =head2 run
@@ -116,7 +116,7 @@ filename.
 
 =cut
 
-requires 'run'; 
+requires 'run';
 
 # -----------------------------------------------------------------------------
 
@@ -131,7 +131,7 @@ identical to the method C<run>. See details in the C<run> method.
 
 =cut
 
-requires 'wait_for'; 
+requires 'wait_for';
 
 # -----------------------------------------------------------------------------
 
@@ -150,7 +150,7 @@ implementation extended possible job states):
 
 =cut
 
-requires 'status'; 
+requires 'status';
 
 # -----------------------------------------------------------------------------
 
@@ -169,7 +169,7 @@ implementation).
 
 =cut
 
-requires 'result'; 
+requires 'result';
 
 
 
