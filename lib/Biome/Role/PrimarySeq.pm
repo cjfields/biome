@@ -4,8 +4,6 @@ use Biome::Role;
 use Biome::Type::Sequence qw(Maybe_Sequence_Alphabet);
 use Biome::Tools::CodonTable;
 
-requires qw(start end);
-
 # this should always return a raw sequence
 has seq => (
     is    => 'rw',
@@ -45,21 +43,21 @@ has symbols => (
 # returns raw subsequence; trunc() calls this for objects
 sub subseq {
     my $self = shift;
-    my ($start,$end,$strand,$gaps,$replace) = $self->rearrange([qw(START 
+    my ($start,$end,$strand,$gaps,$replace) = $self->rearrange([qw(START
                                                            END
                                                            STRAND
                                                            GAPS
                                                            REPLACE_WITH)],@_);
-    
+
     $strand //= 1;
     $gaps //= 1;
-    
+
     # This doesn't account for classes possibly implementing Ranges or
     # Locations, but only for the presence of simple gaps. Such alternatives
     # will be localized to Range/Location-specific implementations (we can't
     # account for all variations and additional constraints, such as laziness,
     # fly/lightweight, etc.)
-    
+
     if( ref($start) && $start->does('Biome::Role::Location::Range') ) {
         # does not handle complex locations; not sure whether we should
         # implement or not (segments are much easier, and relevant code such as
@@ -77,7 +75,7 @@ sub subseq {
         if( $end > $self->length ) {
             $self->throw("Bad end parameter ($end). End must be less than the total length of sequence (total=".$self->length.")");
         }
-        
+
         # convert all coordinates to 0-origin
         $start--;
         $end--;
@@ -98,7 +96,7 @@ sub subseq {
             $seqstr = substr($rawseq, $newst, $newend -$newst + 1);
             $seqstr =~ s/[$gs]//g unless $gaps;
         } else {
-            $seqstr = substr($rawseq, $start, $end -$start + 1);            
+            $seqstr = substr($rawseq, $start, $end -$start + 1);
         }
         return $seqstr;
     }
@@ -111,35 +109,35 @@ sub subseq {
 
 sub revcom {
     my ($self) = @_;
- 
+
     # check the type is good first.
     my $t = $self->alphabet;
- 
+
     if( $t eq 'protein' ) {
         $self->throw("Sequence is a protein. Cannot revcom");
     }
- 
+
     if( $t ne 'dna' && $t ne 'rna' ) {
         $self->warn("Sequence is not dna or rna, but [$t]. ".
                 "Attempting to revcom, but unsure if this is right");
     }
 
-    # yank out the sequence string 
+    # yank out the sequence string
     my $str = $self->seq();
-    
+
     # if is RNA - map to DNA then map back
     if( $t eq 'rna' ) {
         $str =~ tr/uU/tT/;
     }
- 
+
     # revcom etc...
     $str =~ tr/acgtrymkswhbvdnxACGTRYMKSWHBVDNX/tgcayrkmswdvbhnxTGCAYRKMSWDVBHNX/;
     my $revseq = CORE::reverse $str;
- 
+
     if( $t eq 'rna' ) {
         $revseq =~ tr/tT/uU/;
     }
-    
+
     my $out = $self->clone(-seq => $revseq);
     return $out;
 }
@@ -178,7 +176,7 @@ sub translate {
     $unknown //= "X";
     $frame //= 0;
     $codonTableId //= 1;
-        
+
     # Get a CodonTable, error if custom CodonTable is invalid
     if ($codonTable) {
          $self->throw("Need a Biome::Tools::CodonTable object, not ". $codonTable)
@@ -186,7 +184,7 @@ sub translate {
     } else {
          $codonTable = Biome::Tools::CodonTable->new( -id => $codonTableId);
     }
-    
+
     # Error if alphabet is "protein"
     $self->throw("Can't translate an amino acid sequence.") if
         ($self->alphabet eq 'protein');
@@ -196,9 +194,9 @@ sub translate {
         $self->throw("Invalid start codon: $start_codon.") if
            ( $start_codon !~ /^[A-Z]{3}$/i );
     }
-     
+
     my $seq;
-     
+
     if ($offset) {
         $self->throw("Offset must be 1, 2, or 3.") if
             ( $offset !~ /^[123]$/ );
@@ -207,7 +205,7 @@ sub translate {
     } else {
         ($seq) = $self->seq();
     }
-    
+
     # ignore frame if an ORF is supposed to be found
     if ($orf) {
         $seq = $self->_find_orf($seq,$codonTable,$start_codon);
@@ -217,14 +215,14 @@ sub translate {
            unless ($frame == 0 or $frame == 1 or $frame == 2);
         $seq = substr($seq,$frame);
     }
-    
+
     # TODO:
     # Preferentially, CodonTable::translate should handle gaps but currently
     # doesn't; discussion on what to do here.  Gaps are removed for now.
-    
+
     my $gs = ${$self->symbols}{GAP};
     $seq =~ s/[$gs]+//g;
-    
+
     # Translate it
     my $output = $codonTable->translate($seq);
     # Use user-input terminator/unknown
