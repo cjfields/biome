@@ -12,24 +12,25 @@ use namespace::clean -except => 'meta';
 # class can override
 
 with 'Biome::Role::Location::Simple';
+with 'Biome::Role::Location::Split';
 with 'Biome::Role::Location::Locatable';
 
 sub BUILD {
     my ($self, $params) = @_;
-    
+
     if ($params->{location_string}) {
         $self->throw("Can't use 'location_string' with other parameters")
             if (scalar(keys %$params) > 1);
         $self->from_string($params->{location_string});
     }
-    
+
     if ($params->{start} && $params->{end} && ($params->{end} < $params->{start})) {
         $self->warn('End is greater than start; flipping strands');
         $self->end($params->{start});
         $self->start($params->{end});
         $self->strand($self->strand * -1);
     }
-    
+
     $params->{location_type} && $self->location_type($params->{location_type});
 }
 

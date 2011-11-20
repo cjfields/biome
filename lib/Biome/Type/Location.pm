@@ -13,21 +13,20 @@ use MooseX::Types -declare => [qw(
                                Location_Pos_Type
                                Location_Symbol
                                Location_Type
-                               Split_Location_Type
-                               
+
                                Locatable
                                ArrayRef_of_Locatable
 							   )];
 
 use MooseX::Types::Moose qw(Int Str Object CodeRef Any ArrayRef);
 
-my %VALID_SEGMENT_SYMBOL = (
+my %VALID_LOCATION_SYMBOL = (
     '.'          => 'WITHIN',
     '..'         => 'EXACT',
     '^'          => 'IN-BETWEEN',
 );
 
-my %VALID_SEGMENT_POS_SYMBOL = (
+my %VALID_LOCATION_POS_SYMBOL = (
     '..'         => 'EXACT',
     '<'          => 'BEFORE',
     '>'          => 'AFTER',
@@ -47,10 +46,10 @@ my %SYMBOL_TYPE = (
 my %TYPE_SYMBOL = map {$SYMBOL_TYPE{$_} => $_} keys %SYMBOL_TYPE;
 
 # WITHIN here is very rare but does occur, ex (122.144)
-my %VALID_SEGMENT_TYPE = map {$_ => 1}
-    qw(EXACT IN-BETWEEN WITHIN);
+my %VALID_LOCATION_TYPE = map {$_ => 1}
+    qw(EXACT IN-BETWEEN WITHIN JOIN ORDER BOND);
 
-my %VALID_SEGMENT_POS_TYPE = map {$_ => 1}
+my %VALID_LOCATION_POS_TYPE = map {$_ => 1}
     qw(EXACT BEFORE AFTER WITHIN UNCERTAIN);
 
 # TODO: some of these could probably be redef. as enums, but it makes coercion
@@ -58,28 +57,28 @@ my %VALID_SEGMENT_POS_TYPE = map {$_ => 1}
 
 subtype Location_Symbol,
     as Str,
-    where {exists $VALID_SEGMENT_SYMBOL{$_}},
+    where {exists $VALID_LOCATION_SYMBOL{$_}},
     message {"Unknown Location symbol $_"};
 
 subtype Location_Type,
     as Str,
-    where {exists $VALID_SEGMENT_TYPE{$_}},
+    where {exists $VALID_LOCATION_TYPE{$_}},
     message {"Unknown Location type $_"};
 
 subtype Location_Pos_Symbol,
     as Str,
-    where {exists $VALID_SEGMENT_POS_SYMBOL{$_}},
+    where {exists $VALID_LOCATION_POS_SYMBOL{$_}},
     message {"Unknown Location positional symbol $_"};
-    
+
 subtype Location_Pos_Type,
     as Str,
-    where {exists $VALID_SEGMENT_POS_TYPE{$_}},
+    where {exists $VALID_LOCATION_POS_TYPE{$_}},
     message {"Unknown Location positional type $_"};
 
 coerce Location_Pos_Type,
     from Location_Pos_Symbol,
     via {$TYPE_SYMBOL{$_}};
-    
+
 coerce Location_Pos_Symbol,
     from Location_Pos_Type,
     via {$SYMBOL_TYPE{$_}};
@@ -91,14 +90,14 @@ coerce Location_Symbol,
 coerce Location_Type,
     from Location_Symbol,
     via {$TYPE_SYMBOL{$_}};
-    
-my %VALID_SPLIT_TYPE = map {$_ => 1}
-    qw(JOIN ORDER BOND);
-    
-subtype Split_Location_Type,
-    as Str,
-    where {exists $VALID_SPLIT_TYPE{uc $_}},
-    message {"Unknown Split Location type $_"};
+
+#my %VALID_SPLIT_TYPE = map {$_ => 1}
+#    qw(JOIN ORDER BOND);
+
+#subtype Split_Location_Type,
+#    as Str,
+#    where {exists $VALID_SPLIT_TYPE{uc $_}},
+#    message {"Unknown Split Location type $_"};
 
 role_type Locatable, { role => 'Biome::Role::Location::Locatable' };
 
@@ -112,4 +111,3 @@ no MooseX::Types::Moose;
 1;
 
 __END__
-

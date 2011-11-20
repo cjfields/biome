@@ -13,22 +13,22 @@ $LOCREG = qr{
             (??{$LOCREG})
             \)
             )*
-            }xmso;     
+            }xmso;
 
 # make global for now, allow for abstraction later
 our $SIMPLE_CLASS = 'Biome::Location::Simple';
 
-our $SPLIT_CLASS = 'Biome::Location::Split';
+#our $SPLIT_CLASS = 'Biome::Location::Split';
 
 sub BUILD {
     my ($self) = @_;
-    $self->load_modules($SIMPLE_CLASS,$SPLIT_CLASS);
+    $self->load_modules($SIMPLE_CLASS);
 }
 
 sub from_string {
     my ($self,$locstr,$op) = @_;
     my $loc;
-    
+
     # run on first pass only
     # Note : These location types are now deprecated in GenBank (Oct. 2006)
     if (!defined($op)) {
@@ -38,16 +38,16 @@ sub from_string {
         # we should never see the above
         $locstr =~ s{:\((\d+\.{2}\d+)\)}{:\[$1\]}g;
     }
-    
+
     if ($locstr =~ m{(.*?)\(($LOCREG)\)(.*)}o) { # any matching parentheses?
 
         my ($beg, $mid, $end) = ($1, $2, $3);
-        
+
         my @sublocs = grep {$_} (split(q(,),$beg), $mid, split(q(,),$end));
-        
+
         my @loc_objs;
         my $loc_obj;
-        
+
         SUBLOCS:
         while (@sublocs) {
             my $subloc = shift @sublocs;
@@ -64,7 +64,7 @@ sub from_string {
                         $self->throw("getting nested l") unless $oparg eq 'complement';
                         $loc_obj = $SIMPLE_CLASS->new(location_string => "complement($splitlocs[0])");
                     } else {
-                        $loc_obj = $SPLIT_CLASS->new(-verbose => 1,
+                        $loc_obj = $SIMPLE_CLASS->new(-verbose => 1,
                                                     -location_type => uc $oparg);
                         while (my $splitloc = shift @splitlocs) {
                             next unless $splitloc;
@@ -90,7 +90,7 @@ sub from_string {
                     }
                 }
             }
-            # no operator, simple or fuzzy 
+            # no operator, simple or fuzzy
             else {
                 $loc_obj = $self->from_string($subloc,1);
             }
@@ -104,7 +104,7 @@ sub from_string {
                          scalar(@loc_objs).", should be SplitLocationI");
         }
         if ($ct > 1) {
-            $loc = $SPLIT_CLASS->new();
+            $loc = $SIMPLE_CLASS->new();
             $loc->add_sub_Location(shift @loc_objs) while (@loc_objs);
             return $loc;
         } else {
@@ -166,7 +166,7 @@ May include numerous subsections (i.e., =head2, =head3, etc.).
  Title   : _parse_location
  Usage   : $loc = $locfactory->_parse_location( $loc_string)
 
- Function: Parses the given location string and returns a location object 
+ Function: Parses the given location string and returns a location object
            with start() and end() and strand() set appropriately.
            Note that this method is private.
  Returns : A Bio::LocationI implementing object or undef on failure
@@ -217,12 +217,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all
@@ -335,15 +335,15 @@ the Bioperl mailing list.  Your participation is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
+=head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 
 I<bioperl-l@bioperl.org>
 
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs
@@ -367,4 +367,3 @@ Chris Fields, cjfields-at-uiuc-dot-edu
 
 The rest of the documentation details each of the object methods.
 Internal methods are usually preceded with a _
-

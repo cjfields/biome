@@ -2,10 +2,13 @@ package Biome::Role::Location::Split;
 
 use 5.010;
 use Biome::Role;
-use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
+use Biome::Type::Location qw(ArrayRef_of_Locatable);
 use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
+
+# TODO: This will be made a parameterized role at some point, as the
+# attribute should be named based on the consuming class
 
 has     'locations'  => (
     is          => 'ro',
@@ -14,7 +17,8 @@ has     'locations'  => (
     init_arg    => undef,
     writer      => '_set_locations',
     handles     => {
-        add_sub_Location      => 'push',
+        #  override this to allow for expansion of parent location
+        push_sub_Location     => 'push',
         sub_Locations         => 'elements',
         remove_sub_Locations  => 'clear',
         get_sub_Location      => 'get',
@@ -24,177 +28,195 @@ has     'locations'  => (
     default     => sub { [] }
 );
 
-has     'location_type'    => (
-    isa         => Split_Location_Type,
-    is          => 'rw',
-    lazy        => 1,
-    default     => 'JOIN'
-);
 
-has     'resolve_Locations'      => (
-    isa         => 'Bool',
-    is          => 'rw',
-    lazy        => 1,
-    default     => 1,
-);
 
-sub length {
-    my ($self) = @_;
-    return $self->end - $self->start + 1;
+sub add_sub_Location {
+    my ($self, $loc) = @_;
+
+    # TODO : deal with remote locations, offsets
+    # TODO : make expansion optional
+
+    #if ($self->auto_expand) {
+    my ($start,$end,$strand) = $self->union($loc);
+    $self->debug("$start-$end:$strand\n");
+    $self->start($start);
+    $self->end($end);
+    $self->strand($strand);
+    #}
+    $self->push_sub_Location($loc);
 }
 
-sub sub_Location_strand {
-    my ($self) = @_;
-    my ($strand, $lstrand);
-    
-    # this could use reduce()
-    foreach my $loc ($self->sub_Locations()) {
-        $lstrand = $loc->strand();
-        if((! $lstrand) ||
-           ($strand && ($strand != $lstrand)) ||
-           $loc->is_remote()) {
-            $strand = undef;
-            last;
-        } elsif(! $strand) {
-            $strand = $lstrand;
-        }
-    }
-    return $strand;
-}
+#has     'location_type'    => (
+#    isa         => Split_Location_Type,
+#    is          => 'rw',
+#    lazy        => 1,
+#    default     => 'JOIN'
+#);
 
-# overrides 
-
-has     'strand'      => (
-    isa         => Maybe_Sequence_Strand,
-    is          => 'rw',
-    lazy        => 1,
-    predicate   => 'has_strand',
-    default     => sub {
-        my $self = shift;
-        return $self->sub_Location_strand;
-        },
-);
-
-sub start {
-    my ($self, $start) = @_;
-    $self->get_sub_Location(0)->start($start) if defined($start);
-    return $self->get_sub_Location(0)->start if $self->is_remote;
-    return $self->_reduce('start');
-}
-
-sub end {
-    my ($self, $end) = @_;
-    $self->get_sub_Location(0)->end($end) if defined($end);
-    return $self->get_sub_Location(0)->end if $self->is_remote;
-    return $self->_reduce('end');
-}
-
-sub is_remote {
-    my $self = shift;
-    for my $seg ($self->sub_Locations) {
-        return 1 if $seg->is_remote;
-    }
-    0;
-}
-
-sub min_start {
-    my $self = shift;
-    return $self->get_sub_Location(0)->min_start if $self->is_remote;
-    return $self->_reduce('min_start');
-}
-
-sub max_start {
-    my $self = shift;
-    return $self->get_sub_Location(0)->max_start if $self->is_remote;
-    return $self->_reduce('max_start');
-}
-
-sub min_end {
-    my $self = shift;
-    return $self->get_sub_Location(0)->min_end if $self->is_remote;
-    return $self->_reduce('min_end');
-}
-
-sub max_end {
-    my $self = shift;
-    return $self->get_sub_Location(0)->max_end if $self->is_remote;
-    return $self->_reduce('max_end');
-}
-
-sub start_pos_type {
-    my $self = shift;
-    my $type = reduce {$a eq $b ? $a : undef}
-        map {$_->start_pos_type} $self->sub_Locations;
-    return $type;
-}
-
-sub end_pos_type {
-    my $self = shift;
-    my $type = reduce {$a eq $b ? $a : undef} 
-        map {$_->end_pos_type} $self->sub_Locations;
-    return $type;
-}
-
-sub valid_Location {
-    # TODO: add tests
-    my $self = shift;
-    my $type = reduce {$a eq $b ? 1 : 0} 
-        map {$_->valid_Location} $self->sub_Locations;
-}
-
-sub is_fuzzy {
-    # TODO: add tests
-    my $self = shift;
-    my $type = reduce {$a eq $b ? 1 : 0} 
-        map {$_->is_fuzzy} $self->sub_Locations;
-}
-
-# no offsets for splits?  Or maybe for only the first/last one?
-sub start_offset { 0 }
-
-sub end_offset { 0 }
-
-sub flip_strand {
-    my $self = shift;
-    my @segs = @{$self->locations()};
-    @segs = map {$_->flip_strand(); $_} reverse @segs;
-    $self->_set_locations(\@segs);
-}
-
-sub to_string {
-    my $self = shift;
-    # JOIN assumes specific order, ORDER does not, BOND ?
-    my $type = $self->location_type;
-    if ($self->resolve_Locations) {
-        my $substrand = $self->sub_Location_strand;
-        if ($substrand && $substrand < 0) {
-            $self->flip_strand();
-            $self->strand(-1);
-        }
-    }
-    my @segs = $self->sub_Locations;
-    my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
-    if ($self->strand && $self->strand < 0) {
-        $str = "complement($str)";
-    }
-    $str;
-}
-
-# could do all string parsing here instead of FTLocationFactory...
-sub from_string {
-    shift->throw_not_implemented;
-}
-
-# helper, just grabs the indicated value for the contained locations
-sub _reduce {
-    my ($self, $caller) = @_;
-    my @segs = sort {
-        $a->$caller <=> $b->$caller
-                     }
-    grep {$_->$caller} $self->sub_Locations;
-    return unless @segs == $self->num_sub_Locations;
-    $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
-}
+#has     'resolve_Locations'      => (
+#    isa         => 'Bool',
+#    is          => 'rw',
+#    lazy        => 1,
+#    default     => 1,
+#);
+#
+#sub length {
+#    my ($self) = @_;
+#    return $self->end - $self->start + 1;
+#}
+#
+#sub sub_Location_strand {
+#    my ($self) = @_;
+#    my ($strand, $lstrand);
+#
+#    # this could use reduce()
+#    foreach my $loc ($self->sub_Locations()) {
+#        $lstrand = $loc->strand();
+#        if((! $lstrand) ||
+#           ($strand && ($strand != $lstrand)) ||
+#           $loc->is_remote()) {
+#            $strand = undef;
+#            last;
+#        } elsif(! $strand) {
+#            $strand = $lstrand;
+#        }
+#    }
+#    return $strand;
+#}
+#
+## overrides
+#
+#has     'strand'      => (
+#    isa         => Maybe_Sequence_Strand,
+#    is          => 'rw',
+#    lazy        => 1,
+#    predicate   => 'has_strand',
+#    default     => sub {
+#        my $self = shift;
+#        return $self->sub_Location_strand;
+#        },
+#);
+#
+#sub start {
+#    my ($self, $start) = @_;
+#    $self->get_sub_Location(0)->start($start) if defined($start);
+#    return $self->get_sub_Location(0)->start if $self->is_remote;
+#    return $self->_reduce('start');
+#}
+#
+#sub end {
+#    my ($self, $end) = @_;
+#    $self->get_sub_Location(0)->end($end) if defined($end);
+#    return $self->get_sub_Location(0)->end if $self->is_remote;
+#    return $self->_reduce('end');
+#}
+#
+#sub is_remote {
+#    my $self = shift;
+#    for my $seg ($self->sub_Locations) {
+#        return 1 if $seg->is_remote;
+#    }
+#    0;
+#}
+#
+#sub min_start {
+#    my $self = shift;
+#    return $self->get_sub_Location(0)->min_start if $self->is_remote;
+#    return $self->_reduce('min_start');
+#}
+#
+#sub max_start {
+#    my $self = shift;
+#    return $self->get_sub_Location(0)->max_start if $self->is_remote;
+#    return $self->_reduce('max_start');
+#}
+#
+#sub min_end {
+#    my $self = shift;
+#    return $self->get_sub_Location(0)->min_end if $self->is_remote;
+#    return $self->_reduce('min_end');
+#}
+#
+#sub max_end {
+#    my $self = shift;
+#    return $self->get_sub_Location(0)->max_end if $self->is_remote;
+#    return $self->_reduce('max_end');
+#}
+#
+#sub start_pos_type {
+#    my $self = shift;
+#    my $type = reduce {$a eq $b ? $a : undef}
+#        map {$_->start_pos_type} $self->sub_Locations;
+#    return $type;
+#}
+#
+#sub end_pos_type {
+#    my $self = shift;
+#    my $type = reduce {$a eq $b ? $a : undef}
+#        map {$_->end_pos_type} $self->sub_Locations;
+#    return $type;
+#}
+#
+#sub valid_Location {
+#    # TODO: add tests
+#    my $self = shift;
+#    my $type = reduce {$a eq $b ? 1 : 0}
+#        map {$_->valid_Location} $self->sub_Locations;
+#}
+#
+#sub is_fuzzy {
+#    # TODO: add tests
+#    my $self = shift;
+#    my $type = reduce {$a eq $b ? 1 : 0}
+#        map {$_->is_fuzzy} $self->sub_Locations;
+#}
+#
+## no offsets for splits?  Or maybe for only the first/last one?
+#sub start_offset { 0 }
+#
+#sub end_offset { 0 }
+#
+#sub flip_strand {
+#    my $self = shift;
+#    my @segs = @{$self->locations()};
+#    @segs = map {$_->flip_strand(); $_} reverse @segs;
+#    $self->_set_locations(\@segs);
+#}
+#
+#sub to_string {
+#    my $self = shift;
+#    # JOIN assumes specific order, ORDER does not, BOND ?
+#    my $type = $self->location_type;
+#    if ($self->resolve_Locations) {
+#        my $substrand = $self->sub_Location_strand;
+#        if ($substrand && $substrand < 0) {
+#            $self->flip_strand();
+#            $self->strand(-1);
+#        }
+#    }
+#    my @segs = $self->sub_Locations;
+#    my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
+#    if ($self->strand && $self->strand < 0) {
+#        $str = "complement($str)";
+#    }
+#    $str;
+#}
+#
+## could do all string parsing here instead of FTLocationFactory...
+#sub from_string {
+#    shift->throw_not_implemented;
+#}
+#
+## helper, just grabs the indicated value for the contained locations
+#sub _reduce {
+#    my ($self, $caller) = @_;
+#    my @segs = sort {
+#        $a->$caller <=> $b->$caller
+#                     }
+#    grep {$_->$caller} $self->sub_Locations;
+#    return unless @segs == $self->num_sub_Locations;
+#    $caller =~ /start/ ? return $segs[0]->$caller : return $segs[-1]->$caller;
+#}
 
 1;
 
@@ -210,67 +232,67 @@ Biome::Role::Location::Split - Role describing split locations.
         package Foo;
 
         with 'Biome::Role::Location::Split';
-        # other necessary roles...
-        
+         other necessary roles...
+
     }
 
     {
         package Bar;
         with 'Biome::Role::Location::Simple';
-        # other necessary roles...
+         other necessary roles...
     }
-    
+
     my $split = Foo->new(-start => 7, -end => 100, -strand => 1);
 
     my $loc1 = Bar->new(-start => 1, -end => 50, -strand => -1);
     my $loc2 = Bar->new(-start => 75, -end => 150); # no strandedness defined
-    
+
     $split->add_subLocation($loc1);
     $split->add_subLocation($loc2);
-    
-    # Split locations autoexpand to whatever subLocations they contain by
-    # default and the strand is defined by the subLocations. This is b/c this
-    # implementation is just a simple top-level location that contains other
-    # simple Locations, so the borders should match accordingly and the strand
-    # be dictated by them. However, as this is a simple location, the strand
-    # won't be affected.
-    
+
+     Split locations autoexpand to whatever subLocations they contain by
+     default and the strand is defined by the subLocations. This is b/c this
+     implementation is just a simple top-level location that contains other
+     simple Locations, so the borders should match accordingly and the strand
+     be dictated by them. However, as this is a simple location, the strand
+     won't be affected.
+
     say $split->start; # 1
     say $split->end;   # 150
     say $split->strand; # 0, strand for sublocations is different
-    
-    # If you want to explicitly change the top-level coordinate in some way,
-    # then do so after one has finished adding subLocations.
-    
+
+     If you want to explicitly change the top-level coordinate in some way,
+     then do so after one has finished adding subLocations.
+
     $split->start(100);
     $split->strand(1);
     say $split->start; # 100
-    
-    # If you really don't want the split location coordinates set by
-    # subLocations, set autoexpand to 0
+
+     If you really don't want the split location coordinates set by
+     subLocations, set autoexpand to 0
 
     $split = Foo->new(-start => 7, -end => 100, -strand => 1, -autoexpand => 0);
 
     my $loc1 = Bar->new(-start => 1, -end => 50, -strand => -1);
     my $loc2 = Bar->new(-start => 75, -end => 150); # no strandedness defined
-    
+
     $split->add_subLocation($loc1);
     $split->add_subLocation($loc2);
-    
+
     say $split->start; # 7
     say $split->end;   # 100
     say $split->strand; # 1
-    
-    # The default internal behavior for storing sub-Locations is as they are
-    # added (similar in behavior to a JOIN). One can change this by designating
-    # the split_location_type to ORDER, which sorts internal locations by the
-    # start.
-   
-    
-   
+
+     The default internal behavior for storing sub-Locations is as they are
+     added (similar in behavior to a JOIN). One can change this by designating
+     the split_location_type to ORDER, which sorts internal locations by the
+     start.
+
+
+
 =head1 DESCRIPTION
 
-This role describes 
+This role describes
 
 =head1 SUBROUTINES/METHODS
 
@@ -329,12 +351,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all
