@@ -229,7 +229,8 @@ throws_ok { $fuzzy->start(10); } $error, 'Exception:IN-BETWEEN locations should 
 # split location tests
 #########################################
 
-my $container = Biome::Location::Simple->new();
+# note that the location_type for 'split' locations must be specified
+my $container = Biome::Location::Simple->new(-location_type => 'JOIN');
 
 # most complex Range role
 does_ok($container, 'Biome::Role::Location::Simple');

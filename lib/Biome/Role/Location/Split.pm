@@ -2,7 +2,7 @@ package Biome::Role::Location::Split;
 
 use 5.010;
 use Biome::Role;
-use Biome::Type::Location qw(ArrayRef_of_Locatable);
+use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
 use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
@@ -28,22 +28,40 @@ has     'locations'  => (
     default     => sub { [] }
 );
 
-
+has     'auto_expand'   => (
+    isa         => 'Bool',
+    is          => 'ro',
+    default     => 1
+);
 
 sub add_sub_Location {
     my ($self, $loc) = @_;
 
-    # TODO : deal with remote locations, offsets
-    # TODO : make expansion optional
+    if (!is_Split_Location_Type($self->location_type)) {
+        $self->throw("Type ".$self->location_type." does not allow sub locations, change location_type");
+    }
 
-    #if ($self->auto_expand) {
-    my ($start,$end,$strand) = $self->union($loc);
-    $self->debug("$start-$end:$strand\n");
-    $self->start($start);
-    $self->end($end);
-    $self->strand($strand);
-    #}
-    $self->push_sub_Location($loc);
+    my $locs = $self->locations;
+
+    if ($self->auto_expand) {
+        if (@$locs) {
+            if (!$loc->is_remote) {
+                my ($start,$end,$strand) = $self->union($loc);
+                $self->strand($strand);
+                $self->start($start);
+                $self->end($end);
+            }
+        } else {
+            $self->start($loc->start);
+            $self->end($loc->end);
+            $self->strand($loc->strand);
+            $self->seq_id($loc->seq_id) if $loc->seq_id;
+        }
+    }
+
+    push @$locs, $loc;
+
+    1;
 }
 
 #has     'location_type'    => (

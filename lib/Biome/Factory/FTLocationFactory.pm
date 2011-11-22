@@ -18,8 +18,8 @@ $LOCREG = qr{
 # make global for now, allow for abstraction later
 our $SIMPLE_CLASS = 'Biome::Location::Simple';
 
-#our $SPLIT_CLASS = 'Biome::Location::Split';
-
+# TODO: refactor to a default attribute that lazily loads the class (I have code
+# for that somewhere, let's see, where did I put that......)
 sub BUILD {
     my ($self) = @_;
     $self->load_modules($SIMPLE_CLASS);
@@ -31,6 +31,8 @@ sub from_string {
 
     # run on first pass only
     # Note : These location types are now deprecated in GenBank (Oct. 2006)
+
+    # TODO: deprecate support for these?
     if (!defined($op)) {
         # convert all (X.Y) to [X.Y]
         $locstr =~ s{\((\d+\.\d+)\)}{\[$1\]}g;

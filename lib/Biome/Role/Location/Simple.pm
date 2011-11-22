@@ -2,10 +2,13 @@ package Biome::Role::Location::Simple;
 
 use 5.010;
 use Biome::Role;
-use namespace::clean -except => 'meta';
+use namespace::autoclean -except => 'meta';
 
-use Biome::Type::Location qw(Location_Type Location_Symbol
-    Location_Pos_Type Location_Pos_Symbol);
+use Biome::Type::Location qw(Location_Type
+    Split_Location_Type
+    Location_Symbol
+    Location_Pos_Type
+    Location_Pos_Symbol);
 
 with 'Biome::Role::Location::Stranded';
 
@@ -165,6 +168,33 @@ sub valid_Location {
 # TODO: remove or make specific to role
 sub to_string {
     my ($self) = @_;
+
+    my $type = $self->location_type;
+
+    if (is_Split_Location_Type($type)) {
+        my @segs = $self->sub_Locations;
+        my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
+        if ($self->strand && $self->strand < 0) {
+            $str = "complement($str)";
+        }
+        return $str;
+    }
+
+#    # JOIN assumes specific order, ORDER does not, BOND ?
+#    my $type = $self->location_type;
+#    if ($self->resolve_Locations) {
+#        my $substrand = $self->sub_Location_strand;
+#        if ($substrand && $substrand < 0) {
+#            $self->flip_strand();
+#            $self->strand(-1);
+#        }
+#    }
+#    my @segs = $self->sub_Locations;
+#    my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
+#    if ($self->strand && $self->strand < 0) {
+#        $str = "complement($str)";
+#    }
+#    $str;
 
     my %data;
     for (qw(

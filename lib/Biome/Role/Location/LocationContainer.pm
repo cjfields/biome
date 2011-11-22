@@ -33,17 +33,17 @@ role {
     my $p = shift;
 
     my ($class, $singular, $plural) = ($p->class, $p->short_name, $p->plural);
-    
+
     $class ||= 'Biome::Role::Location::Simple';  # any location consumer
-    
+
     if ($p->layered) {
         $singular = "sub$singular";
         $plural = "sub$plural";
     }
-    
+
     has $singular => (
         is      => 'ro',
-        isa     => 'ArrayRef[Biome::Role::Location::Simple]',  # needs a subtype or role type
+        isa     => "ArrayRef[$class]",  # needs a subtype or role type
         traits  => ['Array'],
         default => sub {[]},
         handles => {
@@ -53,7 +53,7 @@ role {
             "remove_$plural"    => 'clear'
             }
     );
-    
+
     # implementing class must provide this, is implementation-specific
     requires "add_$singular";
 };
@@ -72,15 +72,15 @@ container.
 =head1 SYNOPSIS
 
    package Foo;
-   
+
    use Biome;
    with 'Biome::Role::Location::LocationContainer' =>
             { class   => 'Biome::SeqFeature::Generic',
               abbrev  => 'Feature'};
-   
+
    # Foo now can contain an array of Biome::SeqFeature::Generic.  Adding
-   # a new 
-   
+   # a new
+
 =head1 DESCRIPTION
 
 Simple parameterizable role for anything that has one or more Locations
@@ -99,7 +99,7 @@ A method to add new Locations; as this is implementation-specific,
 this is required for anything consuming this class.  For instance, a consumer
 
 
-=back 
+=back
 
 =head1 SUBROUTINES/METHODS
 
@@ -158,12 +158,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

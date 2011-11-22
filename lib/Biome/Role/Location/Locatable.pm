@@ -2,6 +2,7 @@ package Biome::Role::Location::Locatable;
 
 use Biome::Role;
 use namespace::clean -except => 'meta';
+use List::Util qw(max min);
 
 requires qw(start end strand from_string to_string);
 
@@ -10,7 +11,8 @@ requires qw(start end strand from_string to_string);
 
 has 'seq_id'    => (
     is      => 'rw',
-    isa     => 'Str'
+    isa     => 'Str',
+    predicate   => 'has_seq_id',
 );
 
 # returns true if strands are equal and non-zero
@@ -132,15 +134,10 @@ sub union {
 
     $self->_eval_ranges(@$given);
 
-    my @start = sort {$a <=> $b} map { $_->start() } ($self, @$given);
-    my @end   = sort {$a <=> $b} map { $_->end()   } ($self, @$given);
+    my $id = $self->seq_id;
 
-    my $start = shift @start;
-    while( !$start ) {
-        $start = shift @start;
-    }
-
-    my $end = pop @end;
+    my $start = min map { $_->start() } ($self, @$given);
+    my $end   = max map { $_->end()   } ($self, @$given);
 
     my $union_strand = $self->strand;  # Strand for the union range object.
 
