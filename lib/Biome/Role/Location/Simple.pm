@@ -17,7 +17,7 @@ has 'start' => (
     is          => 'rw',
     default     => 0,
 
-    # may remove these and move to a validate() root method (see below)
+    # TODO: may remove these and move to a validate() root method (see below)
     trigger     => sub {
         my ($self, $start) = @_;
         my $end = $self->end;
@@ -35,7 +35,7 @@ has 'end' => (
     is          => 'rw',
     default     => 0,
 
-    # may remove these and add a validate() root method (see below)
+    # TODO: may remove these and add a validate() root method (see below)
     trigger     => sub {
         my ($self, $end) = @_;
         my $start = $self->start;

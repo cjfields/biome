@@ -17,8 +17,7 @@ use MooseX::Types -declare => [qw(
                                Split_Location_Type
 
                                Locatable
-                               ArrayRef_of_Locatable
-							   )];
+                               ArrayRef_of_Locatable)];
 
 use MooseX::Types::Moose qw(Int Str Object CodeRef Any ArrayRef);
 

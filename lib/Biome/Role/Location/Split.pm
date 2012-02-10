@@ -7,8 +7,8 @@ use Biome::Type::Sequence qw(Maybe_Sequence_Strand);
 use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
 
-# TODO: This will be made a parameterized role at some point, as the
-# attribute should be named based on the consuming class
+# TODO: make this a parameterized role at some point? The
+# attributes and methods could be named based on the consuming class...
 
 has     'locations'  => (
     is          => 'ro',
@@ -18,7 +18,7 @@ has     'locations'  => (
     writer      => '_set_locations',
     handles     => {
         #  override this to allow for expansion of parent location
-        push_sub_Location     => 'push',
+        #push_sub_Location     => 'push',
         sub_Locations         => 'elements',
         remove_sub_Locations  => 'clear',
         get_sub_Location      => 'get',
@@ -43,20 +43,27 @@ sub add_sub_Location {
 
     my $locs = $self->locations;
 
-    if ($self->auto_expand) {
-        if (@$locs) {
-            if (!$loc->is_remote) {
-                my ($start,$end,$strand) = $self->union($loc);
-                $self->strand($strand);
-                $self->start($start);
-                $self->end($end);
-            }
-        } else {
-            $self->start($loc->start);
-            $self->end($loc->end);
-            $self->strand($loc->strand);
-            $self->seq_id($loc->seq_id) if $loc->seq_id;
-        }
+    #if ($self->auto_expand && !$loc->is_remote) {
+    #    my ($start,$end,$strand) = @$locs ? ($self->union($loc)) :
+    #        ($loc->start, $loc->end, $loc->strand);
+    #    $self->strand($strand);
+    #    $self->start($start);
+    #    $self->end($end);
+    #    $self->seq_id($loc->seq_id) if $loc->seq_id && @$locs;
+    #}
+
+    if ($self->auto_expand && !$loc->is_remote) {
+        my $union_loc =  @$locs ? $self->union($locs) : $loc;
+        print STDERR "Union:".$union_loc->to_string."\n";
+
+        $self->strand($union_loc->strand);
+        $self->start($union_loc->start);
+        $self->end($union_loc->end);
+        #$self->max_start($loc->max_start);
+        #$self->min_start($loc->min_start);
+        #$self->start_pos_type($loc->start_pos_type);
+        #$self->end_pos_type($loc->end_pos_type);
+        $self->seq_id($loc->seq_id) if $loc->seq_id && @$locs;
     }
 
     push @$locs, $loc;

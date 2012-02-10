@@ -2,7 +2,7 @@ package Biome::Role::Location::Locatable;
 
 use Biome::Role;
 use namespace::clean -except => 'meta';
-use List::Util qw(max min);
+use List::Util qw(max min reduce);
 
 requires qw(start end strand from_string to_string);
 
@@ -130,14 +130,11 @@ sub union {
     if (ref $given ne 'ARRAY') {
         $given = [$given];
     }
-    # strand test doesn't matter here
 
     $self->_eval_ranges(@$given);
 
-    my $id = $self->seq_id;
-
-    my $start = min map { $_->start() } ($self, @$given);
-    my $end   = max map { $_->end()   } ($self, @$given);
+	# cannot give union if a contained location is remote
+	return if grep { $_->is_remote } ($self, @$given);
 
     my $union_strand = $self->strand;  # Strand for the union range object.
 
@@ -147,15 +144,30 @@ sub union {
             last;
         }
     }
-    return unless $start || $end;
-    if( wantarray() ) {
-		return ( $start,$end,$union_strand);
-    } else {
-        return (blessed $self)->new('-start' => $start,
-                          '-end' => $end,
-                          '-strand' => $union_strand
+
+	my $five_prime = reduce { $a->start < $b->start ? $a : $b } ($self, @$given);
+	my $three_prime = reduce { $a->end > $b->end ? $a : $b } ($self, @$given);
+
+	print STDERR "5':".$five_prime->to_string."\n";
+	print STDERR "3':".$three_prime->to_string."\n";
+
+	#my ($start, $end) = ($five_prime->start, $three_prime->end);
+	return unless $five_prime || $three_prime;
+
+#    if( wantarray() ) {
+#		return ( $start,$end,$union_strand);
+#    } else {
+        return (blessed $self)->new(-start => $five_prime->start,
+									#-min_start	=> $five_prime->min_start,
+									#-max_start	=> $five_prime->max_start,
+									#-start_pos_type	=> $five_prime->start_pos_type,
+									-end => $three_prime->end,
+									-min_end => $three_prime->min_end,
+									-max_end => $three_prime->max_end,
+									#-end_pos_type	=> $five_prime->end_pos_type,
+									'-strand' => $union_strand
                           );
-    }
+    #}
 }
 
 ### Other methods

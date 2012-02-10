@@ -72,17 +72,17 @@ my %testcases = (
 
     # SPLITS
 
-    # this isn't a legal location string (can't have two remote locations),
-    # though it is handled; in this case the leftmost string is assumed to be
-    # the 'home' location
+    # this isn't a legal split location string AFAIK (can't have two remote
+    # locations), though it is handled. In this case the parent location can't
+    # be used in any location-based analyses (has no start, end, etc.)
 
     "join(AY016290.1:108..185,AY016291.1:1546..1599)"=> [0,
-        108, 108, "EXACT", 185, 185, "EXACT", "JOIN", 2, undef, 'AY016290.1'],
+        undef, undef, "EXACT", undef, undef, "EXACT", "JOIN", 2, 0, undef],
 
     "join(12..78,134..202)" => [0,
         12, 12, "EXACT", 202, 202, "EXACT", "JOIN", 2, 1, undef],
-    #"join(<12..78,134..202)" => [0,
-    #    undef, 12, undef, 202, 202, "EXACT", "JOIN", 2, 1, undef],
+    "join(<12..78,134..202)" => [0,
+        undef, 12, undef, 202, 202, "EXACT", "JOIN", 2, 1, undef],
     "complement(join(2691..4571,4918..5163))" => [0,
         2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
     "complement(join(4918..5163,2691..4571))" => [0,
