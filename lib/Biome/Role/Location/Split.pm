@@ -43,31 +43,16 @@ sub add_sub_Location {
 
     my $locs = $self->locations;
 
-    #if ($self->auto_expand && !$loc->is_remote) {
-    #    my ($start,$end,$strand) = @$locs ? ($self->union($loc)) :
-    #        ($loc->start, $loc->end, $loc->strand);
-    #    $self->strand($strand);
-    #    $self->start($start);
-    #    $self->end($end);
-    #    $self->seq_id($loc->seq_id) if $loc->seq_id && @$locs;
-    #}
-
     if ($self->auto_expand && !$loc->is_remote) {
-        my $union_loc =  @$locs ? $self->union($locs) : $loc;
-        print STDERR "Union:".$union_loc->to_string."\n";
-
+        my $union_loc =  @$locs ? $self->union($loc) : $loc;
         $self->strand($union_loc->strand);
         $self->start($union_loc->start);
         $self->end($union_loc->end);
-        #$self->max_start($loc->max_start);
-        #$self->min_start($loc->min_start);
-        #$self->start_pos_type($loc->start_pos_type);
-        #$self->end_pos_type($loc->end_pos_type);
+        $self->start_pos_type($union_loc->start_pos_type);
+        $self->end_pos_type($union_loc->end_pos_type);
         $self->seq_id($loc->seq_id) if $loc->seq_id && @$locs;
     }
-
     push @$locs, $loc;
-
     1;
 }
 

@@ -82,7 +82,7 @@ my %testcases = (
     "join(12..78,134..202)" => [0,
         12, 12, "EXACT", 202, 202, "EXACT", "JOIN", 2, 1, undef],
     "join(<12..78,134..202)" => [0,
-        undef, 12, undef, 202, 202, "EXACT", "JOIN", 2, 1, undef],
+        undef, 12, "BEFORE", 202, 202, "EXACT", "JOIN", 2, 1, undef],
     "complement(join(2691..4571,4918..5163))" => [0,
         2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
     "complement(join(4918..5163,2691..4571))" => [0,

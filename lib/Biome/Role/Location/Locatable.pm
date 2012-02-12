@@ -133,8 +133,10 @@ sub union {
 
     $self->_eval_ranges(@$given);
 
+	unshift @$given, $self if blessed($self);
+
 	# cannot give union if a contained location is remote
-	return if grep { $_->is_remote } ($self, @$given);
+	return if grep { $_->is_remote } (@$given);
 
     my $union_strand = $self->strand;  # Strand for the union range object.
 
@@ -145,29 +147,20 @@ sub union {
         }
     }
 
-	my $five_prime = reduce { $a->start < $b->start ? $a : $b } ($self, @$given);
-	my $three_prime = reduce { $a->end > $b->end ? $a : $b } ($self, @$given);
+	my ($five_prime, $three_prime);
 
-	print STDERR "5':".$five_prime->to_string."\n";
-	print STDERR "3':".$three_prime->to_string."\n";
+	for my $loc (@$given) {
+		$five_prime = $loc if !$five_prime || $five_prime->start > $loc->start;
+		$three_prime = $loc if !$three_prime || $three_prime->end < $loc->end;
+	}
+	return unless $five_prime && $three_prime;
 
-	#my ($start, $end) = ($five_prime->start, $three_prime->end);
-	return unless $five_prime || $three_prime;
-
-#    if( wantarray() ) {
-#		return ( $start,$end,$union_strand);
-#    } else {
-        return (blessed $self)->new(-start => $five_prime->start,
-									#-min_start	=> $five_prime->min_start,
-									#-max_start	=> $five_prime->max_start,
-									#-start_pos_type	=> $five_prime->start_pos_type,
-									-end => $three_prime->end,
-									-min_end => $three_prime->min_end,
-									-max_end => $three_prime->max_end,
-									#-end_pos_type	=> $five_prime->end_pos_type,
-									'-strand' => $union_strand
-                          );
-    #}
+	# TODO: do we assign offsets?
+	return (blessed $self)->new(-start 			=> $five_prime->start,
+								-start_pos_type	=> $five_prime->start_pos_type,
+								-end 			=> $three_prime->end,
+								-end_pos_type	=> $three_prime->end_pos_type,
+								-strand 		=> $union_strand);
 }
 
 ### Other methods
