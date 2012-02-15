@@ -10,11 +10,12 @@ use Biome::Type::Location qw(Location_Type
     Location_Pos_Type
     Location_Pos_Symbol);
 
-with 'Biome::Role::Location::Stranded';
+use Biome::Type::Sequence qw(Sequence_Strand);
 
 has 'start' => (
     isa         => 'Num',
     is          => 'rw',
+    # TODO: should a default for a 1-based coord system be 0?  Seems a cludge...
     default     => 0,
 
     # TODO: may remove these and move to a validate() root method (see below)
@@ -33,6 +34,7 @@ has 'start' => (
 has 'end' => (
     isa         => 'Num',
     is          => 'rw',
+    # TODO: should a default for a 1-based coord system be 0?  Seems a cludge...
     default     => 0,
 
     # TODO: may remove these and add a validate() root method (see below)
@@ -48,17 +50,13 @@ has 'end' => (
     }
 });
 
-sub length {
-    my ($self) = @_;
-    given ($self->location_type) {
-        when ([qw(EXACT WITHIN)]) {
-            return $self->end - $self->start + 1;
-        }
-        default {
-            return 0
-        }
-    }
-}
+has strand  => (
+    isa     => Sequence_Strand,
+    is      => 'rw',
+    default => 0,
+    coerce  => 1
+);
+
 
 has 'start_pos_type'    => (
     isa             => Location_Pos_Type,
@@ -122,6 +120,18 @@ has 'is_remote' => (
     default         => 0
 );
 
+sub length {
+    my ($self) = @_;
+    given ($self->location_type) {
+        when ([qw(EXACT WITHIN)]) {
+            return $self->end - $self->start + 1;
+        }
+        default {
+            return 0
+        }
+    }
+}
+
 my %IS_FUZZY = map {$_ => 1} qw(BEFORE AFTER WITHIN UNCERTAIN);
 
 # these just delegate to start, end, using the indicated offsets
@@ -173,14 +183,17 @@ sub to_string {
 
     if (is_Split_Location_Type($type)) {
         my @segs = $self->sub_Locations;
-        my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
-        if ($self->strand && $self->strand < 0) {
+        my $str;
+        if ($self->strand >= 0) {
+            $str = lc($type).'('.join(',', map {$_->to_string} @segs).')'
+        } else {
+            $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
             $str = "complement($str)";
         }
         return $str;
     }
 
-#    # JOIN assumes specific order, ORDER does not, BOND ?
+    # JOIN assumes specific order, ORDER does not, BOND ?
 #    my $type = $self->location_type;
 #    if ($self->resolve_Locations) {
 #        my $substrand = $self->sub_Location_strand;

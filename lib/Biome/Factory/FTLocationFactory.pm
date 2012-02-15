@@ -53,6 +53,8 @@ sub from_string {
         SUBLOCS:
         while (@sublocs) {
             my $subloc = shift @sublocs;
+
+            # TODO: make hash lookup
             my $oparg = ($subloc eq 'join'   || $subloc eq 'bond' ||
                          $subloc eq 'order'  || $subloc eq 'complement') ? $subloc : undef;
             # has operator, requires further work (recurse)
@@ -63,7 +65,7 @@ sub from_string {
                     my @splitlocs = split(q(,), $sub);
                     if (@splitlocs == 1) {
                         # this should be a complement only
-                        $self->throw("getting nested l") unless $oparg eq 'complement';
+                        #$self->throw("Getting nested joins is not supported") unless $oparg eq 'complement';
                         $loc_obj = $SIMPLE_CLASS->new(location_string => "complement($splitlocs[0])");
                     } else {
                         $loc_obj = $SIMPLE_CLASS->new(-verbose => 1,
@@ -74,7 +76,6 @@ sub from_string {
                             if ($splitloc =~ m{\(($LOCREG)\)}) {
                                 my $comploc = $1;
                                 $sobj = $SIMPLE_CLASS->new(location_string => $comploc);
-                                $sobj->strand(-1);
                             } else {
                                 $sobj = $SIMPLE_CLASS->new(location_string => $splitloc);
                             }
