@@ -12,7 +12,7 @@ use namespace::clean -except => 'meta';
 # class can override
 
 with 'Biome::Role::Location::Simple';
-with 'Biome::Role::Location::Split';
+#with 'Biome::Role::Location::Split';
 with 'Biome::Role::Location::Locatable';
 
 sub BUILD {
