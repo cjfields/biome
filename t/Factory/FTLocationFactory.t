@@ -76,41 +76,46 @@ my %testcases = (
     # locations), though it is handled. In this case the parent location can't
     # be used in any location-based analyses (has no start, end, etc.)
 
-    #"join(AY016290.1:108..185,AY016291.1:1546..1599)"=> [0,
-    #    undef, undef, "EXACT", undef, undef, "EXACT", "JOIN", 2, 0, undef],
-    #
-    #"join(12..78,134..202)" => [0,
-    #    12, 12, "EXACT", 202, 202, "EXACT", "JOIN", 2, 1, undef],
-    #"join(<12..78,134..202)" => [0,
-    #    undef, 12, "BEFORE", 202, 202, "EXACT", "JOIN", 2, 1, undef],
-    #"complement(join(2691..4571,4918..5163))" => [0,
-    #    2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
-    #"complement(join(4918..5163,2691..4571))" => [0,
-    #    2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
-    #"join(complement(4918..5163),complement(2691..4571))" => [
-    #    'complement(join(2691..4571,4918..5163))',
-    #    2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
-    #"join(complement(2691..4571),complement(4918..5163))" => [
-    #    'complement(join(4918..5163,2691..4571))',
-    #    2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
-    #"complement(34..(122.126))" => [0,
-    #    34, 34, "EXACT", 122, 126, "WITHIN", "EXACT", 0, -1, undef],
+    "join(AY016290.1:108..185,AY016291.1:1546..1599)"=> [0,
+        undef, undef, "EXACT", undef, undef, "EXACT", "JOIN", 2, 0, undef],
+
+    "complement(join(3207..4831,5834..5902,8881..8969,9276..9403,29535..29764))",
+        [0, 3207, 3207, "EXACT", 29764, 29764, "EXACT", "JOIN", 5, -1, undef],
+    "join(complement(29535..29764),complement(9276..9403),complement(8881..8969),complement(5834..5902),complement(3207..4831))",
+        ["complement(join(3207..4831,5834..5902,8881..8969,9276..9403,29535..29764))",
+        3207, 3207, "EXACT", 29764, 29764, "EXACT", "JOIN", 5, -1, undef],
+    "join(12..78,134..202)" => [0,
+        12, 12, "EXACT", 202, 202, "EXACT", "JOIN", 2, 1, undef],
+    "join(<12..78,134..202)" => [0,
+        undef, 12, "BEFORE", 202, 202, "EXACT", "JOIN", 2, 1, undef],
+    "complement(join(2691..4571,4918..5163))" => [0,
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
+    "complement(join(4918..5163,2691..4571))" => [0,
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
+    "join(complement(4918..5163),complement(2691..4571))" => [
+        'complement(join(2691..4571,4918..5163))',
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
+    "join(complement(2691..4571),complement(4918..5163))" => [
+        'complement(join(4918..5163,2691..4571))',
+        2691, 2691, "EXACT", 5163, 5163, "EXACT", "JOIN", 2, -1, undef],
+    "complement(34..(122.126))" => [0,
+        34, 34, "EXACT", 122, 126, "WITHIN", "EXACT", 0, -1, undef],
 
     # complex, technically not legal FT types but we handle and resolve these as needed
 
-    #'join(11025..11049,join(complement(239890..240081),complement(241499..241580),complement(251354..251412),complement(315036..315294)))'
-    #    => ['join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))',
-    #        11025,11025, 'EXACT', 315294, 315294, 'EXACT', 'JOIN', 2, 0, undef],
-    #'join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))'
-    #    => [0, 11025,11025, 'EXACT', 315294, 315294, 'EXACT', 'JOIN', 2, 0, undef],
-    #'join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))'
-    #    => [0, 20464,20464, 'EXACT', 314672, 314672, 'EXACT', 'JOIN', 3, 0, undef],
-    #'join(20464..20694,21548..22763,join(complement(231520..231669),complement(232596..232990),complement(314652..314672)))'
-    #    => ['join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))',
-    #        20464,20464, 'EXACT', 314672, 314672, 'EXACT', 'JOIN', 3, 0, undef],
-    #
-    #'join(1000..2000,join(3000..4000,join(5000..6000,7000..8000)),9000..10000)'
-    #    => [0, 1000,1000,'EXACT', 10000, 10000, 'EXACT', 'JOIN', 3, 1, undef],
+    'join(11025..11049,join(complement(239890..240081),complement(241499..241580),complement(251354..251412),complement(315036..315294)))'
+        => ['join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))',
+            11025,11025, 'EXACT', 315294, 315294, 'EXACT', 'JOIN', 2, 0, undef],
+    'join(11025..11049,complement(join(315036..315294,251354..251412,241499..241580,239890..240081)))'
+        => [0, 11025,11025, 'EXACT', 315294, 315294, 'EXACT', 'JOIN', 2, 0, undef],
+    'join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))'
+        => [0, 20464,20464, 'EXACT', 314672, 314672, 'EXACT', 'JOIN', 3, 0, undef],
+    'join(20464..20694,21548..22763,join(complement(231520..231669),complement(232596..232990),complement(314652..314672)))'
+        => ['join(20464..20694,21548..22763,complement(join(314652..314672,232596..232990,231520..231669)))',
+            20464,20464, 'EXACT', 314672, 314672, 'EXACT', 'JOIN', 3, 0, undef],
+
+    'join(1000..2000,join(3000..4000,join(5000..6000,7000..8000)),9000..10000)'
+        => [0, 1000,1000,'EXACT', 10000, 10000, 'EXACT', 'JOIN', 3, 1, undef],
 
     # not passing yet, working out 'order' semantics
     #'order(S67862.1:72..75,1..788,S67864.1:1..19)'
@@ -139,7 +144,7 @@ foreach my $locstr (keys %testcases) {
     is($loc->location_type(), $rest[6], "location_type: $locstr");
     my @locs = $loc->sub_Locations();
     is(@locs, $rest[7], "sub_Locations: $locstr");
-    #is($loc->strand(), $rest[8], "strand: $locstr");
+    is($loc->strand(), $rest[8], "strand: $locstr");
 
     # seq_id, where the location string is defined (does not automatically mean
     # the location is remote, only that the ID may be explictly defined)

@@ -1,64 +1,64 @@
-package Biome::Role::Location::LocationContainer;
+package Biome::Role::Location::Split;
 
+use 5.010;
 use Biome::Role;
-use MooseX::Role::Parameterized;
+use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
+use Biome::Type::Sequence qw(Sequence_Strand);
+use List::Util qw(reduce);
+use namespace::clean -except => 'meta';
 
-# we make no assumptions about the implementation of the
-# class, just that the class has a short name (Segment, Location,
-# Feature, etc).
+requires qw(start end strand start_pos_type end_pos_type);
 
-parameter class => (
-    isa         => 'Str',
-);
+# TODO: make this a parameterized role at some point? The
+# attributes and methods could be named based on the consuming class...
 
-parameter short_name => (
-    isa         => 'Str',
-    required    => 1
-);
-
-# Don't assume the plural ends with 's', but default to it
-
-parameter plural => (
-    isa         => 'Str',
+has     'locations'  => (
+    is          => 'ro',
+    isa         => ArrayRef_of_Locatable,
+    traits      => ['Array'],
+    init_arg    => undef,
+    writer      => '_set_locations',
+    handles     => {
+        #  override this to allow for expansion of parent location
+        #push_sub_Location     => 'push',
+        sub_Locations         => 'elements',
+        remove_sub_Locations  => 'clear',
+        get_sub_Location      => 'get',
+        num_sub_Locations     => 'count',
+    },
     lazy        => 1,
-    default     => sub { shift->short_name.'s' }
+    default     => sub { [] }
 );
 
-parameter layered => (
+has     'auto_expand'   => (
     isa         => 'Bool',
+    is          => 'ro',
+    default     => 1
+);
+
+has     'guide_strand'   => (
+    isa         => Sequence_Strand,
+    is          => 'rw',
     default     => 0
 );
 
-role {
-    my $p = shift;
+sub add_sub_Location {
+    my ($self, $loc) = @_;
 
-    my ($class, $singular, $plural) = ($p->class, $p->short_name, $p->plural);
+    my $locs = $self->locations;
 
-    $class ||= 'Biome::Role::Location::Simple';  # any location consumer
-
-    if ($p->layered) {
-        $singular = "sub$singular";
-        $plural = "sub$plural";
+    if ($self->auto_expand && !$loc->is_remote) {
+        my $union_loc =  @$locs ? $self->union($loc) : $loc;
+        # carry over data
+        for my $att (qw(start end start_pos_type end_pos_type)) {
+            $self->$att($union_loc->$att);
+        }
+        $self->strand($union_loc->strand);
+        $self->seq_id($loc->seq_id) if $loc->seq_id && @$locs;
     }
-
-    has $singular => (
-        is      => 'ro',
-        isa     => "ArrayRef[$class]",  # needs a subtype or role type
-        traits  => ['Array'],
-        default => sub {[]},
-        handles => {
-            "get_$singular"     => 'get',
-            "has_$singular"     => 'count',
-            "all_$plural"       => 'elements',
-            "remove_$plural"    => 'clear'
-            }
-    );
-
-    # implementing class must provide this, is implementation-specific
-    requires "add_$singular";
-};
-
-no Biome::Role;
+    push @$locs, $loc;
+    1;
+}
 
 1;
 
@@ -66,40 +66,75 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Location::LocationContainer - Parameterizable role for a Location
-container.
+Biome::Role::Location::Split - Role describing split locations.
 
 =head1 SYNOPSIS
 
-   package Foo;
+    {
+        package Foo;
 
-   use Biome;
-   with 'Biome::Role::Location::LocationContainer' =>
-            { class   => 'Biome::SeqFeature::Generic',
-              abbrev  => 'Feature'};
+        with 'Biome::Role::Location::Split';
+         other necessary roles...
 
-   # Foo now can contain an array of Biome::SeqFeature::Generic.  Adding
-   # a new
+    }
+
+    {
+        package Bar;
+        with 'Biome::Role::Location::Simple';
+         other necessary roles...
+    }
+
+    my $split = Foo->new(-start => 7, -end => 100, -strand => 1);
+
+    my $loc1 = Bar->new(-start => 1, -end => 50, -strand => -1);
+    my $loc2 = Bar->new(-start => 75, -end => 150); # no strandedness defined
+
+    $split->add_subLocation($loc1);
+    $split->add_subLocation($loc2);
+
+     Split locations autoexpand to whatever subLocations they contain by
+     default and the strand is defined by the subLocations. This is b/c this
+     implementation is just a simple top-level location that contains other
+     simple Locations, so the borders should match accordingly and the strand
+     be dictated by them. However, as this is a simple location, the strand
+     won't be affected.
+
+    say $split->start; # 1
+    say $split->end;   # 150
+    say $split->strand; # 0, strand for sublocations is different
+
+     If you want to explicitly change the top-level coordinate in some way,
+     then do so after one has finished adding subLocations.
+
+    $split->start(100);
+    $split->strand(1);
+    say $split->start; # 100
+
+     If you really don't want the split location coordinates set by
+     subLocations, set autoexpand to 0
+
+    $split = Foo->new(-start => 7, -end => 100, -strand => 1, -autoexpand => 0);
+
+    my $loc1 = Bar->new(-start => 1, -end => 50, -strand => -1);
+    my $loc2 = Bar->new(-start => 75, -end => 150); # no strandedness defined
+
+    $split->add_subLocation($loc1);
+    $split->add_subLocation($loc2);
+
+    say $split->start; # 7
+    say $split->end;   # 100
+    say $split->strand; # 1
+
+     The default internal behavior for storing sub-Locations is as they are
+     added (similar in behavior to a JOIN). One can change this by designating
+     the split_location_type to ORDER, which sorts internal locations by the
+     start.
+
+
 
 =head1 DESCRIPTION
 
-Simple parameterizable role for anything that has one or more Locations
-(Biome::Role::Location::Simple consumers). This requires the implementation
-provide several things:
-
-=over3
-
-=item *
-
-
-
-=item *
-
-A method to add new Locations; as this is implementation-specific,
-this is required for anything consuming this class.  For instance, a consumer
-
-
-=back
+This role describes
 
 =head1 SUBROUTINES/METHODS
 

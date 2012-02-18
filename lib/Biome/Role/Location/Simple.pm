@@ -4,6 +4,8 @@ use 5.010;
 use Biome::Role;
 use namespace::autoclean -except => 'meta';
 
+use List::MoreUtils qw(all);
+
 use Biome::Type::Location qw(Location_Type
     Split_Location_Type
     Location_Symbol
@@ -56,7 +58,6 @@ has strand  => (
     default => 0,
     coerce  => 1
 );
-
 
 has 'start_pos_type'    => (
     isa             => Location_Pos_Type,
@@ -181,14 +182,16 @@ sub to_string {
 
     my $type = $self->location_type;
 
+    # TODO: should be in Split role, with a method modifier?
     if (is_Split_Location_Type($type)) {
-        my @segs = $self->sub_Locations;
+        my @segs = #$self->guide_strand >= 0 ? $self->sub_Locations :
+            $self->sub_Locations;
         my $str;
-        if ($self->strand >= 0) {
-            $str = lc($type).'('.join(',', map {$_->to_string} @segs).')'
-        } else {
+        if ($self->strand == -1) {
             $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
             $str = "complement($str)";
+        } else {
+            $str = lc($type).'('.join(',', map {$_->to_string} @segs).')'
         }
         return $str;
     }
@@ -258,7 +261,7 @@ sub to_string {
 {
 my @STRING_ORDER = qw(start loc_type end);
 
-# TODO: should be renamed from_FTstring, from_string is too generic...
+# TODO: move back to the factory
 sub from_string {
     my ($self, $string) = @_;
     return unless $string;

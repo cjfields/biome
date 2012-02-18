@@ -125,22 +125,20 @@ sub intersection {
 }
 
 sub union {
-    my ($self, $given, $so) = @_;
+    my ($self, $newlocs, $so) = @_;
 
-    if (ref $given ne 'ARRAY') {
-        $given = [$given];
-    }
+	my @given = ref $newlocs ne 'ARRAY' ?  [$newlocs] : @$newlocs;
 
-    $self->_eval_ranges(@$given);
+    $self->_eval_ranges(@given);
 
-	unshift @$given, $self if blessed($self);
+	unshift @given, $self if blessed($self) && $self->start && $self->end;
 
 	# cannot give union if a contained location is remote
-	return if grep { $_->is_remote } (@$given);
+	return if grep { $_->is_remote } (@given);
 
-    my $union_strand = $self->strand;  # Strand for the union range object.
+    my $union_strand = $given[0]->strand;
 
-    for my $r (@$given) {
+    for my $r (@given[1..$#given]) {
         if(!defined $r->strand || $union_strand ne $r->strand) {
             $union_strand = 0;
             last;
@@ -149,10 +147,11 @@ sub union {
 
 	my ($five_prime, $three_prime);
 
-	for my $loc (@$given) {
+	for my $loc (@given) {
 		$five_prime = $loc if !$five_prime || $five_prime->start > $loc->start;
 		$three_prime = $loc if !$three_prime || $three_prime->end < $loc->end;
 	}
+
 	return unless $five_prime && $three_prime;
 
 	# TODO: do we assign offsets?
@@ -261,7 +260,7 @@ sub _eval_ranges {
     #$self->throw("start is undefined in calling instance") if !defined $self->start;
     #$self->throw("end is undefined in calling instance") if !defined $self->end;
     for my $obj ($self, @ranges) {
-        $self->throw("Not an object") unless ref($obj);
+        $self->throw("Not an object, got $obj") unless ref($obj);
         $self->throw("start is undefined in instance ".$obj->to_string) if !defined $obj->start;
         $self->throw("end is undefined in instance ".$obj->to_string) if !defined $obj->end;
         $self->throw('Rangeable equality or set methods not '.

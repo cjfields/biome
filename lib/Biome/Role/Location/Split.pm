@@ -34,27 +34,26 @@ has     'auto_expand'   => (
     default     => 1
 );
 
-has     'guide_strand'   => (
-    isa         => Sequence_Strand,
-    is          => 'rw',
-    default     => 1
-);
-
-sub add_sub_Location {
-    my ($self, $loc) = @_;
+sub add_sub_Locations {
+    my ($self, $newlocs) = @_;
 
     my $locs = $self->locations;
 
-    if ($self->auto_expand && !$loc->is_remote) {
-        my $union_loc =  @$locs ? $self->union($loc) : $loc;
-        # carry over data
-        for my $att (qw(start end start_pos_type end_pos_type)) {
-            $self->$att($union_loc->$att);
+    if ($self->auto_expand) {
+        my $union_loc =  $self->union($newlocs);
+        if (defined($union_loc)) {
+            for my $att (qw(start end strand start_pos_type end_pos_type)) {
+                $self->$att($union_loc->$att);
+            }
+            if ($union_loc->strand == -1) {
+                $_->flip_strand for @$newlocs;
+                @$newlocs = reverse @$newlocs
+            }
         }
-        $self->strand($union_loc->strand);
-        $self->seq_id($loc->seq_id) if $loc->seq_id && @$locs;
     }
-    push @$locs, $loc;
+    # if autoexpand is unset, we assume the user is setting this up
+    # directly, so we don't attempt any magic
+    push @$locs, @$newlocs;
     1;
 }
 

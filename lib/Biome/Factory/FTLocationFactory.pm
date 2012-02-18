@@ -18,6 +18,8 @@ $LOCREG = qr{
 # make global for now, allow for abstraction later
 our $SIMPLE_CLASS = 'Biome::Location::Simple';
 
+my %OPS = map { $_ => 1 } qw(join order bond complement);
+
 # TODO: refactor to a default attribute that lazily loads the class (I have code
 # for that somewhere, let's see, where did I put that......)
 sub BUILD {
@@ -26,7 +28,9 @@ sub BUILD {
 }
 
 sub from_string {
-    my ($self,$locstr,$op) = @_;
+    my ($self, $locstr, $op, $depth) = @_;
+    #
+    $depth ||= 0;
     my $loc;
 
     # run on first pass only
@@ -52,42 +56,48 @@ sub from_string {
 
         SUBLOCS:
         while (@sublocs) {
-            my $subloc = shift @sublocs;
+            my $oparg = lc(shift @sublocs);
 
-            # TODO: make hash lookup
-            my $oparg = ($subloc eq 'join'   || $subloc eq 'bond' ||
-                         $subloc eq 'order'  || $subloc eq 'complement') ? $subloc : undef;
             # has operator, requires further work (recurse)
-            if ($oparg) {
+            if (exists($OPS{$oparg})) {
                 my $sub = shift @sublocs;
+
                 # simple split operators (no recursive calls needed)
                 if ($sub !~ m{(?:join|order|bond)}) {
-                    my @splitlocs = split(q(,), $sub);
+                    my @splitlocs = split(/,/, $sub);
                     if (@splitlocs == 1) {
-                        # this should be a complement only
-                        #$self->throw("Getting nested joins is not supported") unless $oparg eq 'complement';
-                        $loc_obj = $SIMPLE_CLASS->new(location_string => "complement($splitlocs[0])");
+                        # this should be a single complement only
+                        $loc_obj = $SIMPLE_CLASS->new(location_string => $splitlocs[0]);
+                        $loc_obj->strand(-1);
                     } else {
-                        $loc_obj = $SIMPLE_CLASS->new(-verbose => 1,
-                                                    -location_type => uc $oparg);
-                        while (my $splitloc = shift @splitlocs) {
-                            next unless $splitloc;
-                            my $sobj;
-                            if ($splitloc =~ m{\(($LOCREG)\)}) {
-                                my $comploc = $1;
-                                $sobj = $SIMPLE_CLASS->new(location_string => $comploc);
-                            } else {
-                                $sobj = $SIMPLE_CLASS->new(location_string => $splitloc);
-                            }
-                            $loc_obj->add_sub_Location($sobj);
-                        }
+                        $loc_obj = $SIMPLE_CLASS->new(-location_type => uc $oparg);
+                        my @loc_objs = map {
+                                my $sobj;
+                                if (m{\(($LOCREG)\)}) {
+                                    my $comploc = $1;
+                                    $sobj = $SIMPLE_CLASS->new(location_string => $comploc);
+                                    $sobj->strand(-1);
+                                } else { # normal
+                                    $sobj = $SIMPLE_CLASS->new(location_string => $_);
+                                }
+                                $sobj;
+                            } @splitlocs;
+                        $loc_obj->add_sub_Locations(\@loc_objs);
+                            # wrapped with complement(...)
+                            #if ($splitloc =~ m{\(($LOCREG)\)}) {
+                            #    my $comploc = $1;
+                            #    $sobj = $SIMPLE_CLASS->new(location_string => $comploc);
+                            #    $sobj->strand(-1);
+                            #} else { # normal
+                            #    $sobj = $SIMPLE_CLASS->new(location_string => $splitloc);
+                            #}
+                            #$loc_obj->add_sub_Location($sobj);
+
                     }
                 } else {
-                    #$self->warn("Nesting operators is not supported yet")
-                    #    unless $oparg eq 'complement';
-                    $loc_obj = $self->from_string($sub, $oparg);
+                    $loc_obj = $self->from_string($sub, $oparg, ++$depth);
                     if ($oparg eq 'complement') {
-                        $loc_obj->strand(-1)
+                        $loc_obj->strand(-1);
                     } else {
                         $loc_obj->location_type(uc $oparg) ;
                     }
@@ -95,7 +105,7 @@ sub from_string {
             }
             # no operator, simple or fuzzy
             else {
-                $loc_obj = $self->from_string($subloc,1);
+                $loc_obj = $self->from_string($oparg, 1, ++$depth);
             }
             #$loc_obj->strand(-1) if ($op && $op eq 'complement');
             push @loc_objs, $loc_obj;
@@ -108,11 +118,10 @@ sub from_string {
         }
         if ($ct > 1) {
             $loc = $SIMPLE_CLASS->new();
-            $loc->add_sub_Location(shift @loc_objs) while (@loc_objs);
+            $loc->add_sub_Locations(\@loc_objs);
             return $loc;
         } else {
-            $loc = shift @loc_objs;
-            return $loc;
+            return $loc_objs[0];
         }
     } else { # simple location(s)
         $loc = $SIMPLE_CLASS->new(location_string => $locstr);
