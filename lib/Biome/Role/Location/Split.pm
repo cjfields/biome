@@ -34,12 +34,19 @@ has     'auto_expand'   => (
     default     => 1
 );
 
+sub add_sub_Location {
+    $_[0]->add_sub_Locations([$_[1]])
+}
+
 sub add_sub_Locations {
     my ($self, $newlocs) = @_;
+    return unless ref $newlocs eq 'ARRAY';
 
     my $locs = $self->locations;
 
-    if ($self->auto_expand) {
+    my $remote = grep {$_->is_remote} @$newlocs;
+
+    if ($self->auto_expand && !$remote) {
         my $union_loc =  $self->union($newlocs);
         if (defined($union_loc)) {
             for my $att (qw(start end strand start_pos_type end_pos_type)) {
@@ -81,27 +88,26 @@ Biome::Role::Location::Split - Role describing split locations.
          other necessary roles...
     }
 
-    my $split = Foo->new(-start => 7, -end => 100, -strand => 1);
+    my $split = Foo->new();
 
     my $loc1 = Bar->new(-start => 1, -end => 50, -strand => -1);
     my $loc2 = Bar->new(-start => 75, -end => 150); # no strandedness defined
 
-    $split->add_subLocation($loc1);
-    $split->add_subLocation($loc2);
+    $split->add_sub_LocationS([$loc1, $loc2]);
 
-     Split locations autoexpand to whatever subLocations they contain by
-     default and the strand is defined by the subLocations. This is b/c this
-     implementation is just a simple top-level location that contains other
-     simple Locations, so the borders should match accordingly and the strand
-     be dictated by them. However, as this is a simple location, the strand
-     won't be affected.
+    # Split locations autoexpand to whatever subLocations they contain by
+    # default, the strand being defined by the subLocations. This is b/c this
+    # implementation is just a simple top-level location that contains other
+    # simple Locations, so the borders should match accordingly and the strand
+    # be dictated by them. However, as this is a simple location, the strand
+    # won't be affected.
 
     say $split->start; # 1
     say $split->end;   # 150
     say $split->strand; # 0, strand for sublocations is different
 
-     If you want to explicitly change the top-level coordinate in some way,
-     then do so after one has finished adding subLocations.
+    # If you want to explicitly change the top-level coordinate in some way,
+    # then do so after one has finished adding subLocations.
 
     $split->start(100);
     $split->strand(1);

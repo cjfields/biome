@@ -5,6 +5,7 @@ use namespace::clean -except => 'meta';
 use List::Util qw(max min reduce);
 
 requires qw(start end strand from_string to_string);
+requires qw(_build_union);
 
 # This should not be set here, and should be Biome::Role::Identifiable to make
 # the primary ID less Seq-specific
@@ -133,9 +134,6 @@ sub union {
 
 	unshift @given, $self if blessed($self) && $self->start && $self->end;
 
-	# cannot give union if a contained location is remote
-	return if grep { $_->is_remote } (@given);
-
     my $union_strand = $given[0]->strand;
 
     for my $r (@given[1..$#given]) {
@@ -154,12 +152,7 @@ sub union {
 
 	return unless $five_prime && $three_prime;
 
-	# TODO: do we assign offsets?
-	return (blessed $self)->new(-start 			=> $five_prime->start,
-								-start_pos_type	=> $five_prime->start_pos_type,
-								-end 			=> $three_prime->end,
-								-end_pos_type	=> $three_prime->end_pos_type,
-								-strand 		=> $union_strand);
+	return $self->_build_union($five_prime, $three_prime, $union_strand);
 }
 
 ### Other methods

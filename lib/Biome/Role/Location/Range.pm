@@ -44,6 +44,13 @@ sub from_string {
 
 sub flip_strand {$_[0]->strand($_[0]->strand * -1);}
 
+sub _build_union {
+    my ($self, $five_prime, $three_prime, $strand) = @_;
+    return (blessed $self)->new(-start 			=> $five_prime->start,
+                            -end 			=> $three_prime->end,
+                            -strand 		=> $strand);
+}
+
 1;
 
 __END__
@@ -280,12 +287,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all
