@@ -113,16 +113,14 @@ sub intersection {
         if ($start > $end) {
             return;
         } else {
+			# TODO: does this need a separate _build_intersection method like
+			# union?
             $intersect = (blessed $self)->new(-start  => $start,
                                     -end    => $end,
                                     -strand => $intersect_strand);
         }
     }
-    if (wantarray()) {
-        return ($intersect->start, $intersect->end, $intersect->strand);
-    } else {
-        return $intersect;
-    }
+    return $intersect;
 }
 
 sub union {
