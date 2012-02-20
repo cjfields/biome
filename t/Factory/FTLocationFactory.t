@@ -118,8 +118,8 @@ my %testcases = (
         => [0, 1000,1000,'EXACT', 10000, 10000, 'EXACT', 'JOIN', 3, 1, undef],
 
     # not passing yet, working out 'order' semantics
-    #'order(S67862.1:72..75,1..788,S67864.1:1..19)'
-    #    => [0,  72, 72, 'EXACT', 75, 75, 'EXACT', 'ORDER', 2, undef, 'S67862.1'],
+    'order(S67862.1:72..75,1..788,S67864.1:1..19)'
+        => [0,  undef, undef, 'EXACT', undef, undef, 'EXACT', 'ORDER', 3, 0, undef],
           );
 
 my $locfac = Biome::Factory::FTLocationFactory->new(-verbose => 1);
