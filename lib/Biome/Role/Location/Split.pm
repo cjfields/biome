@@ -2,67 +2,66 @@ package Biome::Role::Location::Split;
 
 use 5.010;
 use Biome::Role;
-use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
-use Biome::Type::Sequence qw(Sequence_Strand);
-use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
-
-# TODO: make this a parameterized role at some point? The
-# attributes and methods could be named based on the consuming class...
-
-has     'locations'  => (
-    is          => 'ro',
-    isa         => ArrayRef_of_Locatable,
-    traits      => ['Array'],
-    init_arg    => undef,
-    writer      => '_set_locations',
-    handles     => {
-        #  override this to allow for expansion of parent location
-        #push_sub_Location     => 'push',
-        sub_Locations         => 'elements',
-        remove_sub_Locations  => 'clear',
-        get_sub_Location      => 'get',
-        num_sub_Locations     => 'count',
-    },
-    lazy        => 1,
-    default     => sub { [] }
-);
-
-has     'auto_expand'   => (
-    isa         => 'Bool',
-    is          => 'ro',
-    default     => 1
-);
-
-sub add_sub_Location {
-    $_[0]->add_sub_Locations([$_[1]])
-}
-
-sub add_sub_Locations {
-    my ($self, $newlocs) = @_;
-    return unless ref $newlocs eq 'ARRAY';
-
-    my $locs = $self->locations;
-
-    my $remote = grep {$_->is_remote} @$newlocs;
-
-    if ($self->auto_expand && !$remote) {
-        my $union_loc =  $self->union($newlocs);
-        if (defined($union_loc)) {
-            for my $att (qw(start end strand start_pos_type end_pos_type)) {
-                $self->$att($union_loc->$att);
-            }
-            if ($union_loc->strand == -1) {
-                $_->flip_strand for @$newlocs;
-                @$newlocs = reverse @$newlocs
-            }
-        }
-    }
-    # if autoexpand is unset, we assume the user is setting this up
-    # directly, so we don't attempt any magic
-    push @$locs, @$newlocs;
-    1;
-}
+with 'Biome::Role::Location::Collection' => {base_name  => 'Location'};
+#use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
+#use Biome::Type::Sequence qw(Sequence_Strand);
+#use List::Util qw(reduce);
+#
+## TODO: make this a parameterized role at some point? The
+## attributes and methods could be named based on the consuming class...
+#
+#has     'locations'  => (
+#    is          => 'ro',
+#    isa         => ArrayRef_of_Locatable,
+#    traits      => ['Array'],
+#    init_arg    => undef,
+#    writer      => '_set_locations',
+#    handles     => {
+#        #  override this to allow for expansion of parent location
+#        #push_sub_Location     => 'push',
+#        sub_Locations         => 'elements',
+#        remove_sub_Locations  => 'clear',
+#        get_sub_Location      => 'get',
+#        num_sub_Locations     => 'count',
+#    },
+#    lazy        => 1,
+#    default     => sub { [] }
+#);
+#
+#has     'auto_expand'   => (
+#    isa         => 'Bool',
+#    is          => 'ro',
+#    default     => 1
+#);
+#
+#sub add_sub_Location {$_[0]->add_sub_Locations([$_[1]])}
+#
+#sub add_sub_Locations {
+#    my ($self, $newlocs) = @_;
+#    return unless ref $newlocs eq 'ARRAY';
+#
+#    my $locs = $self->locations;
+#
+#    my $remote = grep {$_->is_remote} @$newlocs;
+#
+#    if ($self->auto_expand && !$remote) {
+#        my $union_loc =  $self->union($newlocs);
+#        if (defined($union_loc)) {
+#            for my $att (qw(start end strand start_pos_type end_pos_type)) {
+#                $self->$att($union_loc->$att);
+#            }
+#            if ($union_loc->strand == -1) {
+#                $_->flip_strand for @$newlocs;
+#                @$newlocs = reverse @$newlocs
+#            }
+#        }
+#    }
+#    # if autoexpand is unset, we assume the user is setting this up
+#    # directly, so we don't attempt any magic
+#    push @$locs, @$newlocs;
+#    1;
+#}
 
 1;
 
