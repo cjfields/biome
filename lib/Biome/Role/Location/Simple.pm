@@ -196,22 +196,6 @@ sub to_string {
         return $str;
     }
 
-    # JOIN assumes specific order, ORDER does not, BOND ?
-#    my $type = $self->location_type;
-#    if ($self->resolve_Locations) {
-#        my $substrand = $self->sub_Location_strand;
-#        if ($substrand && $substrand < 0) {
-#            $self->flip_strand();
-#            $self->strand(-1);
-#        }
-#    }
-#    my @segs = $self->sub_Locations;
-#    my $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
-#    if ($self->strand && $self->strand < 0) {
-#        $str = "complement($str)";
-#    }
-#    $str;
-
     my %data;
     for (qw(
         start end
