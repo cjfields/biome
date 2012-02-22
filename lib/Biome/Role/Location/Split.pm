@@ -1,9 +1,9 @@
-package Biome::Role::Location::Split;
+#package Biome::Role::Location::Split;
 
-use 5.010;
-use Biome::Role;
-use namespace::clean -except => 'meta';
-with 'Biome::Role::Location::Collection' => {base_name  => 'Location'};
+#use 5.010;
+#use Biome::Role;
+#use namespace::clean -except => 'meta';
+#with 'Biome::Role::Location::Collection' => {base_name  => 'Location'};
 
 1;
 

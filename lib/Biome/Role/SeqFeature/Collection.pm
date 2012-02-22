@@ -1,10 +1,9 @@
-package Biome::Role::SeqFeature::Collection;
+#package Biome::Role::SeqFeature::Collection;
 
-use Biome::Role;
-with 'Biome::Role::Location::Collection' => {base_name  => 'SeqFeature',
-                                             layered    => 0};
-
-no Biome::Role;
+#use Biome::Role;
+#with 'Biome::Role::Location::Collection' => { base_name  => 'SeqFeature' };
+#
+#no Biome::Role;
 
 1;
 

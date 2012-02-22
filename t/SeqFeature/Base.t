@@ -53,7 +53,7 @@ for my $class (@sf_classes) {
 
     # SeqFeature
     does_ok($feat, 'Biome::Role::SeqFeature');
-    does_ok($feat, 'Biome::Role::SeqFeature::Collection');
+    does_ok($feat, 'Biome::Role::Location::Collection');
     is $feat->seq_id, 'ABCD1234', 'attached_id';
 
     # PrimarySeqContainer

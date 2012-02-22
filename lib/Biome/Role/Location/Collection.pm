@@ -4,7 +4,6 @@ use 5.010;
 use MooseX::Role::Parameterized -metaclass => 'Biome::Meta::Role::Parameterizable';
 use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
 use Biome::Type::Sequence qw(Sequence_Strand);
-use List::Util qw(reduce);
 use namespace::clean -except => 'meta';
 
 parameter 'base_name'  => (
@@ -32,6 +31,10 @@ role {
         'count'         => "num_$prefix$plural"
     );
 
+    # TODO: any magic to get around this kludge?
+    my $add_loc = "add_$prefix$plural";
+    my $push = $methods{'push'};
+
     has     "_$plural"  => (
         is          => 'ro',
         isa         => ArrayRef_of_Locatable,
@@ -50,10 +53,6 @@ role {
         is          => 'ro',
         default     => 1
     );
-
-    # TODO: maybe do a little magic to get around this kludge
-    my $add_loc = "add_$prefix$plural";
-    my $push = $methods{'push'};
 
     method "add_$prefix$name" => sub {$_[0]->$add_loc([$_[1]])};
 
@@ -88,7 +87,8 @@ __END__
 
 =head1 NAME
 
-Biome::Role::Location::Split - Role describing split locations.
+Biome::Role::Location::Collection - Parameterizable role describing location
+collections.
 
 =head1 SYNOPSIS
 

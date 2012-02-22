@@ -12,7 +12,7 @@ A SeqFeature has these Roles:
 3) contains tag-value pairs (Taggable)
 4) is linked to, or contains, a PrimarySeq (PrimarySeqContainer)
 
-And possibly: 
+And possibly:
 
 5) may contain annotations (Annotatable)
 
@@ -22,8 +22,7 @@ with qw(Biome::Role::Taggable
         Biome::Role::Describable
         Biome::Role::Identifiable
         Biome::Role::Scorable
-        Biome::Role::PrimarySeqContainer
-        Biome::Role::SeqFeature::Collection);
+        Biome::Role::PrimarySeqContainer);
 
 # minimal required methods to define location of SeqFeature on a Seq string.
 # Note that this doesn't have to come from the location (eg these could be
@@ -71,12 +70,12 @@ This documentation refers to Biome::Role::SeqFeature version 0.01.
 =head1 SYNOPSIS
 
    use Biome::Role::SeqFeature;
-   
+
 =head1 DESCRIPTION
 
 This is an abstract Role that contains the basic methods/attributes for
-describing a sequence feature.  Most of the methods described here may be 
-defined in other roles.  
+describing a sequence feature.  Most of the methods described here may be
+defined in other roles.
 
 =head1 SUBROUTINES/METHODS
 
@@ -135,12 +134,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

@@ -4,7 +4,7 @@ package Biome::Location::Simple;
 
 use 5.010;
 use Biome;
-use namespace::clean -except => 'meta';
+use namespace::autoclean;
 
 # TODO - It should be possible to stack roles (have an implementation role
 # consume an interface role).  The problem is tracable to an issue with Moose,
@@ -12,7 +12,7 @@ use namespace::clean -except => 'meta';
 # class can override
 
 with 'Biome::Role::Location::Simple';
-with 'Biome::Role::Location::Split';
+with 'Biome::Role::Location::Collection' => {base_name  => 'Location'};
 with 'Biome::Role::Location::Locatable';
 
 sub BUILD {
