@@ -1,29 +1,8 @@
 package Biome::Role::SeqFeature::Collection;
 
 use Biome::Role;
-
-has 'SeqFeatures'  => (
-    is          => 'ro',
-    isa         => 'ArrayRef[Object]',
-    default     => sub {[]},
-    lazy        => 1,
-);
-
-sub add_SeqFeatures {
-    
-}
-
-sub get_SeqFeatures {
-    
-}
-
-sub remove_SeqFeatures {
-    
-}
-
-sub num_SeqFeatures {
-    
-}
+with 'Biome::Role::Location::Collection' => {base_name  => 'SeqFeature',
+                                             layered    => 0};
 
 no Biome::Role;
 
@@ -112,12 +91,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

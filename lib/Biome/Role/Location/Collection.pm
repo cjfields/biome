@@ -12,26 +12,34 @@ parameter 'base_name'  => (
     required => 1
 );
 
+parameter 'layered'  => (
+    isa      => 'Bool',
+    default  => 1
+);
+
 role {
     my $p = shift;
 
     my $name = $p->base_name;
-
+    my $prefix = $p->layered ? 'sub_' : '';
     my $plural = "${name}s";
 
-    has     $plural  => (
+    my %methods = (
+        'push'          => "push_$prefix$plural" ,
+        'elements'      => "$prefix$plural",
+        'clear'         => "remove_$prefix$plural",
+        'get'           => "get_$prefix$name",
+        'count'         => "num_$prefix$plural"
+    );
+
+    has     "_$plural"  => (
         is          => 'ro',
         isa         => ArrayRef_of_Locatable,
         traits      => ['Array'],
         init_arg    => undef,
         writer      => "_set_$plural",
         handles     => {
-            #  override this to allow for expansion of parent location
-            #push_sub_Location     => 'push',
-            "sub_$plural"         => 'elements',
-            "remove_sub_$plural"  => 'clear',
-            "get_sub_$name"       => 'get',
-            "num_sub_$plural"     => 'count',
+            map { $methods{$_} => $_ } keys %methods
         },
         lazy        => 1,
         default     => sub { [] }
@@ -43,13 +51,15 @@ role {
         default     => 1
     );
 
-    method "add_sub_$name" => sub {$_[0]->add_sub_Locations([$_[1]])};
+    # TODO: maybe do a little magic to get around this kludge
+    my $add_loc = "add_$prefix$plural";
+    my $push = $methods{'push'};
 
-    method "add_sub_$plural" => sub {
+    method "add_$prefix$name" => sub {$_[0]->$add_loc([$_[1]])};
+
+    method $add_loc => sub {
         my ($self, $newlocs) = @_;
         return unless ref $newlocs eq 'ARRAY';
-
-        my $locs = $self->$plural;
 
         my $remote = grep {$_->is_remote} @$newlocs;
 
@@ -67,7 +77,7 @@ role {
         }
         # if autoexpand is unset, we assume the user is setting this up
         # directly, so we don't attempt any magic
-        push @$locs, @$newlocs;
+        $self->$push(@$newlocs);
         1;
     };
 };
