@@ -12,7 +12,7 @@ use namespace::autoclean;
 # class can override
 
 with 'Biome::Role::Location::Simple';
-with 'Biome::Role::Location::Collection' => {base_name  => 'Location'};
+with 'Biome::Role::Location::Collection' => {base_name  => 'Location', top => 0};
 with 'Biome::Role::Location::Locatable';
 
 sub BUILD {

@@ -2,8 +2,8 @@
 # $Id: PrimarySeq.t 15112 2008-12-08 18:12:38Z sendu $
 
 use strict;
+use Biome::PrimarySeq;
 my @sf_classes;
-
 
 BEGIN {
     @sf_classes = qw(
@@ -13,7 +13,7 @@ BEGIN {
     use Test::More;
     use Test::Moose;
     use Test::Exception;
-    use_ok('Biome::PrimarySeq');
+
     for my $class (@sf_classes) {
         use_ok($class);
     }

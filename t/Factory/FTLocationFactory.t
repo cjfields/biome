@@ -134,7 +134,7 @@ foreach my $locstr (keys %testcases) {
         is($loc->to_string, $replace, "compare conversion of $locstr to $replace");
     }
 
-    isa_ok($loc, 'Biome::Location::Simple');
+    does_ok($loc, 'Biome::Role::Location::Simple');
     is($loc->min_start(), $rest[0], "min_start: $locstr");
     is($loc->max_start(), $rest[1], "max_start: $locstr");
     is($loc->start_pos_type(), $rest[2], "start_pos_type: $locstr");

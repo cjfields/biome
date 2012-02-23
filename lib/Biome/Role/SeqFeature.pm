@@ -52,6 +52,8 @@ has 'type'         => (
     predicate   => 'has_type'
 );
 
+# TODO: add aliased methods for Location::Collection role
+
 no Biome::Role;
 
 1;

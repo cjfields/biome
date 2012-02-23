@@ -16,7 +16,7 @@ $LOCREG = qr{
             }xmso;
 
 # make global for now, allow for abstraction later
-our $SIMPLE_CLASS = 'Biome::Location::Simple';
+our $SIMPLE_CLASS = 'Biome::SeqFeature::Generic';
 
 my %OPS = map { $_ => 1 } qw(join order bond complement);
 
