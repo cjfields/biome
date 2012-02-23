@@ -1,85 +1,59 @@
 package Biome::Role::Location::Collection;
 
 use 5.010;
-use MooseX::Role::Parameterized -metaclass => 'Biome::Meta::Role::Parameterizable';
+use Biome::Role;
 use Biome::Type::Location qw(Split_Location_Type ArrayRef_of_Locatable);
 use Biome::Type::Sequence qw(Sequence_Strand);
-use namespace::clean -except => 'meta';
+use namespace::autoclean;
 
-parameter 'base_name'  => (
-    isa      => 'Str',
-    required => 1
+has     "_locations"  => (
+    is          => 'ro',
+    isa         => ArrayRef_of_Locatable,
+    traits      => ['Array'],
+    init_arg    => undef,
+    writer      => "_set_locations",
+    handles     => {
+        "push_sub_Locations"    => 'push',
+        "sub_Locations"         => 'elements',
+        "remove_sub_Locations"  => 'clear',
+        "get_sub_Location"      => 'get',
+        "num_sub_Locations"     => 'count'
+    },
+    lazy        => 1,
+    default     => sub { [] }
 );
 
-parameter 'layered'  => (
-    isa      => 'Bool',
-    default  => 1
+has     'auto_expand'   => (
+    isa         => 'Bool',
+    is          => 'ro',
+    default     => 1
 );
 
-role {
-    my $p = shift;
+sub add_sub_Location {$_[0]->add_sub_Locations([$_[1]])};
 
-    my $name = $p->base_name;
-    my $prefix = $p->layered ? 'sub_' : '';
-    my $plural = "${name}s";
+sub add_sub_Locations {
+    my ($self, $newlocs) = @_;
+    return unless ref $newlocs eq 'ARRAY';
 
-    my %methods = (
-        'push'          => "push_$prefix$plural" ,
-        'elements'      => "$prefix$plural",
-        'clear'         => "remove_$prefix$plural",
-        'get'           => "get_$prefix$name",
-        'count'         => "num_$prefix$plural"
-    );
+    my $remote = grep {$_->is_remote} @$newlocs;
 
-    # TODO: any magic to get around this kludge?
-    my $add_loc = "add_$prefix$plural";
-    my $push = $methods{'push'};
-
-    has     "_$plural"  => (
-        is          => 'ro',
-        isa         => ArrayRef_of_Locatable,
-        traits      => ['Array'],
-        init_arg    => undef,
-        writer      => "_set_$plural",
-        handles     => {
-            map { $methods{$_} => $_ } keys %methods
-        },
-        lazy        => 1,
-        default     => sub { [] }
-    );
-
-    has     'auto_expand'   => (
-        isa         => 'Bool',
-        is          => 'ro',
-        default     => 1
-    );
-
-    method "add_$prefix$name" => sub {$_[0]->$add_loc([$_[1]])};
-
-    method $add_loc => sub {
-        my ($self, $newlocs) = @_;
-        return unless ref $newlocs eq 'ARRAY';
-
-        my $remote = grep {$_->is_remote} @$newlocs;
-
-        if ($self->auto_expand && !$remote) {
-            my $union_loc =  $self->union($newlocs);
-            if (defined($union_loc)) {
-                for my $att (qw(start end strand start_pos_type end_pos_type)) {
-                    $self->$att($union_loc->$att);
-                }
-                if ($union_loc->strand == -1) {
-                    $_->flip_strand for @$newlocs;
-                    @$newlocs = reverse @$newlocs
-                }
+    if ($self->auto_expand && !$remote) {
+        my $union_loc =  $self->union($newlocs);
+        if (defined($union_loc)) {
+            for my $att (qw(start end strand start_pos_type end_pos_type)) {
+                $self->$att($union_loc->$att);
+            }
+            if ($union_loc->strand == -1) {
+                $_->flip_strand for @$newlocs;
+                @$newlocs = reverse @$newlocs
             }
         }
-        # if autoexpand is unset, we assume the user is setting this up
-        # directly, so we don't attempt any magic
-        $self->$push(@$newlocs);
-        1;
-    };
-};
+    }
+    # if autoexpand is unset, we assume the user is setting this up
+    # directly, so we don't attempt any magic
+    $self->push_sub_Locations(@$newlocs);
+    1;
+}
 
 1;
 
