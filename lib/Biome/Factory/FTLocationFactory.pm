@@ -38,7 +38,7 @@ my ($LOC_CLASS, $DEF_STR);
 sub BUILD {
     my ($self) = @_;
     $self->load_modules($self->locatable_class);
-    ($LOC_CLASS, $DEF_STR) = ($self->locatable_class, $self->default_string);
+    ($LOC_CLASS, $DEF_STR) = ($self->locatable_class, $self->default_strand);
 }
 
 sub from_string {
@@ -84,7 +84,7 @@ sub from_string {
                         $loc_obj = $self->_parse_range($splitlocs[0]);
                         $loc_obj->strand(-1);
                     } else {
-                        $loc_obj = $self->locatable_class->new(-location_type => uc $oparg);
+                        $loc_obj = $LOC_CLASS->new(-location_type => uc $oparg);
                         my @loc_objs = map {
                                 my $sobj;
                                 if (m{\(($LOCREG)\)}) {
@@ -120,7 +120,7 @@ sub from_string {
                          scalar(@loc_objs).", should be SplitLocationI");
         }
         if ($ct > 1) {
-            $loc = $self->locatable_class->new();
+            $loc = $LOC_CLASS->new();
             $loc->add_sub_Locations(\@loc_objs);
             return $loc;
         } else {
@@ -137,10 +137,9 @@ my @STRING_ORDER = qw(start loc_type end);
 
 sub _parse_range {
     my ($self, $string) = @_;
-    return unless $string;
 
     my %atts;
-    $atts{strand} = $self->default_strand;
+    $atts{strand} = $DEF_STR;
 
     my @loc_data = split(/(\.{2}|\^|\:)/, $string);
 
@@ -157,7 +156,7 @@ sub _parse_range {
             $str =~ s{[\[\]\(\)]+}{}g;
             if ($str =~ /^([<>\?])?(\d+)?$/) {
                 $atts{"${order}_pos_type"} = $1 if $1;
-                $atts{$order} = $2;
+                $atts{$order} = $2 if $2;
             } elsif ($str =~ /^(\d+)\.(\d+)$/) {
                 $atts{"${order}_pos_type"} = '.';
                 $atts{$order} = $1;
@@ -169,6 +168,7 @@ sub _parse_range {
             $atts{location_type} = $str;
         }
     }
+
     if ($atts{start_pos_type} && $atts{start_pos_type} eq '.' &&
         (!$atts{end} && !$atts{end_pos_type})
         ) {
@@ -176,10 +176,10 @@ sub _parse_range {
         delete @atts{qw(start_offset start_pos_type end_pos_type)};
         $atts{location_type} = '.';
     }
-    $atts{end} ||= $atts{start} unless $atts{end_pos_type};
-
-    # TODO: will very likely bork w/o all atts defined...
-    return $self->locatable_class->new(%atts);
+    unless ($atts{end_pos_type} || !$atts{start}) {
+        $atts{end} ||= $atts{start}
+    }
+    return $LOC_CLASS->new(%atts);
 }
 
 }
