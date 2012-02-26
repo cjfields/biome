@@ -18,14 +18,13 @@ with 'Biome::Role::Location::Locatable';
 sub BUILD {
     my ($self, $params) = @_;
 
+    # this should probably just fail validation, seems clunky to handle it here
     if ($params->{start} && $params->{end} && ($params->{end} < $params->{start})) {
         $self->warn('End is greater than start; flipping strands');
         $self->end($params->{start});
         $self->start($params->{end});
         $self->strand($self->strand * -1);
     }
-
-    $params->{location_type} && $self->location_type($params->{location_type});
 }
 
 __PACKAGE__->meta->make_immutable;
