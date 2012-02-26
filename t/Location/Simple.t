@@ -281,9 +281,12 @@ is($container->end, 90);
 $container->add_sub_Location($f);
 is($container->num_sub_Locations(), 5);
 
-$simple = Biome::Location::Simple->new(location_string => '10..20');
+$simple = Biome::Location::Simple->new(start => 10,
+									   end	 => 20);
 
-$fuzzy = Biome::Location::Simple->new( location_string  => '<10..20');
+$fuzzy = Biome::Location::Simple->new( start => 10,
+									   start_pos_type => '<',
+									   end	 => 20);
 
 $fuzzy->strand(-1);
 is($fuzzy->to_string(), 'complement(<10..20)');
