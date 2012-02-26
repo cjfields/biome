@@ -246,62 +246,62 @@ sub to_string {
 my @STRING_ORDER = qw(start loc_type end);
 
 # TODO: move back to the factory
-sub from_string {
-    my ($self, $string) = @_;
-    return unless $string;
-
-    # TODO: add support, since split and simple are merging
-    if ($string =~ /(?:join|order|bond)/) {
-        $self->throw("Passing a split location type: $string");
-    }
-    my %atts;
-    if ($string =~ /^complement\(([^\)]+)\)$/) {
-        $atts{strand} = -1;
-        $string = $1;
-    } else {
-        $atts{strand} = 1; # though, this assumes nucleotide sequence...
-    }
-    my @loc_data = split(/(\.{2}|\^|\:)/, $string);
-
-    # SeqID
-    if (@loc_data == 5) {
-        $atts{seq_id} = shift @loc_data;
-        $atts{is_remote} = 1;
-        shift @loc_data; # get rid of ':'
-    }
-    for my $i (0..$#loc_data) {
-        my $order = $STRING_ORDER[$i];
-        my $str = $loc_data[$i];
-        if ($order eq 'start' || $order eq 'end') {
-            $str =~ s{[\[\]\(\)]+}{}g;
-            if ($str =~ /^([<>\?])?(\d+)?$/) {
-                $atts{"${order}_pos_type"} = $1 if $1;
-                $atts{$order} = $2;
-            } elsif ($str =~ /^(\d+)\.(\d+)$/) {
-                $atts{"${order}_pos_type"} = '.';
-                $atts{$order} = $1;
-                $atts{"${order}_offset"} = $2 - $1;
-            } else {
-                $self->throw("Can't parse location string: $str");
-            }
-        } else {
-            $atts{location_type} = $str;
-        }
-    }
-    if ($atts{start_pos_type} && $atts{start_pos_type} eq '.' &&
-        (!$atts{end} && !$atts{end_pos_type})
-        ) {
-        $atts{end} = $atts{start} + $atts{start_offset};
-        delete @atts{qw(start_offset start_pos_type end_pos_type)};
-        $atts{location_type} = '.';
-    }
-    $atts{end} ||= $atts{start} unless $atts{end_pos_type};
-    for my $m (sort keys %atts) {
-        if (defined $atts{$m}){
-            $self->$m($atts{$m})
-        }
-    }
-}
+#sub from_string {
+#    my ($self, $string) = @_;
+#    return unless $string;
+#
+#    # TODO: add support, since split and simple are merging
+#    if ($string =~ /(?:join|order|bond)/) {
+#        $self->throw("Passing a split location type: $string");
+#    }
+#    my %atts;
+#    if ($string =~ /^complement\(([^\)]+)\)$/) {
+#        $atts{strand} = -1;
+#        $string = $1;
+#    } else {
+#        $atts{strand} = 1; # though, this assumes nucleotide sequence...
+#    }
+#    my @loc_data = split(/(\.{2}|\^|\:)/, $string);
+#
+#    # SeqID
+#    if (@loc_data == 5) {
+#        $atts{seq_id} = shift @loc_data;
+#        $atts{is_remote} = 1;
+#        shift @loc_data; # get rid of ':'
+#    }
+#    for my $i (0..$#loc_data) {
+#        my $order = $STRING_ORDER[$i];
+#        my $str = $loc_data[$i];
+#        if ($order eq 'start' || $order eq 'end') {
+#            $str =~ s{[\[\]\(\)]+}{}g;
+#            if ($str =~ /^([<>\?])?(\d+)?$/) {
+#                $atts{"${order}_pos_type"} = $1 if $1;
+#                $atts{$order} = $2;
+#            } elsif ($str =~ /^(\d+)\.(\d+)$/) {
+#                $atts{"${order}_pos_type"} = '.';
+#                $atts{$order} = $1;
+#                $atts{"${order}_offset"} = $2 - $1;
+#            } else {
+#                $self->throw("Can't parse location string: $str");
+#            }
+#        } else {
+#            $atts{location_type} = $str;
+#        }
+#    }
+#    if ($atts{start_pos_type} && $atts{start_pos_type} eq '.' &&
+#        (!$atts{end} && !$atts{end_pos_type})
+#        ) {
+#        $atts{end} = $atts{start} + $atts{start_offset};
+#        delete @atts{qw(start_offset start_pos_type end_pos_type)};
+#        $atts{location_type} = '.';
+#    }
+#    $atts{end} ||= $atts{start} unless $atts{end_pos_type};
+#    for my $m (sort keys %atts) {
+#        if (defined $atts{$m}){
+#            $self->$m($atts{$m})
+#        }
+#    }
+#}
 
 }
 

@@ -1,6 +1,7 @@
 package Biome::Factory::FTLocationFactory;
 
 use Biome;
+use namespace::autoclean;
 
 my $LOCREG;
 
@@ -15,16 +16,26 @@ $LOCREG = qr{
             )*
             }xmso;
 
-# make global for now, allow for abstraction later
-our $SIMPLE_CLASS = 'Biome::SeqFeature::Generic';
+has     'locatable_class' => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Biome::SeqFeature::Generic'
+);
+
+has     'default_strand' => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 1
+);
 
 my %OPS = map { $_ => 1 } qw(join order bond complement);
 
-# TODO: refactor to a default attribute that lazily loads the class (I have code
-# for that somewhere, let's see, where did I put that......)
+{
+    # TODO: benchmark caching the class and default strand vs simple att call
+
 sub BUILD {
     my ($self) = @_;
-    $self->load_modules($SIMPLE_CLASS);
+    $self->load_modules($self->locatable_class);
 }
 
 sub from_string {
@@ -67,32 +78,22 @@ sub from_string {
                     my @splitlocs = split(/,/, $sub);
                     if (@splitlocs == 1) {
                         # this should be a single complement only
-                        $loc_obj = $SIMPLE_CLASS->new(location_string => $splitlocs[0]);
+                        $loc_obj = $self->_parse_range($splitlocs[0]);
                         $loc_obj->strand(-1);
                     } else {
-                        $loc_obj = $SIMPLE_CLASS->new(-location_type => uc $oparg);
+                        $loc_obj = $self->locatable_class->new(-location_type => uc $oparg);
                         my @loc_objs = map {
                                 my $sobj;
                                 if (m{\(($LOCREG)\)}) {
                                     my $comploc = $1;
-                                    $sobj = $SIMPLE_CLASS->new(location_string => $comploc);
+                                    $sobj = $self->_parse_range($comploc);
                                     $sobj->strand(-1);
                                 } else { # normal
-                                    $sobj = $SIMPLE_CLASS->new(location_string => $_);
+                                    $sobj = $self->_parse_range($_);
                                 }
                                 $sobj;
                             } @splitlocs;
                         $loc_obj->add_sub_Locations(\@loc_objs);
-                            # wrapped with complement(...)
-                            #if ($splitloc =~ m{\(($LOCREG)\)}) {
-                            #    my $comploc = $1;
-                            #    $sobj = $SIMPLE_CLASS->new(location_string => $comploc);
-                            #    $sobj->strand(-1);
-                            #} else { # normal
-                            #    $sobj = $SIMPLE_CLASS->new(location_string => $splitloc);
-                            #}
-                            #$loc_obj->add_sub_Location($sobj);
-
                     }
                 } else {
                     $loc_obj = $self->from_string($sub, $oparg, ++$depth);
@@ -107,7 +108,6 @@ sub from_string {
             else {
                 $loc_obj = $self->from_string($oparg, 1, ++$depth);
             }
-            #$loc_obj->strand(-1) if ($op && $op eq 'complement');
             push @loc_objs, $loc_obj;
         }
         my $ct = @loc_objs;
@@ -117,20 +117,69 @@ sub from_string {
                          scalar(@loc_objs).", should be SplitLocationI");
         }
         if ($ct > 1) {
-            $loc = $SIMPLE_CLASS->new();
+            $loc = $self->locatable_class->new();
             $loc->add_sub_Locations(\@loc_objs);
             return $loc;
         } else {
             return $loc_objs[0];
         }
     } else { # simple location(s)
-        $loc = $SIMPLE_CLASS->new(location_string => $locstr);
+        $loc = $self->_parse_range($locstr);
         $loc->strand(-1) if ($op && $op eq 'complement');
     }
     return $loc;
 }
 
-no Biome;
+my @STRING_ORDER = qw(start loc_type end);
+
+sub _parse_range {
+    my ($self, $string) = @_;
+    return unless $string;
+
+    my %atts;
+    $atts{strand} = $self->default_strand;
+
+    my @loc_data = split(/(\.{2}|\^|\:)/, $string);
+
+    # SeqID
+    if (@loc_data == 5) {
+        $atts{seq_id} = shift @loc_data;
+        $atts{is_remote} = 1;
+        shift @loc_data; # get rid of ':'
+    }
+    for my $i (0..$#loc_data) {
+        my $order = $STRING_ORDER[$i];
+        my $str = $loc_data[$i];
+        if ($order eq 'start' || $order eq 'end') {
+            $str =~ s{[\[\]\(\)]+}{}g;
+            if ($str =~ /^([<>\?])?(\d+)?$/) {
+                $atts{"${order}_pos_type"} = $1 if $1;
+                $atts{$order} = $2;
+            } elsif ($str =~ /^(\d+)\.(\d+)$/) {
+                $atts{"${order}_pos_type"} = '.';
+                $atts{$order} = $1;
+                $atts{"${order}_offset"} = $2 - $1;
+            } else {
+                $self->throw("Can't parse location string: $str");
+            }
+        } else {
+            $atts{location_type} = $str;
+        }
+    }
+    if ($atts{start_pos_type} && $atts{start_pos_type} eq '.' &&
+        (!$atts{end} && !$atts{end_pos_type})
+        ) {
+        $atts{end} = $atts{start} + $atts{start_offset};
+        delete @atts{qw(start_offset start_pos_type end_pos_type)};
+        $atts{location_type} = '.';
+    }
+    $atts{end} ||= $atts{start} unless $atts{end_pos_type};
+
+    # TODO: will very likely bork w/o all atts defined...
+    return $self->locatable_class->new(%atts);
+}
+
+}
 
 __PACKAGE__->meta->make_immutable;
 

@@ -4,7 +4,7 @@ use Biome::Role;
 use namespace::clean -except => 'meta';
 use List::Util qw(max min reduce);
 
-requires qw(start end strand from_string to_string);
+requires qw(start end strand to_string);
 requires qw(_build_union);
 
 # This should not be set here, and should be Biome::Role::Identifiable to make
