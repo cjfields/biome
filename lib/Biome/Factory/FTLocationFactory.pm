@@ -33,9 +33,12 @@ my %OPS = map { $_ => 1 } qw(join order bond complement);
 {
     # TODO: benchmark caching the class and default strand vs simple att call
 
+my ($LOC_CLASS, $DEF_STR);
+
 sub BUILD {
     my ($self) = @_;
     $self->load_modules($self->locatable_class);
+    ($LOC_CLASS, $DEF_STR) = ($self->locatable_class, $self->default_string);
 }
 
 sub from_string {
