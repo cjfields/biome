@@ -126,7 +126,7 @@ sub intersection {
 sub union {
     my ($self, $newlocs, $so) = @_;
 
-	my @given = ref $newlocs ne 'ARRAY' ?  [$newlocs] : @$newlocs;
+	my @given = ref $newlocs ne 'ARRAY' ?  ($newlocs) : @$newlocs;
 
     $self->_eval_ranges(@given);
 
@@ -248,12 +248,8 @@ sub offset_stranded {
 # called as instance method only; does slow things down a bit...
 sub _eval_ranges {
     my ($self, @ranges) = @_;
-    #$self->throw("start is undefined in calling instance") if !defined $self->start;
-    #$self->throw("end is undefined in calling instance") if !defined $self->end;
     for my $obj ($self, @ranges) {
         $self->throw("Not an object, got $obj") unless ref($obj);
-        $self->throw("start is undefined in instance ".$obj->to_string) if !defined $obj->start;
-        $self->throw("end is undefined in instance ".$obj->to_string) if !defined $obj->end;
         $self->throw('Rangeable equality or set methods not '.
                      'implemented yet for fuzzy locations') if
             $self->does('Bio::Range::Segment') && $self->is_fuzzy;
