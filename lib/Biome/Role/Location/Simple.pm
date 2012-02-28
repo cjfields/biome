@@ -17,9 +17,6 @@ use Biome::Type::Sequence qw(Sequence_Strand);
 has 'start' => (
     isa         => 'Num',
     is          => 'rw',
-    # TODO: should a default for a 1-based coord system be 0?  Seems a cludge...
-    default     => 0,
-
     # TODO: may remove these and move to a validate() root method (see below)
     trigger     => sub {
         my ($self, $start) = @_;
@@ -36,9 +33,6 @@ has 'start' => (
 has 'end' => (
     isa         => 'Num',
     is          => 'rw',
-    # TODO: should a default for a 1-based coord system be 0?  Seems a cludge...
-    default     => 0,
-
     # TODO: may remove these and add a validate() root method (see below)
     trigger     => sub {
         my ($self, $end) = @_;
@@ -65,7 +59,6 @@ has 'start_pos_type'    => (
     lazy            => 1,
     default         => 'EXACT',
     coerce          => 1,
-    predicate       => 'has_start_pos_type',
 
     # may remove these and add a validate() root method to be implemented here...
     trigger         => sub {
@@ -85,7 +78,6 @@ has 'end_pos_type'      => (
     lazy            => 1,
     default         => 'EXACT',
     coerce          => 1,
-    predicate       => 'has_end_pos_type',
 
     # may remove these and add a validate() root method to be implemented here...
     trigger         => sub {
@@ -169,9 +161,8 @@ sub is_fuzzy {
         exists $IS_FUZZY{$self->end_pos_type}) ? 1 : 0;
 }
 
-# TODO : add convenience method is_split()?
-
 # TODO: change to validate(), ban from roles (method should be defined in consuming class)
+# TODO: method doesn't take into account '?' and undef start/end
 sub valid_Location {
     defined($_[0]->start) && defined($_[0]->end) ? 1 : 0;
 }
@@ -211,9 +202,6 @@ sub to_string {
 
     for my $pos (qw(start end)) {
         my $pos_str = $data{$pos} || '';
-        if ($pos eq 'end' && $data{start} == $data{end}) {
-            $pos_str = '';
-        }
         given ($data{"${pos}_pos_type"}) {
             when ('WITHIN') {
                 $pos_str = '('.$data{"min_$pos"}.'.'.$data{"max_$pos"}.')';
@@ -226,6 +214,14 @@ sub to_string {
             }
             when ('UNCERTAIN') {
                 $pos_str = '?'.$pos_str;
+            }
+            default {
+                # is there an easier way to deal with this?
+                if ($pos eq 'end' &&
+                    ($data{start} && $data{end}) &&
+                    ($data{start} == $data{end})) {
+                    $pos_str = ''
+                }
             }
         }
         $data{"${pos}_string"} = $pos_str;
@@ -240,69 +236,6 @@ sub to_string {
         $str = sprintf("complement(%s)",$str)
     }
     $str;
-}
-
-{
-my @STRING_ORDER = qw(start loc_type end);
-
-# TODO: move back to the factory
-#sub from_string {
-#    my ($self, $string) = @_;
-#    return unless $string;
-#
-#    # TODO: add support, since split and simple are merging
-#    if ($string =~ /(?:join|order|bond)/) {
-#        $self->throw("Passing a split location type: $string");
-#    }
-#    my %atts;
-#    if ($string =~ /^complement\(([^\)]+)\)$/) {
-#        $atts{strand} = -1;
-#        $string = $1;
-#    } else {
-#        $atts{strand} = 1; # though, this assumes nucleotide sequence...
-#    }
-#    my @loc_data = split(/(\.{2}|\^|\:)/, $string);
-#
-#    # SeqID
-#    if (@loc_data == 5) {
-#        $atts{seq_id} = shift @loc_data;
-#        $atts{is_remote} = 1;
-#        shift @loc_data; # get rid of ':'
-#    }
-#    for my $i (0..$#loc_data) {
-#        my $order = $STRING_ORDER[$i];
-#        my $str = $loc_data[$i];
-#        if ($order eq 'start' || $order eq 'end') {
-#            $str =~ s{[\[\]\(\)]+}{}g;
-#            if ($str =~ /^([<>\?])?(\d+)?$/) {
-#                $atts{"${order}_pos_type"} = $1 if $1;
-#                $atts{$order} = $2;
-#            } elsif ($str =~ /^(\d+)\.(\d+)$/) {
-#                $atts{"${order}_pos_type"} = '.';
-#                $atts{$order} = $1;
-#                $atts{"${order}_offset"} = $2 - $1;
-#            } else {
-#                $self->throw("Can't parse location string: $str");
-#            }
-#        } else {
-#            $atts{location_type} = $str;
-#        }
-#    }
-#    if ($atts{start_pos_type} && $atts{start_pos_type} eq '.' &&
-#        (!$atts{end} && !$atts{end_pos_type})
-#        ) {
-#        $atts{end} = $atts{start} + $atts{start_offset};
-#        delete @atts{qw(start_offset start_pos_type end_pos_type)};
-#        $atts{location_type} = '.';
-#    }
-#    $atts{end} ||= $atts{start} unless $atts{end_pos_type};
-#    for my $m (sort keys %atts) {
-#        if (defined $atts{$m}){
-#            $self->$m($atts{$m})
-#        }
-#    }
-#}
-
 }
 
 sub flip_strand {
