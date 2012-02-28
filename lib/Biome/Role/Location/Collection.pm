@@ -11,7 +11,6 @@ has     "_locations"  => (
     isa         => ArrayRef_of_Locatable,
     traits      => ['Array'],
     init_arg    => undef,
-    writer      => "_set_locations",
     handles     => {
         "push_sub_Locations"    => 'push',
         "sub_Locations"         => 'elements',
