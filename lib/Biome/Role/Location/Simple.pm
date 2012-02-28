@@ -175,8 +175,7 @@ sub to_string {
 
     # TODO: should be in Split role, with a method modifier?
     if (is_Split_Location_Type($type)) {
-        my @segs = #$self->guide_strand >= 0 ? $self->sub_Locations :
-            $self->sub_Locations;
+        my @segs = $self->sub_Locations;
         my $str;
         if ($self->strand == -1) {
             $str = lc($type).'('.join(',', map {$_->to_string} @segs).')';
