@@ -17,8 +17,6 @@ with 'Biome::Role::Location::Locatable';
 
 sub BUILD {
     my ($self, $params) = @_;
-
-    # this should probably just fail validation, seems clunky to handle it here
     if ($params->{start} && $params->{end} && ($params->{end} < $params->{start})) {
         $self->warn('End is greater than start; flipping strands');
         $self->end($params->{start});
