@@ -17,34 +17,26 @@ use Biome::Type::Sequence qw(Sequence_Strand);
 has 'start' => (
     isa         => 'Num',
     is          => 'rw',
-    trigger     => sub {
-        my ($self, $start) = @_;
-        my $end = $self->end;
-        return unless $start && $end;
-        $self->throw("Start must be less than end") if $start > $end;
-        if ($self->location_type eq 'IN-BETWEEN' &&
-            (abs($end - $start) != 1 )) {
-            $self->throw("length of location with IN-BETWEEN position type ".
-                         "cannot be larger than 1; got ".abs($end - $start));
-        }
-    }
+    trigger     => \&_check_coord
 );
 
 has 'end' => (
     isa         => 'Num',
     is          => 'rw',
-    trigger     => sub {
-        my ($self, $end) = @_;
-        my $start = $self->start;
-        return unless $start && $end;
-        $self->throw("Start must be less than end") if $start > $end;
-        if ($self->location_type eq 'IN-BETWEEN' &&
-            (abs($end - $start) != 1) ) {
-            $self->throw("length of location with IN-BETWEEN position type ".
-                         "cannot be larger than 1; got ".abs($end - $start));
-        }
-    }
+    trigger     => \&_check_coord
 );
+
+sub _check_coord {
+    my $self = shift;
+    my ($start, $end) = ($self->start, $self->end);
+    return unless $start && $end;
+    $self->throw("Start must be less than end") if $start > $end;
+    if ($self->location_type eq 'IN-BETWEEN' &&
+        (abs($end - $start) != 1) ) {
+        $self->throw("length of location with IN-BETWEEN position type ".
+                     "cannot be larger than 1; got ".abs($end - $start));
+    }
+}
 
 has strand  => (
     isa     => Sequence_Strand,
@@ -59,16 +51,10 @@ has 'start_pos_type'    => (
     lazy            => 1,
     default         => 'EXACT',
     coerce          => 1,
-
-    # may remove these and add a validate() root method to be implemented here...
     trigger         => sub {
         my ($self, $v) = @_;
         return unless $self->end && $self->start;
         $self->throw("Start position can't have type $v") if $v eq 'AFTER';
-        if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
-            $self->throw("length of location with IN-BETWEEN position type ".
-                         "cannot be larger than 1");
-        }
     }
 );
 
@@ -78,16 +64,10 @@ has 'end_pos_type'      => (
     lazy            => 1,
     default         => 'EXACT',
     coerce          => 1,
-
-    # may remove these and add a validate() root method to be implemented here...
     trigger         => sub {
         my ($self, $v) = @_;
         return unless $self->end && $self->start;
         $self->throw("End position can't have type $v") if $v eq 'BEFORE';
-        if ($v eq 'IN-BETWEEN' && $self->valid_Segment && abs($self->end - $self->start) != 1 ) {
-            $self->throw("length of location with IN-BETWEEN position type ".
-                         " cannot be larger than 1");
-        }
     }
 );
 
