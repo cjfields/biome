@@ -30,17 +30,7 @@ ok(!$simple->is_fuzzy);
 
 is ($simple->to_string, 'my1:10..20', 'full FT string');
 
-# test that even when end < start that length is always positive
-my $f = Biome::Location::Simple->new(
-        -strict  => -1,
-        -start   => 100,
-        -end     => 20,
-        -strand  => 1);
-
-is($f->length, 81, 'Positive length');
-is($f->strand,-1,  'Negative strand' );
-
-is ($f->to_string, 'complement(20..100)','full FT string');
+my $f;
 
 my $exact = Biome::Location::Simple->new(
                     -start         => 10,
@@ -117,7 +107,16 @@ is($exact->end_pos_type, 'EXACT');
 is($exact->to_string, '<10..20', 'full FT string');
 
 # check exception handling
-throws_ok { $exact = $exact = Biome::Location::Simple->new(
+
+# Locations must have start < end or will throw an exception
+throws_ok { $exact = Biome::Location::Simple->new(
+                    -start          => 100,
+                    -end            => 10,
+                    -strand         => '+') }
+    qr/Start must be less than end/,
+    'Start must be less than end';
+
+throws_ok { $exact = Biome::Location::Simple->new(
                     -start          => 10,
                     -end            => 12,
                     -start_pos_type => '>',
@@ -125,7 +124,7 @@ throws_ok { $exact = $exact = Biome::Location::Simple->new(
     qr/Start position can't have type AFTER/,
     'Check start_pos_type constraint';
 
-throws_ok { $exact = $exact = Biome::Location::Simple->new(
+throws_ok { $exact = Biome::Location::Simple->new(
                     -start          => 10,
                     -end            => 12,
                     -end_pos_type   => '<',
@@ -160,15 +159,6 @@ is($fuzzy->start_pos_type, 'BEFORE');
 is($fuzzy->end_pos_type, 'EXACT');
 is($fuzzy->seq_id, 'my2');
 is($fuzzy->seq_id('my3'), 'my3');
-
-$f = Biome::Location::Simple->new(
-                               -strict  => -1,
-                               -start   => 100,
-                               -end     => 20,
-                               -strand  => 1);
-
-is($f->length, 81, 'Positive length');
-is($f->strand,-1);
 
 # Test Biome::Location::Simple
 

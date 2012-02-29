@@ -17,34 +17,34 @@ use Biome::Type::Sequence qw(Sequence_Strand);
 has 'start' => (
     isa         => 'Num',
     is          => 'rw',
-    # TODO: may remove these and move to a validate() root method (see below)
     trigger     => sub {
         my ($self, $start) = @_;
         my $end = $self->end;
         return unless $start && $end;
-        # could put start<->end reversal here...
+        $self->throw("Start must be less than end") if $start > $end;
         if ($self->location_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1 )) {
             $self->throw("length of location with IN-BETWEEN position type ".
                          "cannot be larger than 1; got ".abs($end - $start));
+        }
     }
-});
+);
 
 has 'end' => (
     isa         => 'Num',
     is          => 'rw',
-    # TODO: may remove these and add a validate() root method (see below)
     trigger     => sub {
         my ($self, $end) = @_;
         my $start = $self->start;
         return unless $start && $end;
-        # could put start<->end reversal here...
+        $self->throw("Start must be less than end") if $start > $end;
         if ($self->location_type eq 'IN-BETWEEN' &&
             (abs($end - $start) != 1) ) {
             $self->throw("length of location with IN-BETWEEN position type ".
                          "cannot be larger than 1; got ".abs($end - $start));
+        }
     }
-});
+);
 
 has strand  => (
     isa     => Sequence_Strand,
