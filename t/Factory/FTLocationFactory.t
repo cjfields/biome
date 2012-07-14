@@ -10,10 +10,6 @@ BEGIN {
 
 use Biome::Factory::FTLocationFactory;
 
-# Holds strings and results. The latter is an array of expected class name,
-# min/max start position and position type, min/max end position and position
-# type, location type, the number of locations, and the strand.
-
 my %testcases = (
    # note: the following are directly taken from
    # http://www.ncbi.nlm.nih.gov/collab/FT/#location
@@ -70,7 +66,7 @@ my %testcases = (
     "?" => [0,
         undef, undef, "UNCERTAIN", undef, undef, "EXACT", "EXACT", 0, 1, undef],
 
-    # SPLITS
+    # Split locations (now collections of locations)
 
     # this isn't a legal split location string AFAIK (can't have two remote
     # locations), though it is handled. In this case the parent location can't
@@ -78,7 +74,6 @@ my %testcases = (
 
     "join(AY016290.1:108..185,AY016291.1:1546..1599)"=> [0,
         undef, undef, "EXACT", undef, undef, "EXACT", "JOIN", 2, 0, undef],
-
     "complement(join(3207..4831,5834..5902,8881..8969,9276..9403,29535..29764))",
         [0, 3207, 3207, "EXACT", 29764, 29764, "EXACT", "JOIN", 5, -1, undef],
     "join(complement(29535..29764),complement(9276..9403),complement(8881..8969),complement(5834..5902),complement(3207..4831))",

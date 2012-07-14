@@ -29,7 +29,9 @@ has 'end' => (
 sub _check_coord {
     my $self = shift;
     my ($start, $end) = ($self->start, $self->end);
-    return unless $start && $end;
+
+    # only check if both are defined
+    return unless defined($start) && defined($end);
     $self->throw("Start must be less than end") if $start > $end;
     if ($self->location_type eq 'IN-BETWEEN' &&
         (abs($end - $start) != 1) ) {
