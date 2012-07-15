@@ -3,6 +3,7 @@ package Biome::SeqIO;
 use 5.010;
 use Biome;
 use Biome::Type::Sequence qw(Sequence_Alphabet);
+use Class::Load ();
 use namespace::clean -except => 'meta';
 
 extends 'Biome::Root::IO';
@@ -25,12 +26,12 @@ sub new {
     my $real_class = Scalar::Util::blessed($class) || $class;
     # these all come from the same base, Moose::Object, so this is fine
     my $params = $real_class->BUILDARGS(@_);
-    
+
     # switch out for the real class here
     if (exists $params->{format}) {
         my $biome_class = $real_class;
         $real_class = "Biome::SeqIO::".$params->{format};
-        Class::MOP::load_class($real_class);
+        Class::Load::load_class($real_class);
         $biome_class->throw("Module does not implement a sequence stream")
             unless $real_class->does('Biome::Role::Stream::Seq');
     } else {
@@ -127,12 +128,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all

@@ -1,13 +1,11 @@
 package Biome::Root;
 
+use Modern::Perl;
 use Moose;
-
+use Class::Load ();
 extends 'Moose::Object';
 
 #__PACKAGE__->meta->error_class('Biome::Root::Error');
-
-use Modern::Perl;
-
 # run BEGIN block to check for exception class, default to light output?
 # or should that go in Biome?
 
@@ -30,27 +28,27 @@ has 'strict' => (
 # this overrides the base BUILDARGS, where we deal with '-' named args
 sub BUILDARGS {
     my ($class, @args) = @_;
-    
+
     # allow hash refs
     my $params;
     if ( scalar(@args) % 2 ) {
         if (defined $args[0] && ref $args[0] eq 'HASH') {
             @args = %{$args[0]};
         } else {
-            Class::MOP::class_of($class)->throw_error(
+            Class::Load::class_of($class)->throw_error(
                 "Odd-number of parameters passed to new(). Arguments must be ".
                 "named parameters or a hash reference of named parameters",
                 data => $args[0] );
         }
     }
-    
+
     # take care of bp-like named parameters
     while( @args ) {
         my $key = shift @args;
         $key =~ tr/\055//d if index($key,'-') == 0; #deletes all dashes!
         $params->{lc $key} = shift @args;
     }
-    
+
     return $params;
 }
 
@@ -70,26 +68,26 @@ sub warn {
     elsif ($strict == 1) {
         CORE::warn $header. $string. "\n". $self->meta->stack_trace_dump. $footer;
         return;
-    }    
+    }
 
     CORE::warn $header. $string. "\n". $footer;
 }
 
 sub throw {
     my ($self, @args) = @_;
-    
+
     # Note: value isn't passed on (not sure why, we should address that)
-    
+
     # This delegates to the Biome::Meta::Class throw_error(), which calls
     # proper error class. Therefore we should probably do most of the
     # grunt work there so it also BP-izes the other errors that'll pop up, such
     # as type check errors, etc.
-    
+
     my %args;
-    
+
     @args{qw(message class value)} = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
     $args{message} ||= $args[0] if @args == 1;
-    
+
     $self->meta->throw_error(%args);
 }
 
@@ -107,7 +105,7 @@ sub deprecated{
     #    $msg .= "\nDeprecated in $version";
     #    if ($Biome::Root::VERSION >= $version) {
     #        $self->throw($msg)
-    #    } 
+    #    }
     #}
     ## passing this on to warn() should deal properly with verbosity issues
     $self->warn($msg);
@@ -115,7 +113,7 @@ sub deprecated{
 
 sub throw_not_implemented {
     my $self = shift;
-    
+
     # this method may be supplanted by Moose's autmated system for required
     # abstract role methods
 
@@ -133,7 +131,7 @@ sub warn_not_implemented {
 sub _not_implemented_msg {
     my $self = shift;
     my $package = ref $self;
-    my $meth = (caller(2))[3]; # may not work as intended here; 
+    my $meth = (caller(2))[3]; # may not work as intended here;
     my $msg =<<EOD_NOT_IMP;
 Abstract method \"$meth\" is not implemented by package $package.
 This is not your fault - author of $package should be blamed!
@@ -183,12 +181,12 @@ sub clone {
 # Module::Load::Conditional caches already loaded modules
 sub load_modules {
     my ($self) = shift;
-    Class::MOP::load_class($_) for @_;
+    Class::Load::load_class($_) for @_;
 }
 
 sub load_module {
     my ($self, $name) = @_;
-    Class::MOP::load_class($name);
+    Class::Load::load_class($name);
 }
 
 no Moose;
@@ -205,7 +203,7 @@ __END__
  Usage   : $self->verbose(1)
  Function: Sets verbose flag for debugging output
  Returns : The current verbosity setting (0 or 1)
- Args    : 0 or 1 (Boolean value) 
+ Args    : 0 or 1 (Boolean value)
  Status  : Unstable
 
 =cut
@@ -243,7 +241,7 @@ __END__
          : @param : an array of parameters, either as a list (in
          :          which case the function simply returns the list),
          :          or as an associative array with hyphenated tags
-         :          (in which case the function sorts the values 
+         :          (in which case the function sorts the values
          :          according to @{$order} and returns that new array.)
 	     :	      The tags can be upper, lower, or mixed case
          :          but they must start with a hyphen (at least the
@@ -252,7 +250,7 @@ __END__
          : Stein, and adapted for use in Bio::Seq by Richard Resnick and
          : then adapted for use in Bio::Root::Object.pm by Steve Chervitz,
          : then migrated into Bio::Root::RootI.pm by Ewan Birney.
- Comments: Uppercase tags are the norm, 
+ Comments: Uppercase tags are the norm,
          : (SAC)
          : This method may not be appropriate for method calls that are
          : within in an inner loop if efficiency is a concern.
@@ -262,12 +260,12 @@ __END__
          :  @param = (-NAME=>'me', -COLOR=>'blue');
          :  @param = (-Name=>'me', -Color=>'blue');
          :  @param = ('me', 'blue');
-         : A leading hyphenated argument is used by this function to 
+         : A leading hyphenated argument is used by this function to
          : indicate that named parameters are being used.
          : Therefore, the ('me', 'blue') list will be returned as-is.
          :
-	     : Note that Perl will confuse unquoted, hyphenated tags as 
-         : function calls if there is a function of the same name 
+	     : Note that Perl will confuse unquoted, hyphenated tags as
+         : function calls if there is a function of the same name
          : in the current namespace:
          :    -name => 'foo' is interpreted as -&name => 'foo'
 	     :
@@ -279,7 +277,7 @@ __END__
 	     :
          : Personal note (SAC): I have found all uppercase tags to
          : be more managable: it involves less single-quoting,
-         : the key names stand out better, and there are no method naming 
+         : the key names stand out better, and there are no method naming
          : conflicts.
          : The drawbacks are that it's not as easy to type as lowercase,
          : and lots of uppercase can be hard to read.
@@ -294,4 +292,3 @@ __END__
  Status  : Unstable (this may change into a trait for optional use)
 
 =cut
-

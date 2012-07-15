@@ -3,7 +3,6 @@ package Biome;
 our $VERSION = '0.001';
 
 use Modern::Perl;
-use Class::MOP;
 use Moose ();
 use Moose::Exporter;
 

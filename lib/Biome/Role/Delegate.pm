@@ -15,20 +15,20 @@ role {
             defined $delegate_map->{isa};
         my $cons = $delegate_map->{constructor} || 'new';
         delete $delegate_map->{constructor};
-        
+
         # delegated to methods lazily load classes.  This can probably
         $delegate_map->{default} //= sub {
-                Class::MOP::load_class($delegate_map->{isa})
-                    if !Class::MOP::is_class_loaded($delegate_map->{isa});
+                Class::Load::load_class($delegate_map->{isa})
+                    if !Class::Load::is_class_loaded($delegate_map->{isa});
                 $delegate_map->{default_params} ?
                     $delegate_map->{isa}->$cons($delegate_map->{default_params}) :
                     $delegate_map->{isa}->$cons();
         };
         delete $delegate_map->{default_params};
-        
+
         $delegate_map->{handles} ||= [];
         $delegate_map->{is} ||= 'rw';
-        
+
         has $accessor => (%$delegate_map);
     }
 };
@@ -119,12 +119,12 @@ BioPerl mailing lists. Your participation is much appreciated.
 
 Patches are always welcome.
 
-=head2 Support 
- 
+=head2 Support
+
 Please direct usage questions or support issues to the mailing list:
-  
+
 L<bioperl-l@bioperl.org>
-  
+
 rather than to the module maintainer directly. Many experienced and reponsive
 experts will be able look at the problem and quickly address it. Please include
 a thorough description of the problem with code and data examples if at all
