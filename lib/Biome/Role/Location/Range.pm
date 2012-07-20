@@ -17,17 +17,6 @@ has end     => (
     default => 0
 );
 
-sub ucsc_start {
-    my ($self, $newstart) = shift;
-    if (defined $newstart) {
-        $self->start($newstart + 1);
-    }
-    my $st = $self->start;
-    $st ? $st - 1 : 0;
-}
-
-sub ucsc_end {shift->end}
-
 sub length {$_[0]->end - $_[0]->start + 1;}
 
 sub to_string {
