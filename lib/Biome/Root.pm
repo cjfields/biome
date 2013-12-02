@@ -1,6 +1,6 @@
 package Biome::Root;
 
-use Modern::Perl;
+use 5.014;
 use Moose;
 use Class::Load ();
 extends 'Moose::Object';
