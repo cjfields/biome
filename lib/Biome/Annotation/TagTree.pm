@@ -4,6 +4,7 @@ use 5.010;
 use Biome;
 use Moose::Util::TypeConstraints;
 use Data::Stag ();
+no if $] >= 5.018, 'warnings',  "experimental::smartmatch";
 
 with 'Biome::Role::Annotate';
 

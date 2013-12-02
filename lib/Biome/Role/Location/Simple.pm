@@ -3,6 +3,7 @@ package Biome::Role::Location::Simple;
 use 5.010;
 use Biome::Role;
 use namespace::autoclean -except => 'meta';
+no if $] >= 5.018, 'warnings',  "experimental::smartmatch";
 
 use List::MoreUtils qw(all);
 
