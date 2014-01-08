@@ -1,0 +1,38 @@
+language: perl
+perl:
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+
+env: PERL_CPANM_OPT="--notest --force --skip-satisfied"
+
+install:
+    - "cpanm Moose | tail -n 1"
+    - "cpanm IO::Unread | tail -n 1"
+    - "cpanm Moose | tail -n 1"
+    - "cpanm MooseX::ClassAttributes | tail -n 1"
+    - "cpanm MooseX::Types | tail -n 1"
+    - "cpanm MooseX::Role::Parameterized | tail -n 1"
+    - "cpanm MooseX::Aliases | tail -n 1"
+    - "cpanm MooseX::Params::Validate | tail -n 1"
+    - "cpanm Modern::Perl | tail -n 1"
+    - "cpanm List::MoreUtils | tail -n 1"
+    - "cpanm Data::Stag | tail -n 1"
+    - "perl ./Build.PL --accept"
+
+script:
+    - "./Build test"
+
+#TODO - send emails to bioperl-guts-l
+notifications:
+  email: 
+    recipients:
+      - cjfields1@gmail.com
+    on_success: change
+    on_failure: change
+
+# whitelist branches
+branches:
+  only:
+    - master
