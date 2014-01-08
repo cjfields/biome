@@ -11,7 +11,7 @@ install:
     - "cpanm Moose | tail -n 1"
     - "cpanm IO::Unread | tail -n 1"
     - "cpanm Moose | tail -n 1"
-    - "cpanm MooseX::ClassAttributes | tail -n 1"
+    - "cpanm MooseX::ClassAttribute | tail -n 1"
     - "cpanm MooseX::Types | tail -n 1"
     - "cpanm MooseX::Role::Parameterized | tail -n 1"
     - "cpanm MooseX::Aliases | tail -n 1"
