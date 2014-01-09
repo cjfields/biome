@@ -37,10 +37,11 @@ meta_ok($i, 'Instances of Biome::Root have a meta class');
 isa_ok($i->meta, 'Moose::Meta::Class');
 
 # We should hook in Bio::Root::Exceptions here
-#throws_ok {$i->strict('Foo')} qr/Validation failed for 'Int'/,
-#    'verbose() requires an Int value';
-#throws_ok {$i->verbose('Foo')} qr/Validation failed for 'Bool'/,
-#    'debug() requires a Bool value (0 or 1)';
+throws_ok {$i->strict('Foo')} qr/Validation failed for 'Int'/,
+    'verbose() requires an Int value';
+
+throws_ok {$i->verbose('Foo')} qr/Validation failed for 'Bool'/,
+    'debug() requires a Bool value (0 or 1)';
 
 is($i->strict, 0, 'default strictness');
 is($i->verbose, $VERBOSE, 'default verbosity');
