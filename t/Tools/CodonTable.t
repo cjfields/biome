@@ -45,7 +45,7 @@ $myCodonTable->id(1);
 eval {
     $myCodonTable->translate();
 };
-ok ($@ =~ /Calling translate without a seq argument/) ;
+ok ($@ =~ /missing required argument \$seq/) ;
 
 is $myCodonTable->translate(''), '';
 
@@ -156,12 +156,15 @@ is $myCodonTable->translate_strict('ATG'), 'M';
 # adding a custom codon table
 #
 
-my @custom_table =
-    ( 'test1',
-      'FFLLSSSSYY**CC*WLLLL**PPHHQQR*RRIIIMT*TT*NKKSSRRV*VVAA*ADDEE*GGG'
-    );
+#my @custom_table =
+    #( 'test1',
+    #  'FFLLSSSSYY**CC*WLLLL**PPHHQQR*RRIIIMT*TT*NKKSSRRV*VVAA*ADDEE*GGG'
+    #);
 
-ok my $custct = $myCodonTable->add_table(@custom_table);
+ok my $custct = $myCodonTable->add_table(
+    name    => 'test1',
+    table   => 'FFLLSSSSYY**CC*WLLLL**PPHHQQR*RRIIIMT*TT*NKKSSRRV*VVAA*ADDEE*GGG'
+    );
 is $custct, 24;
 is $myCodonTable->translate('atgaaraayacmacracwacka'), 'MKNTTTT';
 ok $myCodonTable->id($custct);
