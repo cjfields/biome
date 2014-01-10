@@ -4,7 +4,7 @@ use 5.014;
 use Moose::Role;
 use Moose::Exception;
 use Class::Load ();
-use Moose::Util;
+use Biome::Util;
 use Method::Signatures;
 
 #__PACKAGE__->meta->error_class('Biome::Root::Error');
@@ -46,8 +46,8 @@ method warn ($string) {
     CORE::warn $header. $string. "\n". $footer;
 }
 
-method throw ($text, $class = 'Legacy', $value?) {
-    Moose::Util::throw_exception($class, message =>  $text);
+method throw ($text, $class = '', $value?) {
+    Biome::Util::throw_exception($class, message =>  $text);
 }
 
 method deprecated () {
