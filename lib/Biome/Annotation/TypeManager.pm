@@ -1,21 +1,8 @@
 package Bio::Annotation::TypeManager;
 
 use Biome;
-
-#sub new{
-#   my ($class,@args) = @_;
-#
-#   my $self = $class->SUPER::new(@args);
-#
-#   $self->{'_type'} = {};
-#
-#   $self->_add_type_map('reference',"Bio::Annotation::Reference");
-#   $self->_add_type_map('comment',"Bio::Annotation::Comment");
-#   $self->_add_type_map('dblink',"Bio::Annotation::DBLink");
-#
-#   return $self;
-#}
-
+use namespace::autoclean;
+use Method::Signatures;
 
 =head2 type_for_key
 

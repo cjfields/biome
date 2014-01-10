@@ -3,6 +3,8 @@
 package Biome::Annotation::DBLink;
 
 use Biome;
+use namespace::autoclean;
+use Method::Signatures;
 
 with qw(Biome::Role::Annotate
         Biome::Role::DatabaseLink
@@ -20,9 +22,7 @@ has '+namespace' => (
     lazy        => 1,
 );
 
-sub as_text{
-    my ($self) = @_;
-
+method as_text () {
     return "Direct database link to ".$self->primary_id
         .($self->version ? ".".$self->version : "")
         .($self->optional_id ? " (".$self->optional_id.")" : "")
@@ -35,9 +35,9 @@ sub as_text{
 #
 #########################################################################
 
-sub _build_display_id {$_[1]}
-sub _build_object_id {shift->primary_id(@_)}
-sub _build_id {shift->display_id(@_)}
+method _build_display_id ($id) { $id }
+method _build_object_id ($id) {$self->primary_id($id)}
+method _build_id ($id) {$self->display_id($id)}
 
 no Biome;
 

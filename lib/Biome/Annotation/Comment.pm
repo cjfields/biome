@@ -2,6 +2,8 @@
 package Biome::Annotation::Comment;
 
 use Biome;
+use namespace::autoclean;
+use Method::Signatures;
 
 with 'Biome::Role::Annotate' => {
     'data_slots' => [qw(text type)]
@@ -12,8 +14,7 @@ has '+DEFAULT_CB' => (
     lazy    => 1
     );
 
-sub as_text{
-    my ($self) = @_;
+method as_text () {
     return "Comment: ".$self->text;
 }
 

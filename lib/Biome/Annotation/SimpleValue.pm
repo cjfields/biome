@@ -2,6 +2,8 @@
 package Biome::Annotation::SimpleValue;
 
 use Biome;
+use namespace::autoclean;
+use Method::Signatures;
 
 with 'Biome::Role::Annotate' => {
     'data_slots'        => [qw(value term)]
@@ -12,8 +14,7 @@ has '+DEFAULT_CB' => (
     lazy    => 1
     );
 
-sub as_text{
-    my ($self) = @_;
+method as_text () {
     return "Value: ".$self->value;
 }
 
