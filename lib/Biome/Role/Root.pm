@@ -26,33 +26,6 @@ has 'strict' => (
     default => $ENV{BIOME_STRICT} || 0
     );
 
-# this overrides the base BUILDARGS, where we deal with '-' named args
-#before BUILDARGS => sub {
-#    my ($class, @args) = @_;
-#
-#    # allow hash refs
-#    my $params;
-#    if ( scalar(@args) % 2 ) {
-#        if (defined $args[0] && ref $args[0] eq 'HASH') {
-#            @args = %{$args[0]};
-#        } else {
-#            Class::Load::class_of($class)->throw_error(
-#                "Odd-number of parameters passed to new(). Arguments must be ".
-#                "named parameters or a hash reference of named parameters",
-#                data => $args[0] );
-#        }
-#    }
-#
-#    # take care of bp-like named parameters
-#    while( @args ) {
-#        my $key = shift @args;
-#        $key =~ tr/\055//d if index($key,'-') == 0; #deletes all dashes!
-#        $params->{lc $key} = shift @args;
-#    }
-#
-#    return $params;
-#};
-
 sub warn {
     my ($self,$string) = @_;
 

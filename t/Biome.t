@@ -3,7 +3,7 @@ use warnings;
 
 BEGIN {
 	use lib '.';
-	use Test::More;
+	use Test::More tests   => 13;
 	use Test::Moose;
 	use Test::Exception;
 }
@@ -47,9 +47,8 @@ is($i->strict, 0, 'default strictness');
 is($i->verbose, $VERBOSE, 'default verbosity');
 
 # explicit warn/throw
-
 throws_ok {$i->throw('Foo!')} qr/Foo!/, 'throw()';
 
+# check whether the thrown exception is an object
 isa_ok($@, 'Moose::Exception');
 
-done_testing();
