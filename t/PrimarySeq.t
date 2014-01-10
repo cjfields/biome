@@ -113,7 +113,7 @@ is $aa->seq, 'LVAST', "Translation: ". $aa->seq;
 $seq->seq('TTGGTGGCGTCAACTTAA'); # TTG GTG GCG TCA ACT TAA
 
 # please do NOT use this form!
-#$aa = $seq->translate(undef, undef, undef, undef, 1);
+$aa = $seq->translate(complete => 1);
 is $aa->seq, 'MVAST', "Translation: ". $aa->seq;
 
 # same test as previous, but using named parameter
@@ -141,7 +141,7 @@ $seq->strict(2);
 $seq->seq("ggggggatgtggcccc"); # atg tgg ccc
 eval { $seq->translate(orf => 1); };
 if ($@) {
-    like( $@, qr/atgtggcccc\n/);
+    like( $@, qr/atgtggcccc/);
     $seq->strict(-1);
     $aa = $seq->translate(orf => 1);
     is $aa->seq, 'MWP', "Translation: ". $aa->seq;

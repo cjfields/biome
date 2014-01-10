@@ -162,11 +162,6 @@ method translate (:$terminator = '*',
                   :$start_codon,
                   :$offset) {
     # Initialize termination codon, unknown codon, codon table id, frame
-    #$terminator //= '*';
-    #$unknown //= "X";
-    #$frame //= 0;
-    #$codonTableId //= 1;
-    #
     ## Get a CodonTable, error if custom CodonTable is invalid
     if ($codontable) {
          $self->throw("Need a Biome::Tools::CodonTable object, not ". $codontable)
@@ -245,8 +240,6 @@ method translate (:$terminator = '*',
             }
         }
     }
-
-    say STDERR $output;
 
     return $self->clone(seq  => $output, alphabet   => 'protein');
 }
