@@ -11,8 +11,8 @@ use Test::More tests => 9;
 #simple value
 
 my $simple = Biome::Annotation::SimpleValue->new(
-                    -tagname => 'colour',
-					-value   => '1');
+                    tagname => 'colour',
+					value   => '1');
 
 does_ok($simple, 'Biome::Role::Annotate');
 is $simple->display_text, 1;

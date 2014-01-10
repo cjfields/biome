@@ -8,8 +8,8 @@ BEGIN {
     use_ok('Biome::Annotation::Comment');
 }
 
-my $comment = Biome::Annotation::Comment->new(-tagname => 'mycomment',
-                                            -text => 'sometext');
+my $comment = Biome::Annotation::Comment->new(tagname => 'mycomment',
+                                            text => 'sometext');
 
 does_ok($comment,'Biome::Role::Annotate');
 

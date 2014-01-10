@@ -8,8 +8,8 @@ BEGIN {
     use_ok('Biome::Annotation::DBLink');
 }
 
-my $link1 = Biome::Annotation::DBLink->new(-database => 'TSC',
-					 -primary_id => 'TSC0000030',
+my $link1 = Biome::Annotation::DBLink->new(database => 'TSC',
+					 primary_id => 'TSC0000030',
 					);
 does_ok($link1,'Biome::Role::Annotate');
 does_ok($link1,'Biome::Role::Identifiable');
