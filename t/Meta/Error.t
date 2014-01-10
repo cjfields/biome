@@ -51,7 +51,7 @@ throws_ok {$test1->throw('Arg!');} qr/Arg!/, 'simple throw';
 }
 
 throws_ok {$test1->throw('Grr!', 'CustomError');}
-    qr/Biome::Exception::CustomError/, 'custom Biome-based error class';
+    qr/Grr!/, 'custom Biome-based error class';
 
 isa_ok($@, 'Biome::Exception::CustomError', 'custom error metaclass');
 isa_ok($@, 'Biome::Exception', 'inherited');
@@ -75,64 +75,8 @@ sub create_error {
 }
     
 my $e = create_error( my $foo = Foo->new );
-isa_ok( $e->{error}, "Biome::Meta::Error" );
-#isa_ok( $e->{error}, "Exception::Class::Base" );
-isa_ok( $foo->meta, 'Biome::Meta::Class');
+isa_ok( $e->{error}, "Moose::Exception" );
 unlike( $e->{error}->message, qr/line $e->{line}/s,
     "no line info, just a message" );
-isa_ok( $e->{error}->metaclass, "Biome::Meta::Class", "metaclass" );
-is( $e->{error}->metaclass, Foo->meta, "metaclass value" );
-isa_ok( $e->{error}->attr, "Moose::Meta::Attribute", "attr" );
-is( $e->{error}->attr, Foo->meta->get_attribute("foo"), "attr value" );
-isa_ok( $e->{error}->method, "Moose::Meta::Method", "method" );
-is( $e->{error}->method, Foo->meta->get_method("foo"), "method value" );
-is( $e->{error}->line,   $e->{line},                   "line attr" );
-is( $e->{error}->file,   $e->{file},                   "file attr" );
-is_deeply( $e->{error}->data, [ $foo, 4 ], "captured args" );
-like( $e->{error}->last_error, qr/Blah/, "last error preserved" );
-
-#SKIP: {
-#    skip('Exception::Class not found, skipping', 10) unless $EXCEPTION_CLASS;
-#    {
-#        package Foo_EC;
-#
-#        use Biome;
-#        use lib 't/lib';
-#
-#        sub unimplemented {
-#            shift->throw(
-#                -class => 'MyExceptions::VirtualMethod',
-#                -text => 'Abstract method'
-#            );
-#        }
-#
-#        sub bad_param {
-#            my ($self, $param) = @_;
-#            $self->throw(
-#                -class => 'MyExceptions::Params',
-#                -text => 'Bad Param "'.$param.'"'
-#            );
-#        }
-#
-#        sub bad_state {
-#            shift->throw(
-#                -class => 'MyExceptions::ObjectState',
-#                -text => 'Bad State'
-#            );
-#        }
-#    }
-#
-#    my $inst = Foo_EC->new();
-#    throws_ok {$inst->bad_state} qr/Bad\sState/, 'Simple error message';
-#    isa_ok($@, 'MyExceptions::ObjectState', 'special exception class');
-#    isa_ok($@, 'Exception::Class::Base', 'can use Exception::Class');
-#    is($@->description, 'Method called on an object which its current state does not allow');
-#    throws_ok {$inst->unimplemented} qr/Abstract\smethod/, 'Simple error message';
-#    isa_ok($@, 'MyExceptions::VirtualMethod',);
-#    is($@->description, 'Method called must be subclassed in the appropriate class');
-#    throws_ok {$inst->bad_param('urg')} qr/Bad\sParam\s"urg"/, 'Simple error message';
-#    isa_ok($@, 'MyExceptions::Params');
-#    is($@->description, 'An error in the parameters passed in a method of function call');
-#}
 
 done_testing();
