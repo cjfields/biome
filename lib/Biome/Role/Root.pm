@@ -4,7 +4,7 @@ use 5.014;
 use Moose::Role;
 use Moose::Exception;
 use Class::Load ();
-use Biome::Util;
+use Biome::Util ();
 use Method::Signatures;
 
 #__PACKAGE__->meta->error_class('Biome::Root::Error');
@@ -133,75 +133,5 @@ __END__
  Returns : The current verbosity setting (integer between -1 to 2)
  Args    : -1,0,1 or 2
  Status  : Unstable
-
-=cut
-
-=head2 rearrange
-
- Usage   : $object->_rearrange( array_ref, list_of_arguments)
- Purpose : Rearranges named parameters to requested order.
- Example : $self->_rearrange([qw(SEQUENCE ID DESC)],@param);
-         : Where @param = (sequence => $s,
-	     :                 desc     => $d,
-	     :                 id       => $i);
- Returns : @params - an array of parameters in the requested order.
-         : The above example would return ($s, $i, $d).
-         : Unspecified parameters will return undef. For example, if
-         :        @param = (sequence => $s);
-         : the above _rearrange call would return ($s, undef, undef)
- Argument: $order : a reference to an array which describes the desired
-         :          order of the named parameters.
-         : @param : an array of parameters, either as a list (in
-         :          which case the function simply returns the list),
-         :          or as an associative array with hyphenated tags
-         :          (in which case the function sorts the values
-         :          according to @{$order} and returns that new array.)
-	     :	      The tags can be upper, lower, or mixed case
-         :          but they must start with a hyphen (at least the
-         :          first one should be hyphenated.)
- Source  : This function was taken from CGI.pm, written by Dr. Lincoln
-         : Stein, and adapted for use in Bio::Seq by Richard Resnick and
-         : then adapted for use in Bio::Root::Object.pm by Steve Chervitz,
-         : then migrated into Bio::Root::RootI.pm by Ewan Birney.
- Comments: Uppercase tags are the norm,
-         : (SAC)
-         : This method may not be appropriate for method calls that are
-         : within in an inner loop if efficiency is a concern.
-         :
-         : Parameters can be specified using any of these formats:
-         :  @param = (-name=>'me', -color=>'blue');
-         :  @param = (-NAME=>'me', -COLOR=>'blue');
-         :  @param = (-Name=>'me', -Color=>'blue');
-         :  @param = ('me', 'blue');
-         : A leading hyphenated argument is used by this function to
-         : indicate that named parameters are being used.
-         : Therefore, the ('me', 'blue') list will be returned as-is.
-         :
-	     : Note that Perl will confuse unquoted, hyphenated tags as
-         : function calls if there is a function of the same name
-         : in the current namespace:
-         :    -name => 'foo' is interpreted as -&name => 'foo'
-	     :
-         : For ultimate safety, put single quotes around the tag:
-	     : ('-name'=>'me', '-color' =>'blue');
-         : This can be a bit cumbersome and I find not as readable
-         : as using all uppercase, which is also fairly safe:
-	     : (-NAME=>'me', -COLOR =>'blue');
-	     :
-         : Personal note (SAC): I have found all uppercase tags to
-         : be more managable: it involves less single-quoting,
-         : the key names stand out better, and there are no method naming
-         : conflicts.
-         : The drawbacks are that it's not as easy to type as lowercase,
-         : and lots of uppercase can be hard to read.
-         :
-         : Regardless of the style, it greatly helps to line
-	     : the parameters up vertically for long/complex lists.
-         :
-         : Note that if @param is a single string that happens to start with
-         : a dash, it will be treated as a hash key and probably fail to
-         : match anything in the array_ref, so not be returned as normally
-         : happens when @param is a simple list and not an associative array.
- Status  : Unstable (this may change into a trait for optional use)
 
 =cut
