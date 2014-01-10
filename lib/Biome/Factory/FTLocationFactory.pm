@@ -84,7 +84,7 @@ sub from_string {
                         $loc_obj = $self->_parse_range($splitlocs[0]);
                         $loc_obj->strand(-1);
                     } else {
-                        $loc_obj = $LOC_CLASS->new(-location_type => uc $oparg);
+                        $loc_obj = $LOC_CLASS->new(location_type => uc $oparg);
                         my @loc_objs = map {
                                 my $sobj;
                                 if (m{\(($LOCREG)\)}) {

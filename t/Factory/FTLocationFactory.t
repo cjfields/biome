@@ -117,7 +117,7 @@ my %testcases = (
         => [0,  undef, undef, 'EXACT', undef, undef, 'EXACT', 'ORDER', 3, 0, undef],
           );
 
-my $locfac = Biome::Factory::FTLocationFactory->new(-verbose => 1);
+my $locfac = Biome::Factory::FTLocationFactory->new(verbose => 1);
 
 # sorting is to keep the order constant from one run to the next
 foreach my $locstr (keys %testcases) {
