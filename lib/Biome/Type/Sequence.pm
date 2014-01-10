@@ -58,7 +58,7 @@ subtype Sequence_Alphabet,
 subtype Maybe_Sequence_Alphabet,
     as Maybe[Sequence_Alphabet];
 
-enum Output_ID_Type, qw(accession accession.version display primary);
+enum Output_ID_Type, [qw(accession accession.version display primary)];
 
 no MooseX::Types;
 no MooseX::Types::Moose;
