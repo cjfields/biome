@@ -3,7 +3,7 @@ package Biome;
 our $VERSION = '0.001';
 
 use Moose::Exporter;
-use Moose 2.120 ();
+use Moose 2.10 ();
 
 Moose::Exporter->setup_import_methods(
     also    => 'Moose',
