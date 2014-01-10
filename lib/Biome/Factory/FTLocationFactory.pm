@@ -2,6 +2,7 @@ package Biome::Factory::FTLocationFactory;
 
 use Biome;
 use namespace::autoclean;
+use Method::Signatures;
 
 my $LOCREG;
 
@@ -36,14 +37,12 @@ my %OPS = map { $_ => 1 } qw(join order bond complement);
 my ($LOC_CLASS, $DEF_STR);
 
 sub BUILD {
-    my ($self) = @_;
+    my $self = shift;
     $self->load_modules($self->locatable_class);
     ($LOC_CLASS, $DEF_STR) = ($self->locatable_class, $self->default_strand);
 }
 
-sub from_string {
-    my ($self, $locstr, $op, $depth) = @_;
-    #
+method from_string ($locstr, $op?, $depth?) {
     $depth ||= 0;
     my $loc;
 
@@ -135,9 +134,7 @@ sub from_string {
 
 my @STRING_ORDER = qw(start loc_type end);
 
-sub _parse_range {
-    my ($self, $string) = @_;
-
+method _parse_range ($string) {
     my %atts;
     $atts{strand} = $DEF_STR;
 

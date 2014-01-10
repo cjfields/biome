@@ -247,9 +247,7 @@ method translate ($seq!) {
     return $protein;
 }
 
-sub _translate_ambiguous_codon {
-    my ($self, $triplet, $partial, $table, $codons) = @_;
-    $partial ||= 0;
+method _translate_ambiguous_codon ($triplet, $partial=0, $table, $codons) {
     my $aa;
     my @codons = _unambiquous_codons($triplet);
     my %aas = ();
@@ -294,8 +292,7 @@ sub _translate_ambiguous_codon {
 
 =cut
 
-sub translate_strict{
-    my ($self, $value) = @_;
+method translate_strict ($value) {
     my $code = ${$self->genetic_code}{$self->id};
  
     $value  = lc $value;
@@ -491,8 +488,7 @@ sub translate_strict{
 
 =cut
 
-sub is_start_codon{
-    my ($self, $value) = @_;
+method is_start_codon ($value) {
     
     my $code = ${$self->genetic_code}{$self->id};
     $value  = lc $value;
@@ -523,8 +519,7 @@ sub is_start_codon{
 
 =cut
 
-sub is_ter_codon{
-    my ($self, $value) = @_;
+method is_ter_codon ($value) {
  
     my $code = ${$self->genetic_code}{$self->id};
     $value  = lc $value;
@@ -556,8 +551,7 @@ sub is_ter_codon{
 
 =cut
 
-sub is_unknown_codon{
-    my ($self, $value) = @_;
+method is_unknown_codon ($value) {
     my $code = ${$self->genetic_code}{$self->id};
  
     $value  = lc $value;
@@ -585,8 +579,7 @@ sub is_unknown_codon{
 
 =cut
 
-sub _unambiquous_codons{
-    my ($value) = @_;
+func _unambiquous_codons ($value){
     my @nts = ();
     my %iupac = %{__PACKAGE__->iupac_dna};
     my %mapping = map {$_ => [split('',$iupac{$_})] } keys %iupac;
@@ -660,8 +653,7 @@ method add_table (:$name, :$table, :$starts) {
 #
 #}
 
-sub _build_codons {
-    my $self = shift;
+method _build_codons () {
     my @nucs = qw(t c a g);
     my $x = 0;
     my $codons;

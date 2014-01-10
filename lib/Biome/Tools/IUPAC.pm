@@ -158,8 +158,7 @@ class_has map_aa_1_3 => (
 	}
 );
 
-no MooseX::ClassAttribute;
-no Biome;
+__PACKAGE__->meta->make_immutable();
 
 1;
 
