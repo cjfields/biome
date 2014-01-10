@@ -227,11 +227,11 @@ sub flip_strand {
 
 sub _build_union {
     my ($self, $five_prime, $three_prime, $strand) = @_;
-    return (blessed $self)->new(-start 			=> $five_prime->start,
-                            -start_pos_type	=> $five_prime->start_pos_type,
-                            -end 			=> $three_prime->end,
-                            -end_pos_type	=> $three_prime->end_pos_type,
-                            -strand 		=> $strand);
+    return (blessed $self)->new(start 			=> $five_prime->start,
+                            start_pos_type	=> $five_prime->start_pos_type,
+                            end 			=> $three_prime->end,
+                            end_pos_type	=> $three_prime->end_pos_type,
+                            strand 		=> $strand);
 }
 
 1;
