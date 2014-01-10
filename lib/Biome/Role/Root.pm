@@ -2,7 +2,9 @@ package Biome::Role::Root;
 
 use 5.014;
 use Moose::Role;
+use Moose::Exception;
 use Class::Load ();
+use Moose::Util;
 
 #__PACKAGE__->meta->error_class('Biome::Root::Error');
 # run BEGIN block to check for exception class, default to light output?
@@ -75,38 +77,16 @@ sub warn {
 sub throw {
     my ($self, @args) = @_;
 
-    # Note: value isn't passed on (not sure why, we should address that)
-
-    # This delegates to the Biome::Meta::Class throw_error(), which calls
-    # proper error class. Therefore we should probably do most of the
-    # grunt work there so it also BP-izes the other errors that'll pop up, such
-    # as type check errors, etc.
-
-    my %args;
-
-    @args{qw(message class value)} = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
-    $args{message} ||= $args[0] if @args == 1;
-
-    $self->meta->throw_error(%args);
+    my ($message, $class, $value) = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
+    $class ||= 'Legacy';
+    Moose::Util::throw_exception($class, message =>  $message);
 }
 
 sub deprecated{
     my ($self) = shift;
-    #my ($msg, $version) = $self->_rearrange([qw(TEXT VERSION)], @_);
-    #if (!defined $msg) {
     my $prev = (caller(0))[3];
     my $msg = "Use of ".$prev."() is deprecated";
-    #}
     # delegate to either warn or throw based on whether a version is given
-    #if ($version) {
-    #    $self->throw('Version must be numerical, such as 1.006000 for v1.6.0, not '.
-    #                 $version) unless $version =~ /^\d+\.\d+$/;
-    #    $msg .= "\nDeprecated in $version";
-    #    if ($Biome::Root::VERSION >= $version) {
-    #        $self->throw($msg)
-    #    }
-    #}
-    ## passing this on to warn() should deal properly with verbosity issues
     $self->warn($msg);
 }
 
@@ -117,8 +97,7 @@ sub throw_not_implemented {
     # abstract role methods
 
     my $message = $self->_not_implemented_msg;
-
-    $self->throw(-text=>$message); # no class yet for unimplemented methods
+    $self->throw(text => $message); # no class yet for unimplemented methods
 }
 
 sub warn_not_implemented {

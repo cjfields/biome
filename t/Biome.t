@@ -48,6 +48,8 @@ is($i->verbose, $VERBOSE, 'default verbosity');
 
 # explicit warn/throw
 
-#throws_ok {$i->throw('Foo!')} 'Biome::Meta::Error', 'throw()';
+throws_ok {$i->throw('Foo!')} qr/Foo!/, 'throw()';
+
+isa_ok($@, 'Moose::Exception');
 
 done_testing();
