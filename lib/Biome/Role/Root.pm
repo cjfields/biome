@@ -5,6 +5,7 @@ use Moose::Role;
 use Moose::Exception;
 use Class::Load ();
 use Moose::Util;
+use Method::Signatures;
 
 #__PACKAGE__->meta->error_class('Biome::Root::Error');
 # run BEGIN block to check for exception class, default to light output?
@@ -26,9 +27,7 @@ has 'strict' => (
     default => $ENV{BIOME_STRICT} || 0
     );
 
-sub warn {
-    my ($self,$string) = @_;
-
+method warn ($string) {
     my $strict = $self->strict || $self->verbose;
 
     my $header = "\n--------------------- WARNING ---------------------\nMSG: ";
@@ -47,68 +46,38 @@ sub warn {
     CORE::warn $header. $string. "\n". $footer;
 }
 
-sub throw {
-    my ($self, @args) = @_;
-
-    my ($message, $class, $value) = $self->rearrange([qw(TEXT CLASS VALUE)], @args);
-    $class ||= 'Legacy';
-    Moose::Util::throw_exception($class, message =>  $message);
+method throw ($text, $class = 'Legacy', $value?) {
+    Moose::Util::throw_exception($class, message =>  $text);
 }
 
-sub deprecated{
-    my ($self) = shift;
+method deprecated () {
     my $prev = (caller(0))[3];
     my $msg = "Use of ".$prev."() is deprecated";
     # delegate to either warn or throw based on whether a version is given
     $self->warn($msg);
 }
 
-sub throw_not_implemented {
-    my $self = shift;
-
-    # this method may be supplanted by Moose's autmated system for required
-    # abstract role methods
-
+method throw_not_implemented {
     my $message = $self->_not_implemented_msg;
     $self->throw(text => $message); # no class yet for unimplemented methods
 }
 
-sub warn_not_implemented {
-    my $self = shift;
+method warn_not_implemented () {
     my $message = $self->_not_implemented_msg;
     $self->warn( $message );
 }
 
-sub _not_implemented_msg {
-    my $self = shift;
-    my $package = ref $self;
+method _not_implemented_msg () {
+    my $pkg = ref $self;
     my $meth = (caller(2))[3]; # may not work as intended here;
     my $msg =<<EOD_NOT_IMP;
-Abstract method \"$meth\" is not implemented by package $package.
-This is not your fault - author of $package should be blamed!
+Abstract method \"$meth\" is not implemented by package $pkg.
+This is not your fault - author of $pkg should be blamed!
 EOD_NOT_IMP
     return $msg;
 }
 
-# Maybe move into a role or trait for optional root utilities (though it's
-# fairly ubiquitous in bp).  Switch to MooseX::Method::Signatures?
-
-sub rearrange {
-    my $dummy = shift;
-    my $order = shift;
-    return @_ unless (index($_[0]||'', '-') == 0);
-    push @_,undef unless $#_ %2;
-    my %param;
-    while( @_ ) {
-	(my $key = shift) =~ tr/a-z\055/A-Z/d; #deletes all dashes!
-	$param{$key} = shift;
-    }
-    map { $_ = uc($_) } @$order; # for bug #1343, but is there perf hit here?
-    return @param{@$order};
-}
-
-sub debug {
-    my ($self, @msgs) = @_;
+method debug (@msgs) {
     if ($self->verbose) {
         CORE::warn @msgs;
     }
@@ -121,8 +90,7 @@ sub debug {
 # until then if needed we can override this in inheriting classes for recursive
 # cloning
 
-sub clone {
-    my ($self, @p) = @_;
+method clone (@p) {
     my $params = $self->BUILDARGS(@p);
     $self->meta->clone_object($self, %$params);
 }
@@ -130,14 +98,12 @@ sub clone {
 # cleanup methods needed?  These should probably go into the meta class
 
 # Module::Load::Conditional caches already loaded modules
-sub load_modules {
-    my ($self) = shift;
-    Class::Load::load_class($_) for @_;
+method load_modules (@mods) {
+    Class::Load::load_class($_) for @mods;
 }
 
-sub load_module {
-    my ($self, $name) = @_;
-    Class::Load::load_class($name);
+method load_module ($mod) {
+    Class::Load::load_class($mod);
 }
 
 1;
