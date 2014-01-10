@@ -1,11 +1,12 @@
 package Bio::Annotation::Relation;
 
 use Biome;
+use namespace::autoclean;
+use Method::Signatures;
 
 with 'Biome::Role::Annotate';
 
-sub as_text{
-   my ($self) = @_;
+method as_text () {
    return $self->type." to  ".$self->to->id;
 }
 

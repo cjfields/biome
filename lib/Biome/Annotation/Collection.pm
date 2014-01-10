@@ -1,6 +1,8 @@
 package Biome::Annotation::Collection;
 
 use Biome;
+use namespace::autoclean;
+use Method::Signatures;
 
 # though this is an Annotate consumer, we do not allow extra data or object
 # slots (it implements Annotate so we can nest Collections)
@@ -20,23 +22,19 @@ has 'annotation_map' => (
     default   => sub { {} },
 );
 
-sub get_Annotation_keys {
-    keys %{shift->annotation_map};
+method get_Annotation_keys () {
+    keys %{$self->annotation_map};
 }
 
 # may combine with get_Annotation_keys, passing as an option
-sub get_all_Annotation_keys {
-    my ($self, $method) = @_;
-    $method //= 'depth';
+method get_all_Annotation_keys ($method='depth') {
     my @keys;
     for my $key ($self->get_Annotation_keys) {
         push @keys, $key;
     }
 }
 
-sub get_Annotations {
-    my ($self,@keys) = @_;
-
+method get_Annotations (@keys){
     my @anns = ();
     @keys = $self->get_Annotation_keys() unless @keys;
     my $map = $self->annotation_map;
@@ -51,14 +49,13 @@ sub get_Annotations {
     return @anns;
 }
 
-sub get_nested_Annotations {
-    shift->throw_not_implemented;
+method get_nested_Annotations () {
+    $self->throw_not_implemented;
 }
 
 # does this and get_nested_Annotations do the same thing? Seems like some
 # redundancy...
-sub get_all_Annotations {
-    my ($self,@keys) = @_;
+method get_all_Annotations (@keys) {
     my @ann = map {
         $_->does("Biome::Role::CollectAnnotation") ?
             $_->get_all_Annotations(@keys) : $_;
@@ -67,8 +64,7 @@ sub get_all_Annotations {
 }
 
 # does not return nested values, only annotation # contained in this instance
-sub get_num_Annotations {
-    my ($self) = @_;
+method get_num_Annotations () {
     my $count = 0;
     map { $count += scalar @$_ } values %{$self->annotation_map};
     return $count;    
@@ -78,8 +74,7 @@ sub get_num_Annotations {
 
 # As implemented in BioPerl; this doesn't enforce that an incoming instance that
 # Annotates have a matching tagname (key).
-sub add_Annotations {
-    my ($self, $key, $object, $archetype) = @_;
+method add_Annotations ($key, $object?, $archetype?) {
     my $map = $self->annotation_map;
     # if there's no key we use the tagname() as key
     if(ref($key) && $key->does("Biome::Role::Annotate") && (!ref($object))) {
@@ -135,9 +130,7 @@ sub add_Annotations {
 }
 
 # can we remove Annotation by an identifier?
-sub remove_Annotations {
-    my ($self, @keys) = @_;
-
+method remove_Annotations (@keys) {
     @keys = $self->get_Annotation_keys() unless @keys;
     my @anns = $self->get_Annotations(@keys);
     my ($annmap, $typemap) = ($self->annotation_map, $self->type_map);
@@ -149,18 +142,18 @@ sub remove_Annotations {
     return @anns;    
 }
 
-sub flatten_Annotations {
-    shift->throw_not_implemented
+method flatten_Annotations () {
+    $self->throw_not_implemented
 }
 
 # create an iterator and return one at a time...
-sub next_Annotation {
-    shift->throw_not_implemented    
+method next_Annotation () {
+    $self->throw_not_implemented
 }
 
 # create an iterator and return one at a time...
-sub next_Collection {
-    shift->throw_not_implemented    
+method next_Collection () {
+    $self->throw_not_implemented
 }
 
 # Annotate Role
@@ -172,8 +165,8 @@ has '+DEFAULT_CB' => (
     lazy        => 1
     );
 
-sub as_text {
-    shift->throw_not_implemented    
+method as_text () {
+    $self->throw_not_implemented
 }
 
 no Biome;

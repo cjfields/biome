@@ -2,6 +2,9 @@ package Biome::Annotation::TagTree;
 
 use 5.010;
 use Biome;
+use namespace::autoclean;
+use Method::Signatures;
+
 use Moose::Util::TypeConstraints;
 use Data::Stag ();
 no if $] >= 5.018, 'warnings',  "experimental::smartmatch";
@@ -44,8 +47,7 @@ has '+DEFAULT_CB' => (
     lazy    => 1
     );
 
-sub as_text {
-    my ($self) = @_;
+method as_text () {
     return "TagTree: " . $self->value;
 }
 
@@ -68,8 +70,7 @@ has 'node' => (
 # TODO: value is not a first-class attribute (it is a method here).
 # Can we shadow 'alias' attributes?
 
-sub value {
-    my ($self, $value) = @_;
+method value ($value?) {
     if (defined $value) {
         $self->node($value); # coercions shoud catch any variants
     }

@@ -3,6 +3,8 @@
 package Biome::Annotation::Target;
 
 use Biome;
+use namespace::autoclean;
+use Method::Signatures;
 
 extends qw(Biome::Annotation::DBLink);
 
@@ -14,9 +16,7 @@ has '+DEFAULT_CB' => (
     lazy    => 1
 );
 
-sub as_text {
-    my ($self) = @_;
-
+method as_text {
     my $target = $self->target_id || '';
     my $start  = $self->start     || '';
     my $end    = $self->end       || '';
