@@ -12,7 +12,7 @@ BEGIN {
 }
 
 # create a table object by giving an ID
-my $myCodonTable = Biome::Tools::CodonTable->new( -id => 16);
+my $myCodonTable = Biome::Tools::CodonTable->new( id => 16);
 ok defined $myCodonTable;
 isa_ok $myCodonTable, 'Biome::Tools::CodonTable';
 
@@ -45,7 +45,7 @@ $myCodonTable->id(1);
 eval {
     $myCodonTable->translate();
 };
-ok ($@ =~ /EX/) ;
+ok ($@ =~ /Calling translate without a seq argument/) ;
 
 is $myCodonTable->translate(''), '';
 
@@ -170,26 +170,26 @@ is $myCodonTable->translate('atgaaraayacmacracwacka'), 'MKXXTTT';
 # test doing this via Bio::PrimarySeq object
 
 #use Bio::PrimarySeq;
-#ok $seq = Bio::PrimarySeq->new(-seq=>'atgaaraayacmacracwacka', -alphabet=>'dna');
+#ok $seq = Bio::PrimarySeq->new(seq=>'atgaaraayacmacracwacka', alphabet=>'dna');
 #is $seq->translate()->seq, 'MKNTTTT';
 #is $seq->translate(undef, undef, undef, undef, undef, undef, $myCodonTable)->seq, 'MKXXTTT';
 #
 ## test gapped translated
 #
-#ok $seq = Bio::PrimarySeq->new(-seq      => 'atg---aar------aay',
-#			                   -alphabet => 'dna');
+#ok $seq = Bio::PrimarySeq->new(seq      => 'atg---aar------aay',
+#			                   alphabet => 'dna');
 #is $seq->translate->seq, 'M-K--N';
 #
-#ok $seq = Bio::PrimarySeq->new(-seq =>'ASDFGHKL');
+#ok $seq = Bio::PrimarySeq->new(seq =>'ASDFGHKL');
 #is $myCodonTable->reverse_translate_all($seq), 'GCBWSNGAYTTYGGVCAYAARYTN';
-#ok $seq = Bio::PrimarySeq->new(-seq => 'ASXFHKL');
+#ok $seq = Bio::PrimarySeq->new(seq => 'ASXFHKL');
 #is $myCodonTable->reverse_translate_all($seq), 'GCBWSNNNNTTYCAYAARYTN';
 #
 ##
 ## test reverse_translate_best(), requires a Bio::CodonUsage::Table object
 ## 
 #
-#ok $seq = Bio::PrimarySeq->new(-seq =>'ACDEFGHIKLMNPQRSTVWY');
-#ok my $io = Bio::CodonUsage::IO->new(-file => test_input_file('MmCT'));
+#ok $seq = Bio::PrimarySeq->new(seq =>'ACDEFGHIKLMNPQRSTVWY');
+#ok my $io = Bio::CodonUsage::IO->new(file => test_input_file('MmCT'));
 #ok my $cut = $io->next_data();
 #is $myCodonTable->reverse_translate_best($seq,$cut), 'GCCTGCGACGAGTTCGGCCACATCAAGCTGATGAACCCCCAGCGCTCCACCGTGTGGTAC';
