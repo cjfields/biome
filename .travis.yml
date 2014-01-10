@@ -9,6 +9,7 @@ env: PERL_CPANM_OPT="--notest --force --skip-satisfied"
 install:
     - "cpanm Moose | tail -n 1"
     - "cpanm IO::Unread | tail -n 1"
+    - "cpanm Method::Signatures | tail -n 1"
     - "cpanm Moose | tail -n 1"
     - "cpanm MooseX::ClassAttribute | tail -n 1"
     - "cpanm MooseX::Types | tail -n 1"
