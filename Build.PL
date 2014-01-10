@@ -20,7 +20,7 @@ my $build = Module::Build->new(
 
                             # replacement for pushback in IO streams
                             'IO::Unread'                => 0,
-
+                            'Method::Signatures'        => 20121201,
                             # needed for Native Types (replacement for MXAH)
                             'Moose'                         => '1.00',
                             # tentative list of MooseX modules, for comments

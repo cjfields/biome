@@ -15,8 +15,8 @@ BEGIN {
 use Biome::SeqIO;
 
 my $format = 'fasta';
-my $seqio_obj = Biome::SeqIO->new(-file   => File::Spec->catfile(qw(t data test.fasta)),
-                                -format => $format);
+my $seqio_obj = Biome::SeqIO->new(file   => File::Spec->catfile(qw(t data test.fasta)),
+                                format => $format);
 
 isa_ok($seqio_obj, 'Biome::SeqIO');
 does_ok($seqio_obj,'Biome::Role::Stream::Seq');
@@ -47,7 +47,7 @@ like ($seq_obj->description(), $expected{'description'}, 'description');
 # test output
 my $outseq;
 open (my $outfh, '>', \$outseq) || die "Can't attach output to scalar: $!";
-my $out_stream = Biome::SeqIO->new(-fh => $outfh, -format => $format);
+my $out_stream = Biome::SeqIO->new(fh => $outfh, format => $format);
 is($out_stream->mode, 'w', 'mode is correct');
 $out_stream->write_Seq($seq_obj);
 $out_stream->close;
@@ -86,7 +86,7 @@ like ($seq_obj2->description(), $expected2{'description'}, 'description');
 
 # test output
 open ($outfh, '>', \$outseq) || die "Can't attach output to scalar: $!";
-$out_stream = Biome::SeqIO->new(-fh => $outfh, -format => $format);
+$out_stream = Biome::SeqIO->new(fh => $outfh, format => $format);
 is($out_stream->mode, 'w', 'mode is correct');
 $out_stream->write_Seq($seq_obj2);
 $out_stream->close;
@@ -103,7 +103,7 @@ SEQ
 
 # from testformats.pl
 #SKIP: {
-#    test_skip(-tests => 4, -requires_modules => [qw(Algorithm::Diff
+#    test_skip(tests => 4, requires_modules => [qw(Algorithm::Diff
 #                                                    IO::ScalarArray
 #                                                    IO::String)]);
 #    use_ok('Algorithm::Diff');
@@ -117,11 +117,11 @@ SEQ
 #    open(FILE, "< $filename") or die("cannot open $filename");
 #    my @datain = <FILE>;
 #    my $in = new IO::String(join('', @datain));
-#    my $seqin = new Bio::SeqIO( -fh => $in,
-#                -format => $type);
+#    my $seqin = new Bio::SeqIO( fh => $in,
+#                format => $type);
 #    my $out = new IO::String;
-#    my $seqout = new Bio::SeqIO( -fh => $out,
-#                 -format => $type);
+#    my $seqout = new Bio::SeqIO( fh => $out,
+#                 format => $type);
 #    my $seq;
 #    while( defined($seq = $seqin->next_seq) ) { 
 #    $seqout->write_seq($seq);
@@ -131,7 +131,7 @@ SEQ
 #    my $strref = $out->string_ref;
 #    my @dataout = map { $_."\n"} split(/\n/, $$strref );
 #    my @diffs = &diff( \@datain, \@dataout);
-#    is(@diffs, 0, "$format format can round-trip");
+#    is(@diffs, 0, "$format format can roundtrip");
 #    
 #    if(@diffs && $verbose) {
 #        foreach my $d ( @diffs ) {
@@ -150,8 +150,8 @@ SEQ
 # test genbank, gcg, ace against fasta (should throw an exception on each)
 
 for my $file (qw(roa1.genbank test.gcg test.ace test.raw)) {
-    my $in = Biome::SeqIO->new(-file   => File::Spec->catfile('t', 'data', $file),
-                             -format => 'fasta');
+    my $in = Biome::SeqIO->new(file   => File::Spec->catfile('t', 'data', $file),
+                             format => 'fasta');
     throws_ok {$in->next_Seq}
         qr/The sequence does not appear to be FASTA format/, "dies with $file";
 }

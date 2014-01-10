@@ -9,12 +9,12 @@ BEGIN {
 }
 
 my $target = Biome::Annotation::Target->new(
-    -database   => 'UniProt',
-    -primary_id => 'MySeq',
-    -target_id  => 'F321966.1',
-    -start      => 1,
-    -end        => 200,
-    -strand     => 1);
+    database   => 'UniProt',
+    primary_id => 'MySeq',
+    target_id  => 'F321966.1',
+    start      => 1,
+    end        => 200,
+    strand     => 1);
 
 does_ok($target,'Biome::Role::Annotate');
 does_ok($target,'Biome::Role::Identifiable');

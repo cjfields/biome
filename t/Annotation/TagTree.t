@@ -25,16 +25,16 @@ my $struct = [ 'genenames' => [
 					       [ 'Synonyms'=> 'CAMC' ] ] ]
 			      ] ];
 
-my $ann_struct = Biome::Annotation::TagTree->new(-tagname => 'gn',
-					       -value => $struct);
+my $ann_struct = Biome::Annotation::TagTree->new(tagname => 'gn',
+					       value => $struct);
 
 does_ok($ann_struct, 'Biome::Role::Annotate');
 my $val = $ann_struct->value;
 like($val, qr/Name: CALM1/,'default itext');
 
 # roundtrip
-my $ann_struct2 = Biome::Annotation::TagTree->new(-tagname => 'gn',
-						-value => $ann_struct->node);
+my $ann_struct2 = Biome::Annotation::TagTree->new(tagname => 'gn',
+						value => $ann_struct->node);
 is($ann_struct2->value, $val,'roundtrip');
 
 # formats 
@@ -56,7 +56,7 @@ my @nodes = $ann_struct2->children;
 for my $node (@nodes) {
     isa_ok($node, 'Data::Stag::StagI');
     is($node->element, 'genename');
-    # add tag-value data to node
+    # add tagvalue data to node
     $node->set('foo', 'bar');
     # check output
     like($node->itext, qr/foo:\s+bar/,'child changes');
@@ -66,7 +66,7 @@ $ann_struct2->tagformat('itext');
 like($ann_struct2->value, qr/foo:\s+bar/,'child changes in parent node');
 
 # pass in a Data::Stag node to value()
-$ann_struct = Biome::Annotation::TagTree->new(-tagname => 'mytags');
+$ann_struct = Biome::Annotation::TagTree->new(tagname => 'mytags');
 like($ann_struct->value, qr/^\s+:\s+$/xms, 'no tags');
 like($ann_struct->value, qr/^\s+:\s+$/xms,'before Stag node');
 $ann_struct->value($nodes[0]);
@@ -78,7 +78,7 @@ TODO: {
 }
 
 # pass in another TagTree to value()
-$ann_struct = Biome::Annotation::TagTree->new(-tagname => 'mytags');
+$ann_struct = Biome::Annotation::TagTree->new(tagname => 'mytags');
 like($ann_struct->value, qr/^\s+:\s+$/xms,'before TagTree');
 $ann_struct->value($ann_struct2);
 like($ann_struct->value, qr/Name: CALM2/,'after TagTree');
@@ -86,7 +86,7 @@ is(ref $ann_struct->node, ref $ann_struct2->node, 'both stag nodes');
 isnt($ann_struct->node, $ann_struct2->node, 'different instances');
 
 # replace the Data::Stag node in the annotation (no copy)
-$ann_struct = Biome::Annotation::TagTree->new(-tagname => 'mytags');
+$ann_struct = Biome::Annotation::TagTree->new(tagname => 'mytags');
 like($ann_struct->value, qr/^\s+:\s+$/xms,'before TagTree');
 $ann_struct->node($nodes[1]);
 like($ann_struct->value, qr/Name: CALM2/,'after TagTree');
@@ -94,7 +94,7 @@ is(ref $ann_struct->node, ref $ann_struct2->node, 'stag nodes');
 is($ann_struct->node, $nodes[1], 'same instance');
 
 # replace the Data::Stag node in the annotation (use duplicate)
-$ann_struct = Biome::Annotation::TagTree->new(-tagname => 'mytags');
+$ann_struct = Biome::Annotation::TagTree->new(tagname => 'mytags');
 like($ann_struct->value, qr/^\s+:\s+$/xms,'before TagTree');
 $ann_struct->node($nodes[1],'copy');
 like($ann_struct->value, qr/Name: CALM2/,'after TagTree');

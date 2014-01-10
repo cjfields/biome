@@ -8,10 +8,10 @@ BEGIN {
     use_ok('Biome::Annotation::Reference');
 }
 
-my $ref = Biome::Annotation::Reference->new( -authors  => 'author line',
-					   -title    => 'title line',
-					   -location => 'location line',
-					   -start    => 12);
+my $ref = Biome::Annotation::Reference->new( authors  => 'author line',
+					   title    => 'title line',
+					   location => 'location line',
+					   start    => 12);
 does_ok($ref,'Biome::Role::Annotate');
 is $ref->authors, 'author line';
 is $ref->title,  'title line';

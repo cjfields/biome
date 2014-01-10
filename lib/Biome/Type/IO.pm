@@ -19,7 +19,7 @@ subtype IO_Stream,
         (ref($_) || $_)." is not compatible for use with IO yet"
         };
 
-enum IO_Mode, qw(r w x);
+enum IO_Mode, [qw(r w x)];
 
 coerce IO_Stream,
     from Str,

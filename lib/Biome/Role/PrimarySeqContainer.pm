@@ -15,16 +15,16 @@ has 'seq' => (
 
 sub seq {
     my $self = shift;
-    $self->entire_seq->subseq(-start   => $self->start,
-                        -end     => $self->end,
-                        -strand  => $self->strand);
+    $self->entire_seq->subseq(start   => $self->start,
+                        end     => $self->end,
+                        strand  => $self->strand);
 }
 
 sub primary_seq {
     my $self = shift;
-    $self->entire_seq->trunc(-start   => $self->start,
-                       -end     => $self->end,
-                       -strand  => $self->strand);
+    $self->entire_seq->trunc(start   => $self->start,
+                       end     => $self->end,
+                       strand  => $self->strand);
 }
 
 sub spliced_seq {

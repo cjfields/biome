@@ -31,11 +31,11 @@ my $testfile = 'testfile.txt';
 ok open(my $I, $TESTINFILE);
 ok open(my $O, '>', $testfile);
 
-ok my $rio = Foo_Handle->new(-fh => $I );
+ok my $rio = Foo_Handle->new(fh => $I );
 is $rio->mode, 'r', 'handle, read';
 isa_ok($rio->fh, 'GLOB');
 
-ok my $wio = Foo_Handle->new(-fh => $O);
+ok my $wio = Foo_Handle->new(fh => $O);
 is $wio->mode, 'w', 'handle, write';
 isa_ok($wio->fh, 'GLOB');
 
@@ -43,7 +43,7 @@ my $warn;
 local $SIG{__WARN__} = sub { $warn = shift };
 my $tempfile = File::Temp->new;
 my $temp_io;
-ok $temp_io = Foo_Handle->new( -fh => $tempfile );
+ok $temp_io = Foo_Handle->new( fh => $tempfile );
 is $temp_io->mode, 'w', 'is a write handle';
 ok($temp_io->close);
 ok !$warn, 'no warnings';
@@ -51,7 +51,7 @@ ok !$warn, 'no warnings';
 }
 
 ##############################################
-# test -file (file names)
+# test file (file names)
 ##############################################
 
 {
@@ -69,10 +69,10 @@ ok !$warn, 'no warnings';
 my $obj = File::Temp->new();
 my $fn = $obj->filename;
 
-ok my $rio = Foo_File->new(-file => $TESTINFILE);
+ok my $rio = Foo_File->new(file => $TESTINFILE);
 is $rio->mode, 'r', 'filename, read';
 
-ok my $wio = Foo_File->new(-file => "> $fn");
+ok my $wio = Foo_File->new(file => "> $fn");
 is $wio->mode, 'w', 'filename, write';
 }
 
@@ -82,7 +82,7 @@ is $wio->mode, 'w', 'filename, write';
 
 {
 
-my $rio = Foo_File->new(-file => $TESTINFILE );
+my $rio = Foo_File->new(file => $TESTINFILE );
 
 my $line1 = $rio->readline;
 my $line2 = $rio->readline;
@@ -103,7 +103,7 @@ ok $rio->pushback($line2);
 ok $rio->pushback($line5);
 
 ok($rio->close);
-my $rio2 = Foo_File->new(-file => $TESTINFILE );
+my $rio2 = Foo_File->new(file => $TESTINFILE );
 
 my $newline1 = $rio2->readline;
 my $newline2 = $rio2->readline;
@@ -116,7 +116,7 @@ ok($rio2->close);
 }
 
 ##############################################
-# test -scalar
+# test scalar
 ##############################################
 
 {
@@ -130,7 +130,7 @@ ok($rio2->close);
 
 {
     my $teststring = "Foo\nBar\nBaz";
-    ok my $rio = Foo_String->new(-scalar => \$teststring), 'default -scalar method';
+    ok my $rio = Foo_String->new(scalar => \$teststring), 'default scalar method';
     is $rio->mode, 'r', 'scalar, read';
 
     my $line1 = $rio->readline;
@@ -197,7 +197,7 @@ SKIP: {
     # IO::Unread has a buffering layer built in, but the order is different;
     # (stack instead of queue).  
     
-    my $rio = Foo_Unread->new(-file => $TESTINFILE );
+    my $rio = Foo_Unread->new(file => $TESTINFILE );
     
     my $line1 = $rio->readline; # Lorem ...
     my $line2 = $rio->readline; # pulvinar ...
@@ -220,7 +220,7 @@ SKIP: {
     ok $rio->pushback($line2);
     ok $rio->pushback($line5);
     
-    my $rio2 = Foo_Unread->new(-file => $TESTINFILE );
+    my $rio2 = Foo_Unread->new(file => $TESTINFILE );
     
     my $newline1 = $rio2->readline;
     my $newline2 = $rio2->readline;
@@ -259,11 +259,11 @@ SKIP: {
 ##############################################
 
 #SKIP: {
- # test_skip(-tests => 2, -requires_networking => 1);
+ # test_skip(tests => 2, requires_networking => 1);
 
     #my $TESTURL = 'http://www.google.com/index.html';
     #
-    #ok(my $rio = Foo->new(-url=>$TESTURL), 'default -url method');
+    #ok(my $rio = Foo->new(url=>$TESTURL), 'default url method');
     
 #}
 
@@ -287,7 +287,7 @@ SKIP: {
     
     {
     
-    ok my $rio = Foo_All->new(-file => $TESTINFILE);
+    ok my $rio = Foo_All->new(file => $TESTINFILE);
     
     does_ok($rio, 'Biome::Role::IO::Handle');
     does_ok($rio, 'Biome::Role::IO::File');

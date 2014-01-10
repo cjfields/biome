@@ -10,7 +10,7 @@ BEGIN {
     use_ok('Biome::SeqIO');
 }
 
-ok my $in = Biome::SeqIO->new(-format => 'fasta');
+ok my $in = Biome::SeqIO->new(format => 'fasta');
 
 # does the plugin
 isa_ok($in, 'Biome::SeqIO::fasta');

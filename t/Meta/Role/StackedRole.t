@@ -73,7 +73,7 @@ is($foo->bah, 98.6);
 does_ok($foo, 'MyRole1', 'does MyRole1');
 does_ok($foo, 'MyRole2', 'does MyRole2');
 isa_ok($foo, 'RoleTest');
-isa_ok($foo, 'Biome::Root');
-isa_ok($foo->meta, 'Biome::Meta::Class');
+does_ok($foo, 'Biome::Role::Root');
+isa_ok($foo->meta, 'Moose::Meta::Class');
 
 done_testing();

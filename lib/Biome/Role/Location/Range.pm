@@ -35,9 +35,10 @@ sub flip_strand {$_[0]->strand($_[0]->strand * -1);}
 
 sub _build_union {
     my ($self, $five_prime, $three_prime, $strand) = @_;
-    return (blessed $self)->new(-start 			=> $five_prime->start,
-                            -end 			=> $three_prime->end,
-                            -strand 		=> $strand);
+    return (blessed $self)->new(
+                            start 	    => $five_prime->start,
+                            end 		=> $three_prime->end,
+                            strand 		=> $strand);
 }
 
 1;

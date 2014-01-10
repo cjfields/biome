@@ -62,7 +62,7 @@ for my $st (qw(. .. ^ ? ! < > : EXACT WITHIN BETWEEN BEFORE
     for my $att (qw(segment_type pos_type)) {
         if (exists $real_types{$att}{$st}) {
             lives_ok {
-                $test_obj = Foo->new("-$att" => $st);
+                $test_obj = Foo->new("$att" => $st);
                 } "$st is a valid Location $att type";
             if (exists $symbols{$att}{$st}) {
                 is($test_obj->$att, $symbols{$att}{$st},
@@ -70,7 +70,7 @@ for my $st (qw(. .. ^ ? ! < > : EXACT WITHIN BETWEEN BEFORE
             }
         } else {
             throws_ok {
-                $test_obj = Foo->new("-$att" => $st)
+                $test_obj = Foo->new("$att" => $st)
                 } qr/Attribute\s\($att\)\sdoes\snot\spass/xms,
             "$st is not a valid LocationType";
         }

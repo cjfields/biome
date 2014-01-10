@@ -13,11 +13,11 @@ BEGIN {
 
 # simple get/set
 my $seq = Biome::PrimarySeq->new(
-                    -seq          => '----TTGGTGG---CGTCA--ACT---',
-                    -display_id       => 'new-id',
-                    -alphabet         => 'dna',
-                    -accession_number => 'X677667',
-                    -description      => 'Sample PrimarySeq object');
+                    seq          => '----TTGGTGG---CGTCA--ACT---',
+                    display_id       => 'new-id',
+                    alphabet         => 'dna',
+                    accession_number => 'X677667',
+                    description      => 'Sample PrimarySeq object');
 ok defined $seq;
 does_ok($seq,'Biome::Role::PrimarySeq');
 is $seq->seq(), '----TTGGTGG---CGTCA--ACT---';
@@ -47,11 +47,11 @@ is $seq->display_name(), "new-id";
 is $seq->display_name('really-new-id'), "really-new-id";
 ok($seq->has_gaps,'gaps present');
 
-is($seq->subseq(-start => 2, -end => 9, -strand => 1), 'TGGTGG---CG');
-is($seq->subseq(-start => 2, -end => 9, -strand => 1, -gaps => 0), 'TGGTGGCG');
+is($seq->subseq(start => 2, end => 9, strand => 1), 'TGGTGG---CG');
+is($seq->subseq(start => 2, end => 9, strand => 1, gaps => 0), 'TGGTGGCG');
 
 # across two gaps
-is($seq->subseq(-start => 7, -end => 15, -strand => 1), 'G---CGTCA--ACT');
+is($seq->subseq(start => 7, end => 15, strand => 1), 'G---CGTCA--ACT');
 
 # TODO: Locations NYI
 #my $location = Bio::Location::Simple->new('-start' => 2, 
@@ -78,7 +78,7 @@ is($seq->subseq(-start => 7, -end => 15, -strand => 1), 'G---CGTCA--ACT');
 #
 #is( $seq->subseq($fuzzy), 'GGTGGC');
 
-my $trunc = $seq->trunc(-start => 1, -end => 4);
+my $trunc = $seq->trunc(start => 1, end => 4);
 does_ok $trunc, 'Biome::Role::PrimarySeq';
 is $trunc->seq(), 'TTGG' || diag("Expecting TTGG. Got ".$trunc->seq());
 is $trunc->length(), 4;
@@ -113,73 +113,73 @@ is $aa->seq, 'LVAST', "Translation: ". $aa->seq;
 $seq->seq('TTGGTGGCGTCAACTTAA'); # TTG GTG GCG TCA ACT TAA
 
 # please do NOT use this form!
-$aa = $seq->translate(undef, undef, undef, undef, 1);
+$aa = $seq->translate(complete => 1);
 is $aa->seq, 'MVAST', "Translation: ". $aa->seq;
 
 # same test as previous, but using named parameter
-$aa = $seq->translate(-complete => 1);
+$aa = $seq->translate(complete => 1);
 is $aa->seq, 'MVAST', "Translation: ". $aa->seq;
 
 # find ORF, ignore codons outside the ORF or CDS
 $seq->seq('TTTTATGGTGGCGTCAACTTAATTT'); # ATG GTG GCG TCA ACT
-$aa = $seq->translate(-orf => 1);
+$aa = $seq->translate(orf => 1);
 is $aa->seq, 'MVAST*', "Translation: ". $aa->seq;
 
 # smallest possible ORF
 $seq->seq("ggggggatgtagcccc"); # atg tga
-$aa = $seq->translate(-orf => 1);
+$aa = $seq->translate(orf => 1);
 is $aa->seq, 'M*', "Translation: ". $aa->seq;
 
 # same as previous but complete, so * is removed
-$aa = $seq->translate(-orf => 1,
-                      -complete => 1);
+$aa = $seq->translate(orf => 1,
+                      complete => 1);
 is $aa->seq, 'M', "Translation: ". $aa->seq;
 
 # ORF without termination codon
 # should warn, let's change it into throw for testing
 $seq->strict(2);
 $seq->seq("ggggggatgtggcccc"); # atg tgg ccc
-eval { $seq->translate(-orf => 1); };
+eval { $seq->translate(orf => 1); };
 if ($@) {
-    like( $@, qr/atgtggcccc\n/);
+    like( $@, qr/atgtggcccc/);
     $seq->strict(-1);
-    $aa = $seq->translate(-orf => 1);
+    $aa = $seq->translate(orf => 1);
     is $aa->seq, 'MWP', "Translation: ". $aa->seq;
 }
 $seq->strict(0);
 
 # use non-standard codon table where terminator is read as Q
 $seq->seq('ATGGTGGCGTCAACTTAG'); # ATG GTG GCG TCA ACT TAG
-$aa = $seq->translate(-codontable_id => 6);
+$aa = $seq->translate(codontable_id => 6);
 is $aa->seq, 'MVASTQ' or diag("Translation: ". $aa->seq);
 
 # insert an odd character instead of terminating with *
-$aa = $seq->translate(-terminator => 'X');
+$aa = $seq->translate(terminator => 'X');
 is $aa->seq, 'MVASTX' or diag("Translation: ". $aa->seq);
 
 # change frame from default
-$aa = $seq->translate(-frame => 1); # TGG TGG CGT CAA CTT AG
+$aa = $seq->translate(frame => 1); # TGG TGG CGT CAA CTT AG
 is $aa->seq, 'WWRQL' or diag("Translation: ". $aa->seq);
 
-$aa = $seq->translate(-frame => 2); # GGT GGC GTC AAC TTA G
+$aa = $seq->translate(frame => 2); # GGT GGC GTC AAC TTA G
 is $aa->seq, 'GGVNL' or diag("Translation: ". $aa->seq);
 
 # TTG is initiator in Standard codon table? Afraid so.
 $seq->seq("ggggggttgtagcccc"); # ttg tag
-$aa = $seq->translate(-orf => 1);
+$aa = $seq->translate(orf => 1);
 is $aa->seq, 'L*' or diag("Translation: ". $aa->seq);
 
 # Replace L at 1st position with M by setting complete to 1 
 $seq->seq("ggggggttgtagcccc"); # ttg tag
-$aa = $seq->translate(-orf => 1,
-                    -complete => 1);
+$aa = $seq->translate(orf => 1,
+                    complete => 1);
 is $aa->seq, 'M' or diag("Translation: ". $aa->seq);
 
 # Ignore non-ATG initiators (e.g. TTG) in codon table
 $seq->seq("ggggggttgatgtagcccc"); # atg tag
-$aa = $seq->translate(-orf => 1,
-                    -start => "atg",
-                    -complete => 1);
+$aa = $seq->translate(orf => 1,
+                    start_codon => "atg",
+                    complete => 1);
 is $aa->seq, 'M' or diag("Translation: ". $aa->seq);
 
 
@@ -190,9 +190,9 @@ is $seq->seq('TTGGTGGCG?CAACT'), 'TTGGTGGCG?CAACT';
 # implementation-specific, see above for Biome::PrimarySeq
 
 $seq = Biome::PrimarySeq->new(
-		-display_id 	=> 'myID',
-		-id				=> 'foo',
-        -description 	=> 'Alias desc');
+		display_id 	=> 'myID',
+		id				=> 'foo',
+        description 	=> 'Alias desc');
 is($seq->description, 'Alias desc');
 is($seq->display_id, 'myID'); 
 $seq->display_id('foo'); 
@@ -212,7 +212,7 @@ ok(!$seq->can('id'), 'we do not use the generic id()');
 
 # alphabet has a type constraint
 dies_ok {Biome::PrimarySeq->new(
-	-seq           => '----TTGGTGG---CGTCA--ACT---',
-	-display_id       => 'new-id',
-	-alphabet         => 'foo')} 'alphabet is a contrained type';
+	seq           => '---TTGGTGG----CGTCA--ACT---',
+	display_id       => 'new-id',
+	alphabet         => 'foo')} 'alphabet is a contrained type';
 

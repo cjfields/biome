@@ -21,13 +21,13 @@ BEGIN {
 
 for my $class (@sf_classes) {
     my $feat = $class->new(
-                            -start          => 40,
-                            -end            => 80,
-                            -strand         => 1,
-                            -primary_tag    => 'exon',
-                            -source_tag     => 'internal',
-                            -seq_id         => 'ABCD1234',
-                            -tag_map        => {
+                            start          => 40,
+                            end            => 80,
+                            strand         => 1,
+                            primary_tag    => 'exon',
+                            source_tag     => 'internal',
+                            seq_id         => 'ABCD1234',
+                            tag_map        => {
                                 silly => 20,
                                 new => 1
                             }
@@ -60,11 +60,11 @@ for my $class (@sf_classes) {
     my $rawseq = 'gatcagtagacccagcgacagcagggcggggcccagcaggccggccgtggcgtagagcgc'.
     'gaggacggcgaccggcgtggccaccgacaggatggctgcggcgacgcggacgacaccgga';
     my $seq = Biome::PrimarySeq->new(
-                        -seq          => $rawseq,
-                        -display_id       => 'myseq',
-                        -alphabet         => 'dna',
-                        -accession_number => 'X677667',
-                        -description      => 'Sample PrimarySeq object');
+                        seq          => $rawseq,
+                        display_id       => 'myseq',
+                        alphabet         => 'dna',
+                        accession_number => 'X677667',
+                        description      => 'Sample PrimarySeq object');
 
     does_ok($feat, 'Biome::Role::PrimarySeqContainer');
     $feat->attach_seq($seq);

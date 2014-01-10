@@ -115,9 +115,9 @@ sub intersection {
         } else {
 			# TODO: does this need a separate _build_intersection method like
 			# union?
-            $intersect = (blessed $self)->new(-start  => $start,
-                                    -end    => $end,
-                                    -strand => $intersect_strand);
+            $intersect = (blessed $self)->new(start  => $start,
+                                    end    => $end,
+                                    strand => $intersect_strand);
         }
     }
     return $intersect;
@@ -204,7 +204,7 @@ sub subtract {
 
     # Subtracts everything (empty Range of length = 0 and strand = 0
     if ($self->equals($range) || $range->contains($self)) {
-        return (blessed $self)->new(-start => 0, -end => 0, -strand => 0);
+        return (blessed $self)->new(start => 0, end => 0, strand => 0);
     }
 
     my $int = $self->intersection($range, $so);
@@ -215,16 +215,17 @@ sub subtract {
     if ($self->start < $start) {
         push(@outranges,
 		 (blessed $self)->new(
-                '-start'=> $self->start,
-			    '-end'=>$start - 1,
-			    '-strand'=>$self->strand,
+                start   => $self->start,
+			    end     => $start - 1,
+			    strand  => $self->strand,
 			   ));
     }
     if ($self->end > $end) {
         push(@outranges,
-		 (blessed $self)->new('-start'=>$end + 1,
-			    '-end'=>$self->end,
-			    '-strand'=>$self->strand,
+		 (blessed $self)->new(
+                start   =>  $end + 1,
+			    end     =>  $self->end,
+			    strand  =>  $self->strand,
 			   ));
     }
     return @outranges;

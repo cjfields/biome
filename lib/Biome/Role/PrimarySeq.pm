@@ -3,6 +3,7 @@ package Biome::Role::PrimarySeq;
 use Biome::Role;
 use Biome::Type::Sequence qw(Maybe_Sequence_Alphabet);
 use Biome::Tools::CodonTable;
+use Method::Signatures;
 
 # this should always return a raw sequence
 has seq => (
@@ -41,14 +42,7 @@ has symbols => (
     );
 
 # returns raw subsequence; trunc() calls this for objects
-sub subseq {
-    my $self = shift;
-    my ($start,$end,$strand,$gaps,$replace) = $self->rearrange([qw(START
-                                                           END
-                                                           STRAND
-                                                           GAPS
-                                                           REPLACE_WITH)],@_);
-
+method subseq (:$start, :$end, :$strand, :$gaps, :$replace) {
     $strand //= 1;
     $gaps //= 1;
 
@@ -138,7 +132,7 @@ sub revcom {
         $revseq =~ tr/tT/uU/;
     }
 
-    my $out = $self->clone(-seq => $revseq);
+    my $out = $self->clone(seq => $revseq);
     return $out;
 }
 
@@ -154,42 +148,33 @@ sub has_gaps {
 
 sub trunc {
     my ($self) = shift;
-    return $self->clone(-seq => $self->subseq(@_));
+    return $self->clone(seq => $self->subseq(@_));
 }
 
-sub translate {
-    my ($self,@args) = @_;
-    my ($terminator, $unknown, $frame, $codonTableId, $complete, $throw,
-         $codonTable, $orf, $start_codon, $offset) =
-            $self->rearrange([qw(TERMINATOR
-                               UNKNOWN
-                               FRAME
-                               CODONTABLE_ID
-                               COMPLETE
-                               THROW
-                               CODONTABLE
-                               ORF
-                               START
-                               OFFSET)], @args);
+method translate (:$terminator = '*',
+                  :$unknown = 'X',
+                  :$frame = '0',
+                  :$codontable_id = 1,
+                  :$complete,
+                  :$throw,
+                  :$codontable,
+                  :$orf,
+                  :$start_codon,
+                  :$offset) {
     # Initialize termination codon, unknown codon, codon table id, frame
-    $terminator //= '*';
-    $unknown //= "X";
-    $frame //= 0;
-    $codonTableId //= 1;
-
-    # Get a CodonTable, error if custom CodonTable is invalid
-    if ($codonTable) {
-         $self->throw("Need a Biome::Tools::CodonTable object, not ". $codonTable)
-            unless $codonTable->isa('Biome::Tools::CodonTable');
+    ## Get a CodonTable, error if custom CodonTable is invalid
+    if ($codontable) {
+         $self->throw("Need a Biome::Tools::CodonTable object, not ". $codontable)
+            unless $codontable->isa('Biome::Tools::CodonTable');
     } else {
-         $codonTable = Biome::Tools::CodonTable->new( -id => $codonTableId);
+         $codontable = Biome::Tools::CodonTable->new( id => $codontable_id);
     }
-
+    
     # Error if alphabet is "protein"
     $self->throw("Can't translate an amino acid sequence.") if
         ($self->alphabet eq 'protein');
 
-    ## Error if -start parameter isn't a valid codon
+    ## Error if start parameter isn't a valid codon
     if ($start_codon) {
         $self->throw("Invalid start codon: $start_codon.") if
            ( $start_codon !~ /^[A-Z]{3}$/i );
@@ -208,14 +193,14 @@ sub translate {
 
     # ignore frame if an ORF is supposed to be found
     if ($orf) {
-        $seq = $self->_find_orf($seq,$codonTable,$start_codon);
+        $seq = $self->_find_orf($seq,$codontable,$start_codon);
     } else {
         # use frame, error if frame is not 0, 1 or 2
         $self->throw("Valid values for frame are 0, 1, or 2, not $frame.")
            unless ($frame == 0 or $frame == 1 or $frame == 2);
         $seq = substr($seq,$frame);
     }
-
+    
     # TODO:
     # Preferentially, CodonTable::translate should handle gaps but currently
     # doesn't; discussion on what to do here.  Gaps are removed for now.
@@ -224,7 +209,7 @@ sub translate {
     $seq =~ s/[$gs]+//g;
 
     # Translate it
-    my $output = $codonTable->translate($seq);
+    my $output = $codontable->translate($seq);
     # Use user-input terminator/unknown
     $output =~ s/\*/$terminator/g;
     $output =~ s/X/$unknown/g;
@@ -246,7 +231,7 @@ sub translate {
         }
         # if the initiator codon is not ATG, the amino acid needs to be changed to M
         if ( substr($output,0,1) ne 'M' ) {
-            if ($codonTable->is_start_codon(substr($seq, 0, 3)) ) {
+            if ($codontable->is_start_codon(substr($seq, 0, 3)) ) {
                 $output = 'M'. substr($output,1);
             }  elsif ($throw) {
                 $self->throw("Seq [$id]: Not using a valid initiator codon!");
@@ -256,10 +241,7 @@ sub translate {
         }
     }
 
-    return $self->clone(
-                -seq     => $output,
-                -alphabet   => 'protein',
-                  );
+    return $self->clone(seq  => $output, alphabet   => 'protein');
 }
 
 # account for sequences with gaps

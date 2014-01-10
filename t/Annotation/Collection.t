@@ -16,12 +16,12 @@ use Biome::Annotation::Target;
 
 my $ac = Biome::Annotation::Collection->new();
 does_ok($ac,'Biome::Role::CollectAnnotation');
-isa_ok($ac,'Biome::Root');
+does_ok($ac,'Biome::Role::Root');
 
 #simple value
 
-my $simple = Biome::Annotation::SimpleValue->new(-tagname => 'colour',
-					       -value   => '1');
+my $simple = Biome::Annotation::SimpleValue->new(tagname => 'colour',
+					       value   => '1');
 
 $ac->add_Annotation('simplevalue',$simple);
 
@@ -29,37 +29,37 @@ is(join(',',$ac->get_Annotation_keys), 'simplevalue');
 
 # link
 
-my $link1 = Biome::Annotation::DBLink->new(-database => 'TSC',
-					 -primary_id => 'TSC0000030');
+my $link1 = Biome::Annotation::DBLink->new(database => 'TSC',
+					 primary_id => 'TSC0000030');
 
 $ac->add_Annotation('dblink',$link1);
 $ac->add_Annotation('dblink',
-		    Biome::Annotation::DBLink->new(-database => 'TSC',
-						 -primary_id => 'HUM_FABV'));
+		    Biome::Annotation::DBLink->new(database => 'TSC',
+						 primary_id => 'HUM_FABV'));
 
 is(join(',',sort $ac->get_Annotation_keys), 'dblink,simplevalue');
 
-my $comment = Biome::Annotation::Comment->new(-tagname => 'mycomment',
-                                            -text => 'sometext');
+my $comment = Biome::Annotation::Comment->new(tagname => 'mycomment',
+                                            text => 'sometext');
 
 $ac->add_Annotation('comment',$comment);
 
 is(join(',',sort $ac->get_Annotation_keys), 'comment,dblink,simplevalue');
 
-my $target = Biome::Annotation::Target->new(-target_id  => 'F321966.1',
-					  -start      => 1,
-					  -end        => 200,
-					  -strand     => 1,
+my $target = Biome::Annotation::Target->new(target_id  => 'F321966.1',
+					  start      => 1,
+					  end        => 200,
+					  strand     => 1,
 					 );
 
 ok $ac->add_Annotation('target', $target);
 
 is(join(',',sort $ac->get_Annotation_keys), 'comment,dblink,simplevalue,target');
 
-my $ref = Biome::Annotation::Reference->new( -authors  => 'author line',
-					   -title    => 'title line',
-					   -location => 'location line',
-					   -start    => 12);
+my $ref = Biome::Annotation::Reference->new( authors  => 'author line',
+					   title    => 'title line',
+					   location => 'location line',
+					   start    => 12);
 
 $ac->add_Annotation('reference', $ref);
 
@@ -104,8 +104,8 @@ is (scalar($nested_ac->get_Annotations()), 1);
 does_ok($ac, "Biome::Role::CollectAnnotation");
 is (scalar($nested_ac->get_all_Annotations()), 7);
 
-my $simple2 = Biome::Annotation::SimpleValue->new(-tagname => 'foo',
-					       -value   => 'bar');
+my $simple2 = Biome::Annotation::SimpleValue->new(tagname => 'foo',
+					       value   => 'bar');
 
 is (scalar($nested_ac->get_Annotations()), 1);
 is (scalar($nested_ac->get_all_Annotations()), 7);
@@ -125,7 +125,7 @@ isa_ok($anns[0], "Biome::Annotation::SimpleValue");
 #is (scalar($nested_ac->get_all_Annotations()), 7);
 
 ##SKIP: {
-##  test_skip(-tests => 7, -requires_modules => [qw(Graph::Directed Bio::Annotation::OntologyTerm)]);
+##  test_skip(tests => 7, -requires_modules => [qw(Graph::Directed Bio::Annotation::OntologyTerm)]);
 ##  use_ok('Bio::Annotation::OntologyTerm');
 ##  # OntologyTerm annotation
 ##  my $termann = Bio::Annotation::OntologyTerm->new(-label => 'test case',

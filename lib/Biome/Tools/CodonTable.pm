@@ -2,8 +2,8 @@ package Biome::Tools::CodonTable;
 
 use Biome;
 use MooseX::ClassAttribute;
-
 use Biome::Tools::IUPAC;
+use Method::Signatures;
 
 # first set internal values for all translation tables
 
@@ -144,8 +144,7 @@ has id => (
 
 =cut
 
-sub name {
-    my ($self) = @_;
+method name () {
     my ($id) = $self->id;
     return ${$self->genetic_code()}{$id}{name};
 }
@@ -163,8 +162,7 @@ sub name {
 
 =cut
 
-sub tables {
-    my $self = shift;
+method tables () {
     my $codes = $self->genetic_code;
     my %data = map {$_ => $codes->{$_}{name} } keys %$codes;
     \%data;
@@ -199,11 +197,7 @@ sub tables {
 
 =cut
 
-sub translate {
-    my ($self, $seq) = @_;
-    $self->throw("Calling translate without a seq argument!") unless defined $seq;
-    return '' unless $seq;
-
+method translate ($seq!) {
     my $table = ${ $self->genetic_code }{$self->id}{code};
 
     my ($codons, $codonsize, $gap) = ($self->codons, $self->codon_size, $self->gap);
@@ -623,14 +617,12 @@ sub _unambiquous_codons{
 
 =cut
 
-sub add_table {
-    my ($self, @args) = @_;
-    my ($name, $table, $starts) = $self->rearrange([qw(NAME TABLE STARTS)], @args);
+method add_table (:$name, :$table, :$starts) {
     my $data = $self->genetic_code;
     my $top = (sort {$a <=> $b} keys %$data)[-1];
     $top++;
     $name ||= 'Custom'. $self->_code_elements + 1;
-    $starts ||= $data->{1}->{start}; 
+    $starts ||= $data->{1}->{start};
     $self->throw('Suspect input!')
         unless length($table) == 64 and length($starts) == 64;
     $self->_add_table($top,
