@@ -72,19 +72,10 @@ sub next_Seq {
 
     # switch this to a builder, or better yet a handler...
     $seq = Biome::PrimarySeq->new(
-        -seq => $sequence,
-
-        # forcing more specificity here (from -id to -display_id)
-        # We could possibly alias this, but I think more specific the better.
-        -display_id => $id,
-
-        # Ewan's note - I don't think this healthy
-        # but obviously to taste.
-        #-primary_id  => $id,
-        -description => $fulldesc,
-        -alphabet    => $alphabet,
-
-        #-direct      => 1,  # what does this do??
+        seq => $sequence,
+        display_id => $id,
+        description => $fulldesc,
+        alphabet    => $alphabet,
     );
 
     return $seq;
