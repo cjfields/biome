@@ -218,7 +218,7 @@ method translate ($seq!) {
                 $protein .= substr($table, 
                        $codons->{$triplet},1);
             } else {
-                $protein .= $self->_translate_ambiguous_codon($triplet, $partial, $table, $codons);
+                $protein .= $self->_translate_ambiguous_codon($triplet, $table, $codons, $partial);
             }
         }
     } else { # simple, strict translation
@@ -241,13 +241,13 @@ method translate ($seq!) {
             my $aa = substr($table, $codons->{$triplet},1);       
             $protein .= $aa;
         } else {
-            $protein .= $self->_translate_ambiguous_codon($triplet, $partial, $table, $codons);
+            $protein .= $self->_translate_ambiguous_codon($triplet, $table, $codons, $partial);
         }
     }
     return $protein;
 }
 
-method _translate_ambiguous_codon ($triplet, $partial=0, $table, $codons) {
+method _translate_ambiguous_codon ($triplet, $table, $codons, $partial=0) {
     my $aa;
     my @codons = _unambiquous_codons($triplet);
     my %aas = ();
